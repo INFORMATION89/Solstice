@@ -2595,4 +2595,15 @@ Steps:
   8. **Toolbar on Apple's principles planned:** `docs/TOOLBAR_MOTION_PLAN.md`. Velocity and
      projection for slide to switch, the highlight as its own sprung surface, a press on the glass,
      the bud as a morph, damping by gesture, never blocking input, haptics.
+- **2026-11-21: one material for a morph** (the user's rule, now in MOTION.md and the `:motion`
+  README), built, not tested.
+  - **Lab demo:** the pill is the card's fill.
+  - **Moon pill:** it's the sheet's own glass in the same tint (`moonGlassTint`, shared), no outline.
+    The morph keeps the material at 1 the whole way, and only the shape, size and content change.
+- **2026-11-21: tonight's item 8, the moon icon on the Forecast diagram follows the moon's real
+  tilt**, built, not tested.
+  - **`MoonSky`** (`shell/MoonSky.kt`): one calculation for the card and the diagram (limb angle;
+    the parallactic angle eased by altitude and averaged over ±4 h per hour), and
+    `iconRotation(phase, limb, parallactic)`, the same orientation the card's shader draws.
+  - **`drawMoonPhaseIcon(…, rotation)`:** the diagram turns the outline icon by it.
 

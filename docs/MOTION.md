@@ -58,6 +58,11 @@ curve applies.
 - Use `SharedTransitionLayout` with `sharedBounds` and a custom `BoundsTransform`. The curve runs
   from critically damped to lightly underdamped.
 - Text that travels (a button's label becoming a heading) shares bounds with scale-to-bounds.
+- **The button and the card it becomes share one material** (the user, 2026-11-21). A morphing
+  button and its card use the same background material (the same glass, or the same fill). The
+  morph changes the shape, size and content, never the material, so nothing crossfades and the card
+  reads as the button itself grown. Different materials at the two ends (an outlined button opening
+  into a glass card, say) are not allowed.
 - **The button itself becomes the card** (agreed 2026-11-21, a style morph): `Morph` takes the
   source's and target's `MorphStyle` (fill, border, shadow, material amount) and the source's own
   content. Its first frame is exactly the button, `Modifier.morphSource` hides the real button in that

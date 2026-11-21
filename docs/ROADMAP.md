@@ -108,7 +108,7 @@ comparison to Google's libraries, no weather references), and Apple's principles
 - [ ] ⭐ **Foundations for it** (PLAN.md): F1 haptics system, F2 edge blur generalized, F3 dial, F4 sky effects
   (stars, twinkle ready but off, ready for weather effects), then F5 the moon card.
 - [ ] 💬 **Twinkling stars** (built with F4, switched on only once agreed).
-- [ ] **Moon icon on the Forecast diagram follows the moon's real tilt** (reuse the moon card's calculation).
+- [x] **Moon icon on the Forecast diagram follows the moon's real tilt** (done 2026-11-21, `MoonSky`; not yet seen on the phone).
 - [ ] 💬 **Very subtle toolbar haptics**, once F1's haptics system exists.
 - [x] **Fix:** taps blocked while a tab transition plays (done 2026-11-21: `:motion` PageTransition; closing sheets let taps through too).
 - [x] **Fix:** the postcard window's pages lack home's blur between tabs (done 2026-11-21: `ShellNavigation`, shared with home).

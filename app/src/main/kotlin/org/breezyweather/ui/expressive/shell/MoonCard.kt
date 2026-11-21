@@ -283,23 +283,36 @@ internal fun MoonButton(
     // While its card is open, the morph draws the pill exactly as it is and grows it into the sheet
     // (the button becomes the card, 2026-11-21); morphSource hides the real pill only while it does.
     // Material 3 outlined button, in the sky's ink.
-    OutlinedButton(
-        onClick = {
-            MoonCardState.glass = pageGlass
-            MoonCardState.buttonInk = text
-            MoonCardState.show(location, now, null, phase + suffix, palette, night)
-        },
-        border = BorderStroke(StrokeWidth.Thin, text.copy(alpha = 0.35f)),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = text),
-        contentPadding = PaddingValues(horizontal = Space.S3, vertical = Space.S2),
-        modifier = Modifier.morphSource(pillKey(location), cornerRadius = 100.dp)
+    // One material at both ends (MOTION.md, 2026-11-21): the pill is the sheet's own glass, in the
+    // same tint, so opening grows it rather than swapping an outline for glass.
+    val pill = androidx.compose.foundation.shape.CircleShape
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .morphSource(pillKey(location), cornerRadius = 100.dp)
+            .glass(pageGlass, pill, moonGlassTint(palette, night))
+            .clip(pill)
+            .clickable(role = androidx.compose.ui.semantics.Role.Button) {
+                MoonCardState.glass = pageGlass
+                MoonCardState.buttonInk = text
+                MoonCardState.show(location, now, null, phase + suffix, palette, night)
+            }
+            .padding(horizontal = Space.S3, vertical = Space.S2)
     ) {
         MoonPillContent(phase, suffix, text, Modifier.morphAnchor(labelKey(location)))
     }
 }
 
-/** The pill's own look, shared by the real pill and the morph that grows out of it. */
-internal fun moonPillStyle(text: Color) = MorphStyle(border = text.copy(alpha = 0.35f), borderWidth = StrokeWidth.Thin)
+/**
+ * The moon's glass tint, shared by the pill and the sheet it grows into: the sky's base colour,
+ * darkened at night (dark mode when it's night at the place) and lightened by day.
+ */
+@Composable
+internal fun moonGlassTint(sky: org.breezyweather.ui.expressive.sky.SkyPalette?, night: Boolean): Color = when {
+    sky == null -> MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.5f)
+    night -> lerp(sky.base, SolsticePalette.NightDeep, 0.55f).copy(alpha = 0.62f)
+    else -> lerp(sky.base, Color.White, 0.55f).copy(alpha = 0.55f)
+}
 
 /** The pill's label: the phase and its "· 85 %". The morph draws the same, so the swap is invisible. */
 @Composable
@@ -428,11 +441,7 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
     // night at the place) and lightened by day.
     val sky = MoonCardState.palette
     val night = MoonCardState.night
-    val tint = when {
-        sky == null -> MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.5f)
-        night -> lerp(sky.base, SolsticePalette.NightDeep, 0.55f).copy(alpha = 0.62f)
-        else -> lerp(sky.base, Color.White, 0.55f).copy(alpha = 0.55f)
-    }
+    val tint = moonGlassTint(sky, night)
     val ink = when {
         sky == null -> MaterialTheme.colorScheme.onSurface
         night -> SolsticePalette.MoonNightText
@@ -494,9 +503,9 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
             // grows around it.
             contentAlignment = Alignment.TopCenter,
             shape = { _, _ -> shape },
-            // Starts as the pill itself (its outline, its label) and becomes the sheet: the outline
-            // thins away while the search card's glass, in the forecast's tint, comes in.
-            fromStyle = moonPillStyle(MoonCardState.buttonInk),
+            // Starts as the pill itself (the same glass, its label) and grows into the sheet: one
+            // material the whole way (MOTION.md), only the shape, size and content change.
+            fromStyle = MorphStyle(material = 1f),
             toStyle = MorphStyle(material = 1f),
             styleWindow = 0f..MATERIAL_SPAN,
             material = { amount -> glass(MoonCardState.glass ?: glass, shape, tint, alpha = amount) },
@@ -660,21 +669,11 @@ private fun MoonCard(
     // tilt would look wild). To keep it calm, the tilt is averaged over the hours around the shown
     // time (so each 6-hour tick doesn't rock it), and a heavy, slow spring follows that: a flick of
     // the dial mostly passes the moon by, and it turns gently into place once the dial settles.
-    val limbAngle = MoonIllumination.compute().on(at).execute().angle
-    val rest = if (location.latitude < 0) 180.0 else 0.0
-    fun tiltAt(t: Long): Double {
-        val p = MoonPosition.compute().on(Date(t)).at(location.latitude, location.longitude).execute()
-        val up = ((p.altitude + 5.0) / 20.0).coerceIn(0.0, 1.0)
-        var q = p.parallacticAngle
-        if (q - rest > 180) q -= 360
-        if (q - rest < -180) q += 360
-        return (q - rest) * up * up * (3 - 2 * up)
-    }
-    // Snapped to the hour so the average only changes once an hour of the dial has gone by.
-    val hour = 3_600_000L
-    val centre = ((now + (offset * DAY).toLong()) / hour) * hour
+    // One calculation with the Forecast diagram's icon (MoonSky).
+    val limbAngle = MoonSky.limbAngle(at)
+    val centre = MoonSky.hourOf(now + (offset * DAY).toLong())
     val targetParallactic = remember(centre, location.latitude, location.longitude) {
-        rest + (-4..4).map { tiltAt(centre + it * hour) }.average()
+        MoonSky.parallactic(centre, location.latitude, location.longitude)
     }
     // A slow drift on purpose (≈1.8 s), not a gesture's motion: one of the few documented exceptions
     // to the motion tokens (agreed 2026-11-19).

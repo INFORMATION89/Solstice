@@ -62,6 +62,9 @@ to `settings.gradle.kts` and `implementation(project(":motion"))` to your app. P
 6. **Open on `container`, close on `dismiss`.** Opening can bounce a little; going back never does.
 7. **Read motion values in layout and draw** (`graphicsLayer {}`, `Modifier.layout`, `drawBehind`),
    so a motion doesn't recompose every frame.
+8. **One material for a morph.** A button and the card it morphs into use the same background
+   material (the same glass or fill): give `SpringMorph` the same material at both ends and let it
+   change only shape, size and content. Two different materials would read as a swap, not a growth.
 
 ## Examples
 

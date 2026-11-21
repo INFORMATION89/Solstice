@@ -288,6 +288,16 @@ private fun SunPath(
     val lit = ((1 - kotlin.math.cos(Math.toRadians(angle.toDouble()))) / 2).toFloat()
     var showPhase by remember { mutableStateOf(false) }
     val phaseIcons = rememberMoonPhaseIcons()
+    // How the moon is turned in this place's sky now, from the same calculation as the moon card
+    // (MoonSky), worked out per hour.
+    val moonHour = MoonSky.hourOf(now)
+    val moonTilt = remember(moonHour, angle, location.latitude, location.longitude) {
+        MoonSky.iconRotation(
+            angle,
+            MoonSky.limbAngle(java.util.Date(now)),
+            MoonSky.parallactic(moonHour, location.latitude, location.longitude)
+        )
+    }
     val warm = SolsticePalette.SunWarm
     val cool = SolsticePalette.MoonCool
     val accent = if (night) cool else warm
@@ -378,8 +388,9 @@ private fun SunPath(
             if (!night) {
                 drawCircle(SolsticePalette.Sun, radius = 7.dp.toPx(), center = c)
             } else {
-                // The plain outline phase icon (the realistic moon is for the moon card).
-                drawMoonPhaseIcon(phaseIcons, c, 10.dp.toPx(), angle, text)
+                // The plain outline phase icon (the realistic moon is for the moon card), turned the way
+                // the moon really looks in this place's sky now (agreed: the same tilt as the card).
+                drawMoonPhaseIcon(phaseIcons, c, 10.dp.toPx(), angle, text, rotation = moonTilt)
             }
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

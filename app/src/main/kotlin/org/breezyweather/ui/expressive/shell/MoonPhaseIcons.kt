@@ -22,6 +22,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
@@ -48,10 +49,14 @@ internal fun DrawScope.drawMoonPhaseIcon(
     angle: Int,
     tint: Color,
     alpha: Float = 1f,
+    // Degrees clockwise: the moon as it really looks in the sky (MoonSky.iconRotation).
+    rotation: Float = 0f,
 ) {
     val i = (((angle % 360) + 360) % 360 + 22) / 45 % 8
     val side = r * 2f
-    translate(center.x - r, center.y - r) {
-        with(icons[i]) { draw(Size(side, side), alpha = alpha, colorFilter = ColorFilter.tint(tint)) }
+    rotate(rotation, pivot = center) {
+        translate(center.x - r, center.y - r) {
+            with(icons[i]) { draw(Size(side, side), alpha = alpha, colorFilter = ColorFilter.tint(tint)) }
+        }
     }
 }

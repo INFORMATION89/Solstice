@@ -16,7 +16,7 @@
 
 package org.breezyweather.ui.expressive.lab
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -44,7 +44,6 @@ import io.github.information89.motion.morphSource
 import io.github.information89.motion.rememberMorphMotion
 import org.breezyweather.ui.expressive.theme.Corners
 import org.breezyweather.ui.expressive.theme.Space
-import org.breezyweather.ui.expressive.theme.StrokeWidth
 
 /**
  * The new morph (docs/MORPH_STUDY.md), to compare with the old one above: an outlined pill that is
@@ -56,7 +55,7 @@ import org.breezyweather.ui.expressive.theme.StrokeWidth
 internal fun SpringMorphDemo() {
     val motion = rememberMorphMotion()
     val ink = MaterialTheme.colorScheme.onSurface
-    val pillStyle = MorphStyle(border = ink.copy(alpha = 0.4f), borderWidth = StrokeWidth.Thin)
+    // One material at both ends (MOTION.md, 2026-11-21): the pill is already the card's fill.
     val cardStyle = MorphStyle(fill = MaterialTheme.colorScheme.primaryContainer)
     MorphHost(Modifier.fillMaxWidth().height(320.dp)) {
         Box(Modifier.fillMaxSize()) {
@@ -75,14 +74,14 @@ internal fun SpringMorphDemo() {
                     .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
                         motion.open()
                     }
-                    .border(pillStyle.borderWidth, pillStyle.border, CircleShape)
+                    .background(cardStyle.fill, CircleShape)
             ) { PillLabel(ink) }
             morphAnchorOf("lab-spring-card")?.let { t ->
                 SpringMorph(
                     from = "lab-spring-pill",
                     target = t,
                     motion = motion,
-                    fromStyle = pillStyle,
+                    fromStyle = cardStyle,
                     toStyle = cardStyle,
                     sourceContent = { PillLabel(ink) }
                 ) {
