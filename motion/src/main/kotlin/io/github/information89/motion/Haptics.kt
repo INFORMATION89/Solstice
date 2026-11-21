@@ -180,11 +180,7 @@ class MotionHaptics internal constructor(private val view: View) {
         if (now - token.last < token.minGapMillis) return
         token.last = now
         if (!feedbackEnabled()) return
-        var scale = (token.scale * Haptic.intensity).coerceIn(0f, 1f)
-        if (token.speedFade && fastSpeed > slowSpeed) {
-            val t = ((abs(speed) - slowSpeed) / (fastSpeed - slowSpeed)).coerceIn(0f, 1f)
-            scale *= 1f - 0.7f * t
-        }
+        val scale = hapticScale(token, Haptic.intensity, speed, slowSpeed, fastSpeed)
         if (scale <= 0.01f) return
         if (!playPrimitive(token.primitive, scale)) playFallback(token.fallback)
     }
@@ -240,3 +236,22 @@ fun ProvideHaptics(content: @Composable () -> Unit) {
 /** The haptics here: the provided one, or one for this view. */
 @Composable
 fun haptics(): MotionHaptics = LocalHaptics.current ?: rememberMotionHaptics()
+
+/**
+ * How strongly [token] plays: its own scale times the global [intensity], and for speed-faded tokens
+ * up to 70 % lighter between [slowSpeed] and [fastSpeed] (iOS's lighter ticks on fast gestures).
+ */
+internal fun hapticScale(
+    token: HapticToken,
+    intensity: Float,
+    speed: Float,
+    slowSpeed: Float,
+    fastSpeed: Float,
+): Float {
+    var scale = (token.scale * intensity).coerceIn(0f, 1f)
+    if (token.speedFade && fastSpeed > slowSpeed) {
+        val t = ((abs(speed) - slowSpeed) / (fastSpeed - slowSpeed)).coerceIn(0f, 1f)
+        scale *= 1f - 0.7f * t
+    }
+    return scale
+}

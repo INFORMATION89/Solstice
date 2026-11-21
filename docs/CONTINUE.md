@@ -114,8 +114,8 @@ PLAN.md log):
    opened by `SpringMorph` once approved.
 2. **Search's bubble and the postcard window on the morph pieces** (the button becomes the card), then
    moving the moon pill from `Morph` to `SpringMorph` once the lab version is approved.
-3. **Unit tests** for the new `:motion` pieces (dial, haptics rate limit, page settle, `SpringMorph`):
-   no phone needed.
+3. **Unit tests** for the new `:motion` pieces: dial scale, haptic strength and the new spring tokens done
+   (`FoundationsTest`, 2026-11-21); still to do: haptics rate limit, page settle, `SpringMorph` release.
 5. Refining rounds 4–6: toolbar (per `TOOLBAR_MOTION_PLAN.md`), Places, messages.
 
 **Open, between the above:** icons vs M3 (grade −25 on dark backgrounds, the small-icon/touch-target
