@@ -41,6 +41,8 @@ Where things stand and how to pick the work up anywhere. The plan, decisions and
    | `shell_rain_stops_in` | Rain expected to stop in %1$d minutes | Rain should stop in about %1$d minutes |
    | `moon_lit_growing` / `_shrinking` | The moon is %1$s lit and growing. | Tonight the moon will be %1$s lit and still growing. (shrinking: "…and already shrinking.") |
    | `moon_rises_then_sets` / `moon_sets_then_rises` | It rises at %1$s and sets at %2$s. | It will rise at %1$s and set at %2$s. (and "It will set at %1$s and rise again at %2$s.") |
+   - **Changed after (2026-11-21):** the "…rain expected…" texts say **"precipitation"** when snow is
+     possible too (PLAN.md "Summaries: what they say"); rain-only stays "rain".
    - **Unchanged on purpose:** every "…rain expected…" text (`shell_rain_starts_in`, the plural, `shell_rain_next_hour`, `shell_no_rain`), "Expect [icon] … on %1$s", `moon_full_in` / `moon_full_today`.
    - The warmest/coldest pair becomes **two sentences**: `week_warmest` = "%1$s will be the warmest day, at"
      + temperature + ". "; `week_coldest_night` = "The coldest night will be on %1$s, at" + temperature + "."
@@ -78,7 +80,11 @@ Where things stand and how to pick the work up anywhere. The plan, decisions and
      - "It won't be up tonight." (sets before dark and rises after sunrise)
      - "Too close to new moon to see." (lit under ~3 %)
    - Times in 12-hour format; never more than two short sentences.
-5. Then continue with **F5, the moon card** (below), which includes 4.
+5. **What the summaries say** (agreed 2026-11-21, PLAN.md "Summaries: what they say"): build the
+   priority-list summary engine (shared, unit-tested; no phone needed), the 6 PM evening switch, the
+   "precipitation" rule, and check whether our sources give yesterday's data. **Show the user every new
+   sentence and the evening-time setting before shipping.** Onboarding steps: propose to the user first.
+6. Then continue with **F5, the moon card** (below), which includes 4.
 
 **Phone pass still due** for everything built today (list below). The user tests when the phone is connected;
 items 1 and 3 can be built and unit-tested without it.

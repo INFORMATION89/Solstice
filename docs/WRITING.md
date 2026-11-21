@@ -21,6 +21,12 @@ first one that matches.
 - **Only what helps decide something.** Each sentence should answer a question the user has (do I
   need an umbrella, a jacket, when is it nicer); what that is for each summary is to be worked out
   with the user (DESIGN.md, check 2).
+- **One question per summary** (agreed 2026-11-21): each summary answers one question ("What do I
+  need to know about today?", "How will the week go?") with the top one or two facts from its
+  priority list (PLAN.md "Summaries: what they say"). **If nothing is especially useful, say
+  nothing extra.** Humidity, pressure and wind only when extreme.
+- **Rain or snow → "precipitation"** (the user, 2026-11-21): when either could fall, write
+  "Precipitation expected…"; only rain possible keeps "rain".
 - **Same voice everywhere:** calm, a little warm, never alarmist (except real alerts).
 - **Units and times** come from settings; write `{temp}`, `{time}`, `{minutes}`, `{hours}`, `{day}`.
 - **Temperatures in the This week summary are bold and underlined** (future links to day cards).

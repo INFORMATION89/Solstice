@@ -915,6 +915,64 @@ animations off. Build effects into that system, not beside it:
 
 Order: F1 → F2 → F3 → F4 → F5, each with its lab demo and a check on the Pixel 7, CI green.
 
+## Summaries: what they say (agreed with the user 2026-11-21)
+
+The question every summary answers: **what does this change about my day?** Research behind it (chat,
+2026-11-21): people look at temperature and precipitation first; high temperature overtook "when will
+it rain" as the top need between 2006 and 2022; most check in the early morning or the evening;
+mornings are about what to wear; people want the numbers translated into plain words.
+
+**Rule: one question per summary, the top 1–2 facts from a priority list** (agreed "for now"; revisit
+after living with it). The app walks the list top to bottom and shows the first one or two items that
+apply. **If nothing is especially useful, it says nothing extra**: no filler sentence just to fill
+the space.
+
+### Forecast: "What do I need to know about today?"
+1. A weather alert, if there is one.
+2. When precipitation will start or stop today ("Precipitation expected from 4 PM to 7 PM").
+3. Today's high, when it comes, and **compared with yesterday** ("It will be warmer than yesterday, up
+   to 28° by 3 PM"). The comparison is **"maybe do"**: first check that our sources give yesterday's
+   data (Open-Meteo has past days; check the others). If a source can't, leave the comparison out
+   rather than guessing.
+4. Extras **only when they're extreme or matter for the day**: strong UV, strong wind gusts, poor air
+   quality, a sharp drop tonight. **Humidity, pressure and ordinary wind never appear** unless extreme
+   (thresholds to agree, starting from the app's existing alert/level scales).
+
+**Evening switch:** from **6 PM** (default) the Forecast summary answers "What about tonight and
+tomorrow?": tonight's low, then tomorrow's most useful fact from the same list ("Tomorrow will be
+cooler, with rain in the morning"). **The time is adjustable** (a setting; agree where it lives and
+how it looks with the user before building, per CLAUDE.md).
+
+### This week: "How will the week go?"
+- Keep: the rain days, the warmest day and the coldest night (wording already agreed).
+- Add **both**, only when each is useful: the **trend** ("It will get warmer toward the weekend") and
+  **the weekend** (e.g. which weekend day is better outside). Still at most two facts shown: the list
+  order decides which.
+
+### Rain, snow or both: "precipitation" (the user, 2026-11-21)
+When the forecast could bring **either rain or snow** (snow, sleet, mixed, or the source can't say
+which), texts say **"precipitation"** instead of "rain": "Precipitation expected in 20 minutes", "No
+precipitation expected in the next 3 hours". **Only rain possible** keeps "rain". To confirm with the
+user before building: snow-only saying "snow" ("Snow expected in 20 minutes"), and whether the same
+rule applies to the This week texts ("No precipitation expected this week", the umbrella lines).
+
+### What to wear
+Not in these summaries. It belongs to the proactive channels (daily brief, notifications); see the
+research queue.
+
+### Onboarding helps set this up
+The redesigned first-time setup (log 2026-11-18: where are you, where the weather comes from) should
+also **help the user configure the app to their needs**: e.g. when their evening starts (the summary
+switch), and other choices that change what Solstice tells them. Which steps, in what order, and how
+few: to propose and agree with the user (keep it very short; everything changeable later in
+settings).
+
+### Build notes (for the code environment)
+- One summary engine per page: an ordered list of rules, each `(applies?, text)`, first one or two
+  that apply win. Shared, unit-tested, no phone needed. Not hand-written `if` chains per screen.
+- Texts follow WRITING.md (future tense, natural, one fact per sentence, 12-hour times).
+- Every new sentence's exact wording goes to the user before it ships.
+
 ## Research queue (from the user, 2026-11-21)
 
 1. **The page receding behind a sheet, done cheaply, as a `:motion` piece.** We dropped it because
@@ -1727,6 +1785,11 @@ Things to try on the phone before calling any motion done (debug and release bui
   deckle kept on the straight edges); an even paper border all round (one caption line with its
   margins, ~28 dp) with the place and its weather on the top border and the country on the bottom;
   the window morph and its paper frame follow.
+- **2026-11-21 (agreed with the user in chat): what the summaries say.** One question per summary, top
+  1–2 facts from a priority list, nothing extra when nothing is useful; Forecast switches to tonight and
+  tomorrow from 6 PM (adjustable); compare with yesterday if sources allow; This week adds the trend and
+  the weekend; humidity, pressure and wind only when extreme; "precipitation" instead of "rain" when snow
+  is possible; onboarding to help configure the app. Section "Summaries: what they say".
 
 ## Backlog (user notes, 2026-11-18)
 

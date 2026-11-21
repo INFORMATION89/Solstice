@@ -104,6 +104,11 @@ comparison to Google's libraries, no weather references), and Apple's principles
 - [ ] **Design audits** (DESIGN.md): empty/loading/error/offline states everywhere; affordances vs behaviour;
   dead ends and links between information; landscape/foldable/tablet layouts; settings that shouldn't exist.
 - [ ] **Summary wording** (agreed table in CONTINUE.md "Right now").
+- [ ] **What the summaries say** (agreed 2026-11-21, PLAN.md): priority-list engine (one question per
+  summary, top 1–2 facts, nothing extra when nothing is useful); Forecast evening switch at 6 PM, adjustable;
+  compare with yesterday if sources allow; This week trend and weekend; "precipitation" when snow is possible.
+- [ ] 💬 **Onboarding helps configure the app** (where you are, source, when your evening starts, …): steps to
+  propose to the user.
 - [x] 💬 **Moon card redesign** designed in chat: direction A with changes (2026-11-21).
 - [ ] ⭐ **Foundations for it** (PLAN.md): ~~F1 haptics system~~ (built 2026-11-21), ~~F2 edge blur generalized~~ (built 2026-11-21), ~~F3 dial~~ (built 2026-11-21), ~~F4 sky effects~~ (built 2026-11-21) — **F5 (the moon card itself) on hold until the user says go** (2026-11-21)
   (stars, twinkle ready but off, ready for weather effects), then F5 the moon card.
