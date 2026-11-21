@@ -47,8 +47,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.github.information89.motion.EdgeBand
 import io.github.information89.motion.Motion
-import org.breezyweather.ui.expressive.components.edgeBlur
+import io.github.information89.motion.edgeBlur
 import org.breezyweather.ui.expressive.theme.Sizes
 import org.breezyweather.ui.expressive.theme.Space
 import kotlin.math.abs
@@ -133,7 +134,12 @@ internal fun PageScaffold(
             bottom = ToolbarClearance
         ),
         verticalArrangement = Arrangement.spacedBy(spacing),
-        modifier = Modifier.fillMaxSize().edgeBlur(page, top = top + 56.dp, strength = pageFade)
+        modifier = Modifier.fillMaxSize().edgeBlur(
+            // :motion's edge blur (F2): blurred and faded into the page at the top and bottom.
+            top = EdgeBand(top + 56.dp, blur = 18.dp, fadeTo = page, fadeAlpha = 0.85f, fadeLength = 0.8f),
+            bottom = EdgeBand(140.dp, blur = 18.dp, fadeTo = page, fadeAlpha = 0.85f, fadeLength = 0.7f),
+            strength = pageFade
+        )
     ) {
         item(key = "header") {
             // As tall as an icon button, with or without one, so the title sits at the same height.

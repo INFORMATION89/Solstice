@@ -154,10 +154,25 @@ fun rememberMotionValue(
     // How a fling is projected: DECELERATION_FAST (short throws, the default) or
     // DECELERATION_NORMAL (UIKit's scroll and sheet-dismiss feel: a medium flick goes far).
     deceleration: Float = MotionPhysics.DECELERATION_FAST,
+    // The spring for each move; by default containers open and dismiss closes. A dial settles
+    // without bouncing: `{ _, _ -> Motion.settle }`.
+    springFor: ((from: Float, target: Float) -> MotionSpring)? = null,
 ): MotionValue {
     val scope = rememberCoroutineScope()
     val value = remember(scope) {
-        MotionValue(initial, scope, restPoints, overMin, overMax, deceleration = deceleration)
+        if (springFor != null) {
+            MotionValue(
+                initial,
+                scope,
+                restPoints,
+                overMin,
+                overMax,
+                deceleration = deceleration,
+                springFor = springFor
+            )
+        } else {
+            MotionValue(initial, scope, restPoints, overMin, overMax, deceleration = deceleration)
+        }
     }
     // Later changes to the rest points passed here apply too (the other parameters are fixed at
     // creation). Only when they change, so rest points set directly on the value aren't undone.

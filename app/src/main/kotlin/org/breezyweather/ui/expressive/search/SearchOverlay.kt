@@ -117,7 +117,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import breezyweather.domain.location.model.Location
+import io.github.information89.motion.EdgeBand
 import io.github.information89.motion.Motion
+import io.github.information89.motion.edgeBlur
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -630,7 +632,11 @@ private fun Results(
         targetState = mode,
         transitionSpec = { fadeIn(Motion.content.spec()) togetherWith fadeOut(Motion.snappy.spec()) },
         label = "results",
-        modifier = Modifier.fillMaxSize().softEdges()
+        modifier = Modifier.fillMaxSize().edgeBlur(
+            // :motion's edge blur (F2): the list fades away at both ends, over the glass.
+            top = EdgeBand(14.dp, fadeOut = true),
+            bottom = EdgeBand(18.dp, fadeOut = true)
+        )
     ) { shown ->
         when (shown) {
             ResultsMode.NONE -> Column(
@@ -773,31 +779,6 @@ private fun Modifier.riseIn(order: Int, shownAt: Long): Modifier {
         translationY = (1f - enter.value) * 10.dp.toPx()
     }
 }
-
-/** Fades the list out over a short band at the top (under the handle) and bottom (above the field). */
-private fun Modifier.softEdges(): Modifier = this
-    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-    .drawWithContent {
-        drawContent()
-        val top = 14.dp.toPx()
-        val bottom = 18.dp.toPx()
-        drawRect(
-            Brush.verticalGradient(0f to Color.Transparent, 1f to Color.Black, endY = top),
-            size = Size(size.width, top),
-            blendMode = BlendMode.DstIn
-        )
-        drawRect(
-            Brush.verticalGradient(
-                0f to Color.Black,
-                1f to Color.Transparent,
-                startY = size.height - bottom,
-                endY = size.height
-            ),
-            topLeft = Offset(0f, size.height - bottom),
-            size = Size(size.width, bottom),
-            blendMode = BlendMode.DstIn
-        )
-    }
 
 @Composable
 private fun CityRow(

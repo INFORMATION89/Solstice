@@ -2636,4 +2636,29 @@ Steps:
     - the moon dial: a day is a detent, 6 hours a tick, double tap a snap.
   - **Lab:** a "Haptics" panel to feel each token and change its primitive, intensity and the overall
     intensity.
+- **2026-11-21: F2, the edge blur generalized into `:motion`, built.** Not seen on the phone.
+  - **`Modifier.edgeBlur(top, bottom, start, end, strength)` with `EdgeBand`:** size, blur, and a
+    fade either into a colour (alpha and length) or to transparent. Any edge, each with one blur
+    effect set once.
+  - **The app's two implementations are gone:** `components/EdgeBlur.kt` and search's `softEdges`.
+    The pages (`PageFrame`) and the search list call `:motion` with their exact previous values
+    (top band +56 dp and bottom 140 dp, blur 18 dp, page fade 0.85 over 0.8 and 0.7 of the band;
+    search fades out over 14 and 18 dp).
+  - **Lab:** an "Edge blur" carousel demo with blur, band and fade controls.
+- **2026-11-21: F3, a dial in `:motion`, built.** Not felt on the phone.
+  - **`Dial` with `DialScale`, `DialLook` and `rememberDialState`.**
+  - **Motion:** state on `MotionValue` (`rememberMotionValue` can now take a `springFor`; a dial
+    settles on `Motion.settle`, without bounce). It drags 1:1 and flings with UIKit's projection
+    (normal deceleration), snapping to steps (optional). Rubber-band past the ends is two steps,
+    and a touch catches it mid-flight.
+  - **Haptics (F1 tokens):** `tick` per step (lighter when fast), `detent` per major step, `edge` on
+    hitting an end, `snap` on settling.
+  - **Look:** ticks, optional labels and decorations per major step, a centre marker, and drum
+    curvature (items placed on a turning cylinder: largest and brightest at the centre). F2 edge
+    blur on both sides, and end caps so the range is visibly finite.
+  - **TalkBack:** an adjustable control (`setProgress`, range info, value read out). A double tap is
+    up to the caller (e.g. back to today).
+  - **Lab:** a "Dial" demo, ±14 days in 6-hour steps, with switches for labels, curvature and
+    snapping.
+  - **The moon card keeps its own dial until F5** moves it onto this one.
 

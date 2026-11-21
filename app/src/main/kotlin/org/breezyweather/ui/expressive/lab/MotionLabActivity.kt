@@ -179,6 +179,20 @@ private fun MotionLab(onBack: () -> Unit) {
             }
             item {
                 Section(
+                    "Dial",
+                    "Drag or flick along the ruler. Ticks for steps, a stronger one for each major step, and " +
+                        "it rubber-bands at the ends with a haptic. Double tap goes back to the middle."
+                ) { DialDemo() }
+            }
+            item {
+                Section(
+                    "Edge blur",
+                    "Content blurs and fades near an edge, on any side: here the start and end of a carousel. " +
+                        "Scroll it, and change the blur, the band and the fade."
+                ) { EdgeBlurDemo() }
+            }
+            item {
+                Section(
                     "Haptics",
                     "Feel each token, named for what it's for (tick, detent, edge, snap, press, release, " +
                         "threshold, confirm, reject). Tap a chip to change its primitive; slide its intensity. " +

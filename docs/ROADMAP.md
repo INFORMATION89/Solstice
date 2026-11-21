@@ -105,7 +105,7 @@ comparison to Google's libraries, no weather references), and Apple's principles
   dead ends and links between information; landscape/foldable/tablet layouts; settings that shouldn't exist.
 - [ ] **Summary wording** to WRITING.md's "natural, not generated" rule (week summary first).
 - [x] 💬 **Moon card redesign** designed in chat: direction A with changes (2026-11-21).
-- [ ] ⭐ **Foundations for it** (PLAN.md): ~~F1 haptics system~~ (built 2026-11-21), F2 edge blur generalized, F3 dial, F4 sky effects
+- [ ] ⭐ **Foundations for it** (PLAN.md): ~~F1 haptics system~~ (built 2026-11-21), ~~F2 edge blur generalized~~ (built 2026-11-21), ~~F3 dial~~ (built 2026-11-21), F4 sky effects
   (stars, twinkle ready but off, ready for weather effects), then F5 the moon card.
 - [ ] 💬 **Twinkling stars** (built with F4, switched on only once agreed).
 - [x] **Moon icon on the Forecast diagram follows the moon's real tilt** (done 2026-11-21, `MoonSky`; not yet seen on the phone).
