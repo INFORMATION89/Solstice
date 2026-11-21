@@ -52,6 +52,10 @@ hand, build the motion lab (M5), then refine animations area by area.**
 
 ### 6 AM session (Saturday 2026-11-21, the user's list), work in `:motion`
 
+**Done 2026-11-21 (built, not tested on the phone, which wasn't connected); see the PLAN.md log. Next:
+test on the Pixel (profile build, Motion Lab → "Morph, iOS way (new)"), then the user agrees the two
+plans (`MOTION_LAB_PLAN.md`, `TOOLBAR_MOTION_PLAN.md`).**
+
 The user leaves the session to work alone: **work in the motion environment** (`:motion` and the Motion
 Lab), maximize work, minimize testing, and **test by yourself at the end** (profile build, Pixel 7).
 Research first where asked; the study is `docs/MORPH_STUDY.md`.

@@ -70,6 +70,9 @@ object MorphDefaults {
 
     /** The source's own content (a button's label) hands over to the target's over this part. */
     val SourceWindow: ClosedFloatingPointRange<Float> = 0f..0.15f
+
+    /** How far a pressed morph surface sinks (iOS 26 interactive glass scales under the finger). */
+    const val PRESS_DEPTH: Float = 0.03f
 }
 
 /**

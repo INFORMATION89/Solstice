@@ -18,10 +18,8 @@ package io.github.information89.motion
 
 import android.os.Build
 import androidx.compose.animation.core.Animatable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -49,6 +47,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
@@ -117,6 +116,13 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
     private val r = Animatable(0f)
     private var placed = false
 
+    // Under a finger the surface sinks a little and springs back when let go, like iOS 26's
+    // interactive glass ("scales and bounces"; WWDC25 Meet Liquid Glass). 0 at rest, 1 pressed.
+    private val press = Animatable(0f)
+
+    /** How far a pressed surface sinks (scale), 0 for none. */
+    var pressDepth: Float = MorphDefaults.PRESS_DEPTH
+
     /** Whether it's open or heading open. */
     var isOpen by mutableStateOf(false)
         private set
@@ -127,10 +133,12 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
 
     /** The surface's bounds now, in the host's coordinates. */
     val bounds: Rect
-        get() = Rect(
-            Offset(cx.value - w.value / 2f, cy.value - h.value / 2f),
-            Size(w.value.coerceAtLeast(0f), h.value.coerceAtLeast(0f))
-        )
+        get() {
+            val k = 1f - pressDepth * press.value
+            val width = (w.value * k).coerceAtLeast(0f)
+            val height = (h.value * k).coerceAtLeast(0f)
+            return Rect(Offset(cx.value - width / 2f, cy.value - height / 2f), Size(width, height))
+        }
 
     /** Its corner radius now, in pixels. */
     val cornerRadius: Float get() = r.value.coerceAtLeast(0f)
@@ -229,9 +237,13 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
      * closed (WWDC18: the nearest end to where it would land); each spring starts with the finger's
      * velocity, and a flick with momentum gets the slight overshoot.
      */
-    fun release(velocity: Float, deceleration: Float = MotionPhysics.DECELERATION_NORMAL) {
+    fun release(rawVelocity: Float, deceleration: Float = MotionPhysics.DECELERATION_NORMAL) {
         val s = source ?: return
         val t = target ?: return
+        // A speed limit (user 2026-11-21: a very fast close broke the animation): the finger's speed is
+        // handed to the springs only up to MAX_VELOCITY, so a hard flick still feels thrown but never
+        // overshoots past the source or turns the surface inside out.
+        val velocity = rawVelocity.coerceIn(-MAX_VELOCITY, MAX_VELOCITY)
         val landing = MotionPhysics.project(progress, velocity, deceleration)
         val opening = landing >= 0.5f
         val a = values(s)
@@ -250,6 +262,33 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
     private companion object {
         /** Path per second above which a release counts as a flick with momentum. */
         const val MOMENTUM_VELOCITY = 1.2f
+
+        /** The fastest the springs are thrown, in path per second (~1/4 s for the whole way). */
+        const val MAX_VELOCITY = 4f
+    }
+
+    /** The finger lifted: the surface springs back up with a little bounce. */
+    internal fun unpress() {
+        scope.launch { press.animateTo(0f, Motion.playful.spec()) }
+    }
+
+    /** Whether any of the springs is moving. */
+    internal val isMoving: Boolean
+        get() = cx.isRunning || cy.isRunning || w.isRunning || h.isRunning || r.isRunning
+
+    /**
+     * A finger came down on it: every spring stops where it is (iOS: caught mid-flight, never
+     * cancelled); a drag carries on from there, a tap turns it back.
+     */
+    internal fun catch() {
+        scope.launch { press.animateTo(1f, Motion.snappy.spec()) }
+        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            cx.stop()
+            cy.stop()
+            w.stop()
+            h.stop()
+            r.stop()
+        }
     }
 }
 
@@ -379,19 +418,46 @@ fun SpringMorph(
                     translationX = b.left
                     translationY = b.top
                 }
-                .pointerInput(motion) { detectTapGestures { onTap?.invoke() ?: motion.toggle() } }
-                .then(
-                    if (draggable) {
-                        Modifier.draggable(
-                            orientation = Orientation.Vertical,
-                            state = rememberDraggableState { d -> motion.drag(-d / dragRange) },
-                            startDragImmediately = true,
-                            onDragStopped = { v -> motion.release(-v / dragRange) }
-                        )
-                    } else {
-                        Modifier
+                // One gesture, the iOS way (user 2026-11-21: it couldn't be reopened while closing). A
+                // touch catches it where it is; moving past the touch slop makes it a drag that follows
+                // the finger and is thrown on release; lifting without moving is a tap that turns it back.
+                .pointerInput(motion, draggable, dragRange) {
+                    awaitEachGesture {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        down.consume()
+                        motion.catch()
+                        val tracker = VelocityTracker()
+                        tracker.addPosition(down.uptimeMillis, down.position)
+                        var dragging = false
+                        var travelled = 0f
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                            if (!change.pressed) {
+                                motion.unpress()
+                                if (dragging) {
+                                    val v = tracker.calculateVelocity().y
+                                    motion.release(-v / dragRange)
+                                } else {
+                                    onTap?.invoke() ?: motion.toggle()
+                                }
+                                change.consume()
+                                break
+                            }
+                            val dy = change.position.y - change.previousPosition.y
+                            travelled += abs(change.position.y - change.previousPosition.y) +
+                                abs(change.position.x - change.previousPosition.x)
+                            tracker.addPosition(change.uptimeMillis, change.position)
+                            if (!dragging && draggable && travelled > viewConfiguration.touchSlop) {
+                                dragging = true
+                                // Dragging, it follows the finger at full size.
+                                motion.unpress()
+                            }
+                            if (dragging) motion.drag(-dy / dragRange)
+                            change.consume()
+                        }
                     }
-                )
+                }
         )
         // The source's own content, at its own size, riding at the top of the surface and centred:
         // blurs and fades out as the target's sharpens in (and back on the way home).
@@ -427,8 +493,11 @@ object MorphHandOff {
     /** The part of the growth over which the source's content hands over (blur replace). */
     val Window: ClosedFloatingPointRange<Float> = 0.05f..0.45f
 
-    /** How blurred each side is at its faintest. */
-    val Blur: Dp = 8.dp
+    /**
+     * How blurred each side is at its faintest: strong enough to read as a blur, not a soft focus
+     * (user 2026-11-21: 8 dp was too subtle).
+     */
+    val Blur: Dp = 20.dp
 }
 
 /** [SpringMorph]'s content clip: [height] and [radius] in the content layer's unscaled coordinates. */

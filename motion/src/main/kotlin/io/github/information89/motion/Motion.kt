@@ -116,9 +116,10 @@ object Motion {
 
     /**
      * Opening a container by a tap (user 2026-11-21: "a little bit of bounce" when it finishes opening):
-     * Apple's "a little more brisk" (~15 % bounce).
+     * Apple's "a little more brisk", nudged a little further (user 2026-11-21: "a tiny bit more
+     * bounce"): ~20 % bounce.
      */
-    val brisk = MotionSpring(response = 0.4f, damping = 0.85f)
+    val brisk = MotionSpring(response = 0.4f, damping = 0.78f)
 
     /**
      * A gesture with momentum, let go (WWDC18: Now Playing dismissed by a swipe uses 80 % damping, "a

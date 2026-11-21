@@ -87,9 +87,9 @@ internal fun SpringMorphDemo() {
                     sourceContent = { PillLabel(ink) }
                 ) {
                     Column(Modifier.fillMaxSize().padding(Space.S4)) {
-                        Text("Waxing gibbous", style = MaterialTheme.typography.headlineSmall)
+                        Text("Details", style = MaterialTheme.typography.headlineSmall)
                         Text(
-                            "Grown on five springs. Tap to close; drag down to scrub, or flick.",
+                            "Grown on five springs. Tap to close, even mid-way; drag down to scrub, or flick.",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -102,7 +102,7 @@ internal fun SpringMorphDemo() {
 @Composable
 private fun PillLabel(ink: Color) {
     Text(
-        "Waxing gibbous · 86 %",
+        "Open details",
         color = ink,
         style = MaterialTheme.typography.labelLarge,
         modifier = Modifier.padding(horizontal = Space.S3, vertical = Space.S2)

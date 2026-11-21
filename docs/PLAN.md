@@ -2576,4 +2576,23 @@ Steps:
   - **Input:** only the surface as drawn takes touches. A layer at the target's size is
     transformed onto the current bounds, so a tap toggles it from anywhere mid-motion and a drag
     catches it; the rest of the screen gets taps at once.
+- **2026-11-21, 6 AM session (the user's list), built, not tested on the phone** (it wasn't connected).
+  1. **Reopen while closing:** `SpringMorph` now has one gesture. A touch catches every spring where
+     it is; moving past the touch slop drags it, and lifting without moving taps it back. The old
+     drag started on touch-down and swallowed taps.
+  2. **Blur replace stronger:** `MorphHandOff.Blur` 20 dp (was 8).
+  3. **Research, iOS 26/27 blur and morphing:** `docs/MORPH_STUDY.md` section 4. Apple gives no
+     numbers. The button morphs into the overlay, glass "materializes" rather than fading, glass
+     "scales and bounces" on touch, and an interrupted push becomes a pop.
+  4. **Refined from it:** a press. Under the finger the surface sinks 3 % (snappy) and springs back
+     with a little bounce (playful); `MorphDefaults.PRESS_DEPTH`.
+  5. **Speed limit:** release velocity capped at 4 path/s (`MAX_VELOCITY`).
+  6. **More opening bounce:** `Motion.brisk` 0.78 (was 0.85).
+  7. **Motion Lab redesign planned:** `docs/MOTION_LAB_PLAN.md`. A gallery of patterns, one page
+     each, a "Compare" switch against Google's Compose/Material defaults, and tools tucked away. Weather
+     references are already removed from the lab (demo text, the "In the app" section) and the
+     `:motion` README.
+  8. **Toolbar on Apple's principles planned:** `docs/TOOLBAR_MOTION_PLAN.md`. Velocity and
+     projection for slide to switch, the highlight as its own sprung surface, a press on the glass,
+     the bud as a morph, damping by gesture, never blocking input, haptics.
 

@@ -185,15 +185,6 @@ private fun MotionLab(onBack: () -> Unit) {
                         "in the app too, until it restarts."
                 ) { ToolbarDemo() }
             }
-            item {
-                Section(
-                    "In the app",
-                    "Search (SolsticeSheetState): Places → search. Postcard window (swipe down to close): " +
-                        "Places → a postcard. Moon card: Forecast → moon. Toolbar bud, tab pop, messages, " +
-                        "Places drag: on the home screen. Slow motion stays on while this screen is open " +
-                        "in the background."
-                ) {}
-            }
         }
     }
 }

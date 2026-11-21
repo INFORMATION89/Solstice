@@ -119,3 +119,62 @@ Sources:
 [WWDC23 Animate with springs](https://developer.apple.com/videos/play/wwdc2023/10158/) ·
 [WWDC23 Wind your way through advanced animations](https://developer.apple.com/videos/play/wwdc2023/10157/) ·
 [WWDC24 Enhance your UI animations and transitions](https://developer.apple.com/videos/play/wwdc2024/10145/)
+
+## 4. iOS 26/27: blur and morphing (research, 2026-11-21)
+
+From Apple's WWDC25 sessions "Meet Liquid Glass" (219), "Get to know the new design system" (356),
+"Build a SwiftUI app with the new design" (323) and "Build a UIKit app with the new design" (284);
+WWDC24 10145; and WWDC26 269, 278, 322 and 250. Apple gives **no numbers** for glass morphs, menus,
+sheets or blur. Everything below is qualitative, and our values are our own tuning.
+
+**The control becomes what it opens.**
+- "the button morphs into the overlay" (284).
+- Sheets "directly morph out of buttons that present them", and dialogs too (323).
+- A menu's "bubble simply pops open to reveal the content" (219).
+- The search button "expands into a search field" while the others collapse (284).
+- Dismissing retraces to the source; collapsing badges are "re-absorbed" into their button (323).
+
+**Glass materializes, it doesn't fade.**
+- "Instead of fading, Liquid Glass objects materialize in and out" (219), by modulating the light
+  bending and lensing. Larger glass reads as thicker, with deeper shadows and stronger lensing.
+- On Android we fake lensing with blur and tint, so the closest match ramps the glass in with the
+  shape (the style window). Avoid plain alpha.
+
+**Touch.**
+- Interactive glass "scales and bounces" when tapped (284), reacts by "scaling, bouncing, and
+  shimmering" (323), and "illuminates from within" under the finger (219).
+- Elements can "lift up into Liquid Glass temporarily".
+- Reduce Motion "disables any elastic properties".
+
+**Interruption.**
+- Transitions are "fluid and interruptible" (243).
+- An interrupted push "is always converted into a pop" (10145): an interrupted opening turns into a
+  closing, it's never cancelled.
+
+**Blur.**
+- During motion, blur mostly shows up as **scroll edge effects**: content under bars gets "a subtle
+  blur and fade" (323) rather than a hard divider.
+- The text "blur replace" transitions exist in SwiftUI, but none of the sessions we could read give
+  their values (the documentation pages didn't load).
+
+**iOS 27 (WWDC26):** no change to the morph mechanics was found. The new APIs are about toolbars and
+tab bars minimizing on scroll, and tinting the glass.
+
+**What this changed in `SpringMorph` (2026-11-21):**
+- **One gesture:** a touch catches it (each spring stops where it is). Moving past the touch slop
+  drags it; lifting without moving taps it back the other way. Before, the drag swallowed taps, so
+  it couldn't be reopened mid-close.
+- **Press:** under the finger the surface sinks 3 % (`MorphDefaults.PRESS_DEPTH`, snappy), and
+  springs back with a little bounce (playful). iOS 26's interactive glass.
+- **Speed limit:** the release velocity handed to the springs is capped at 4 path/s, so a hard flick
+  never breaks the morph.
+- **Stronger blur replace:** 20 dp, was 8. **More bounce opening:** `Motion.brisk` 0.78, was 0.85.
+
+Sources: [WWDC25 219](https://developer.apple.com/videos/play/wwdc2025/219/) ·
+[WWDC25 356](https://developer.apple.com/videos/play/wwdc2025/356/) ·
+[WWDC25 323](https://developer.apple.com/videos/play/wwdc2025/323/) ·
+[WWDC25 284](https://developer.apple.com/videos/play/wwdc2025/284/) ·
+[WWDC25 243](https://developer.apple.com/videos/play/wwdc2025/243/) ·
+[WWDC24 10145](https://developer.apple.com/videos/play/wwdc2024/10145/) ·
+[WWDC26 269](https://developer.apple.com/videos/play/wwdc2026/269/) ·
+[WWDC26 278](https://developer.apple.com/videos/play/wwdc2026/278/)

@@ -2,8 +2,9 @@
 
 A small motion framework for Jetpack Compose that makes interactions feel like iOS: springs written
 as *response* and *damping*, gestures that hand their velocity to the animation, rubber-banding,
-UIKit's release rule, and surfaces that morph out of the element that opened them. Written for
-Solstice but usable anywhere: it depends only on Compose (`animation`, `foundation`).
+UIKit's release rule, and surfaces that morph out of the element that opened them. A universal library of
+animations and interaction components for any app: it depends only on Compose (`animation`,
+`foundation`).
 
 Licensed under the Apache License 2.0 (see `LICENSE`), unlike the rest of Solstice (LGPL-3.0).
 
