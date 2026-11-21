@@ -2778,3 +2778,18 @@ Steps:
   the sheet's top (`pageTopInset()`). "Visiting" only until pinned. (5) **A dry week's headline is the
   temperature trend** (agreed): warming / getting colder / steady, first three highs vs last three,
   3 °C threshold (`weekTrend`). Built and installed; not yet felt on the phone.
+- **2026-11-21 (agreed with the user): plan for the third round** (the second round's fixes didn't
+  hold on the phone). Decisions: the postcard window goes **full screen**, keeping its handle; every
+  corner at a screen edge (window, moon card's bottom) uses **the screen's own corner radius** (Android's
+  `RoundedCorner` API), the whole way through the morph; the window closes by **dragging the handle,
+  tapping it, or back** (a real M3 drag handle, M3's 48 dp touch target; the made-up 64 dp strip goes);
+  a pull on the page always refreshes. The stiff tab settle is **compared in the Motion Lab first**.
+  Findings so far: on the phone (adb), a pull on the window's handle does nothing on Forecast (it works
+  after swiping to This week); the tab settle waits two frames at release to freeze the page into an
+  image (`PageTransition.freeze`) before sliding, which likely kills the swipe's momentum. Not yet
+  explained: what blocks touches (swipes, reopening a postcard) while a window closes.
+  Order: (1) confirm both unexplained causes on the phone with temporary logs, report them;
+  (2) full-screen window + screen-radius corners (window, moon card); (3) the M3 handle; (4) the fixes
+  from (1); (5) Motion Lab: settle A (freeze during the swipe, no pause at release) vs B (the pager
+  springs from the finger's velocity, no image); (6) check each on the phone before handing over.
+  Open: a fallback radius for Android 10–11 (no `RoundedCorner` API).
