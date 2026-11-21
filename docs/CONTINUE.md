@@ -80,6 +80,20 @@ Where things stand and how to pick the work up anywhere. The plan, decisions and
      - "It won't be up tonight." (sets before dark and rises after sunrise)
      - "Too close to new moon to see." (lit under ~3 %)
    - Times in 12-hour format; never more than two short sentences.
+   - **Shared, not moon-only** (the user: "don't hard code anything, the moon card is one of many future
+     cards"): `sky/SkyVisibility.kt` answers "will I see it tonight?" for any sky object (`Tonight`,
+     `VisibilityRules`, `VisibilityTexts`, 10 tests in `SkyVisibilityTest`); a card gives only its altitude,
+     its "too faint" rule and its texts (`shell/MoonVisibility.kt`). Cards' sentences share `sentences()`,
+     `ValueStyle` and `sentenceTime()` in `shell/Format.kt` (follows the system's 12/24-hour setting).
+   - **Logic built 2026-11-21**: dark =
+     sun below -6°, up = moon above 3°, checked every 10 min, clear = cloud cover under 40 %, too new under
+     3 % lit, no answer when cloud data is missing. Answers: Clear (maybe with a late rise), AfterClouds,
+     UntilClouds, Breaks, Hidden, NotUp, TooNew. Shown as one line in the moon card's details (tonight only), until F5 gives it its tile.
+   - **Texts, agreed 2026-11-21** ("more human, more neutral", always "The moon…", never "it", "from" for a start time; these replace the list above):
+     Clear "The moon will be visible tonight." · late rise / clouds clear "The moon will be visible from
+     11 PM." · clouds come in "The moon will be visible until 1 AM." · breaks "The moon will be visible at
+     times from 10 PM." · hidden "The moon won't be visible tonight." · not up "The moon won't be up
+     tonight." · too new "The moon will be too thin to see tonight."
 5. **What the summaries say** (agreed 2026-11-21, PLAN.md "Summaries: what they say"): build the
    priority-list summary engine (shared, unit-tested; no phone needed), the 6 PM evening switch, the
    "precipitation" rule, and check whether our sources give yesterday's data. **Show the user every new

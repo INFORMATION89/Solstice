@@ -82,6 +82,14 @@
     <string name="moon_sets_then_rises">It sets at %1$s and rises again at %2$s.</string>
     <string name="moon_full_in">Full moon in %1$s, %2$s away.</string>
     <string name="moon_full_today">Full moon today, %1$s away.</string>
+    <!-- "Will I see it tonight?" (agreed 2026-11-21): always "The moon…", "from" for a start time. -->
+    <string name="moon_tonight_visible">The moon will be visible tonight.</string>
+    <string name="moon_tonight_from">The moon will be visible from %1$s.</string>
+    <string name="moon_tonight_until">The moon will be visible until %1$s.</string>
+    <string name="moon_tonight_at_times">The moon will be visible at times from %1$s.</string>
+    <string name="moon_tonight_hidden">The moon won’t be visible tonight.</string>
+    <string name="moon_tonight_not_up">The moon won’t be up tonight.</string>
+    <string name="moon_tonight_too_thin">The moon will be too thin to see tonight.</string>
     <string name="moon_illumination">Illumination</string>
     <string name="moon_rise">Moonrise</string>
     <string name="moon_set">Moonset</string>

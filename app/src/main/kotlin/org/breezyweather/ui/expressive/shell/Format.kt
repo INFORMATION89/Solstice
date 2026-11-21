@@ -28,6 +28,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import breezyweather.domain.location.model.Location
 import org.breezyweather.R
 import org.breezyweather.domain.settings.SettingsManager
@@ -78,6 +84,35 @@ internal fun time(
         else -> "h:mm a"
     }
     return SimpleDateFormat(pattern, Locale.getDefault()).apply { timeZone = zone }.format(date)
+}
+
+/**
+ * A time inside a sentence: "11 PM" on the hour, "11:40 PM" off it (or "23" / "23:40" on the 24-hour
+ * clock, following the system setting like [time]).
+ */
+internal fun sentenceTime(context: Context, time: Long, zone: TimeZone): String {
+    val onHour = java.util.Calendar.getInstance(zone).apply { timeInMillis = time }.get(java.util.Calendar.MINUTE) == 0
+    return time(context, Date(time), zone, hourOnly = onHour)
+}
+
+/** How a value stands out in a summary sentence: bold and underlined (future links to its detail). */
+internal val ValueStyle = SpanStyle(fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline)
+
+/**
+ * Sentences joined into one paragraph, each a template (`%1$s`, `%2$s`…) and its values, the values
+ * drawn in [ValueStyle]. Shared by every card that writes its details as sentences.
+ */
+internal fun sentences(parts: List<Pair<String, List<String>>>): AnnotatedString = buildAnnotatedString {
+    parts.forEachIndexed { i, (template, args) ->
+        if (i > 0) append(" ")
+        var last = 0
+        Regex("%(\\d)\\\$s").findAll(template).forEach { m ->
+            append(template.substring(last, m.range.first))
+            withStyle(ValueStyle) { append(args[m.groupValues[1].toInt() - 1]) }
+            last = m.range.last + 1
+        }
+        append(template.substring(last))
+    }
 }
 
 private fun dayName(context: Context, date: Date, zone: TimeZone): String =

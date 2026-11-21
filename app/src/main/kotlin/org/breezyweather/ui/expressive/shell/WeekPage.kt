@@ -130,7 +130,6 @@ private fun WeekSummary(
         wetDays.size >= days.size - 1 -> context.getString(R.string.week_mostly_wet)
         else -> context.getString(R.string.week_some_wet, countWord(context, wetDays.size))
     }
-    val bold = SpanStyle(fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline)
     val wetIcon = wetDays.firstOrNull()?.let { SkyWeather.of(days[it].day?.weatherCode) }
     val body = buildAnnotatedString {
         if (wetIcon != null) {
@@ -142,11 +141,11 @@ private fun WeekSummary(
         }
         if (hottest != null) {
             append(context.getString(R.string.week_warmest, name(hottest)) + " ")
-            withStyle(bold) { append(degrees(context, highs[hottest]!!)) }
+            withStyle(ValueStyle) { append(degrees(context, highs[hottest]!!)) }
         }
         if (coldest != null) {
             append(context.getString(R.string.week_coldest_night, name(coldest)) + " ")
-            withStyle(bold) { append(degrees(context, lows[coldest]!!)) }
+            withStyle(ValueStyle) { append(degrees(context, lows[coldest]!!)) }
             append(".")
         }
     }

@@ -152,6 +152,8 @@ import org.breezyweather.domain.weather.model.getDescription
 import org.breezyweather.ui.expressive.components.GlassSource
 import org.breezyweather.ui.expressive.components.SolsticeMotion
 import org.breezyweather.ui.expressive.components.glass
+import org.breezyweather.ui.expressive.sky.SkyVisibility
+import org.breezyweather.ui.expressive.sky.Tonight
 import org.breezyweather.ui.expressive.theme.CornerShapes
 import org.breezyweather.ui.expressive.theme.Corners
 import org.breezyweather.ui.expressive.theme.Sizes
@@ -634,6 +636,19 @@ private fun MoonCard(
             }.filter { abs(it.first - now) <= 15 * DAY }
         }
     }
+    // "Will I see it tonight?": worked out in the background, like the phase marks.
+    val hourly = location.weather?.nextHourlyForecast
+    val tonight by androidx.compose.runtime.produceState<Tonight?>(null, now, hourly) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+            MoonVisibility.tonight(
+                now,
+                location.latitude,
+                location.longitude,
+                hourly.orEmpty(),
+                moonAt(Date(now)).second
+            )
+        }
+    }
     var fling by remember { androidx.compose.runtime.mutableStateOf<kotlinx.coroutines.Job?>(null) }
 
     // Haptics: a firm tick per day, a lighter one per 6-hour step.
@@ -907,7 +922,15 @@ private fun MoonCard(
                     val days = ((full.time - at.time) / DAY.toDouble()).roundToInt().coerceAtLeast(0)
                     val km = "%,d km".format(distance.roundToInt())
                     val growing = angle < 180
-                    val sentences = listOf(
+                    // Tonight's visibility leads, only while the dial is on today.
+                    val tonightSentence = tonight?.takeIf { abs(offset) < 0.5f }?.let { t ->
+                        val (res, args) = SkyVisibility.sentence(t, MoonVisibility.texts) {
+                            sentenceTime(context, it, zone)
+                        }
+                        stringResource(res) to args
+                    }
+                    val sentences = listOfNotNull(
+                        tonightSentence,
                         stringResource(
                             if (growing) R.string.moon_lit_growing else R.string.moon_lit_shrinking
                         ) to listOf("${(lit * 100).roundToInt()} %"),
@@ -923,19 +946,7 @@ private fun MoonCard(
                                 listOf(context.getString(R.string.moon_days, days), km)
                         }
                     )
-                    val bold = SpanStyle(fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline)
-                    val body = buildAnnotatedString {
-                        sentences.forEachIndexed { i, (template, args) ->
-                            if (i > 0) append(" ")
-                            var last = 0
-                            Regex("%(\\d)\\\$s").findAll(template).forEach { m ->
-                                append(template.substring(last, m.range.first))
-                                withStyle(bold) { append(args[m.groupValues[1].toInt() - 1]) }
-                                last = m.range.last + 1
-                            }
-                            append(template.substring(last))
-                        }
-                    }
+                    val body = sentences(sentences)
                     Box(
                         Modifier
                             .fillMaxWidth()
