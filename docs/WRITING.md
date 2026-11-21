@@ -26,7 +26,8 @@ first one that matches.
   priority list (PLAN.md "Summaries: what they say"). **If nothing is especially useful, say
   nothing extra.** Humidity, pressure and wind only when extreme.
 - **Rain or snow → "precipitation"** (the user, 2026-11-21): when either could fall, write
-  "Precipitation expected…"; only rain possible keeps "rain".
+  "Precipitation expected…"; only rain keeps "rain", only snow says "snow". Same rule on every page,
+  This week included.
 - **Same voice everywhere:** calm, a little warm, never alarmist (except real alerts).
 - **Units and times** come from settings; write `{temp}`, `{time}`, `{minutes}`, `{hours}`, `{day}`.
 - **Temperatures in the This week summary are bold and underlined** (future links to day cards).

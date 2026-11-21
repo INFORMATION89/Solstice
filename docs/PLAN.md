@@ -952,9 +952,13 @@ how it looks with the user before building, per CLAUDE.md).
 ### Rain, snow or both: "precipitation" (the user, 2026-11-21)
 When the forecast could bring **either rain or snow** (snow, sleet, mixed, or the source can't say
 which), texts say **"precipitation"** instead of "rain": "Precipitation expected in 20 minutes", "No
-precipitation expected in the next 3 hours". **Only rain possible** keeps "rain". To confirm with the
-user before building: snow-only saying "snow" ("Snow expected in 20 minutes"), and whether the same
-rule applies to the This week texts ("No precipitation expected this week", the umbrella lines).
+precipitation expected in the next 3 hours". **Only rain possible** keeps "rain"; **only snow possible**
+says "snow" ("Snow expected in 20 minutes") (agreed 2026-11-21). **The same rule applies everywhere,
+This week included** (agreed): "No precipitation expected this week"; the umbrella lines become, for
+snow, "It will snow on %1$s" / "It will snow on %1$s days this week" / "It will snow most of the week",
+and for mixed, "Expect rain or snow on %1$s" / "…on %1$s days this week" / "…most of the week" (draft
+wording: show the user before shipping). Week rule: a day counts as snow or mixed by its own
+precipitation type; the week's sentence uses "precipitation" or "rain or snow" if its days differ.
 
 ### What to wear
 Not in these summaries. It belongs to the proactive channels (daily brief, notifications); see the
@@ -1790,6 +1794,8 @@ Things to try on the phone before calling any motion done (debug and release bui
   tomorrow from 6 PM (adjustable); compare with yesterday if sources allow; This week adds the trend and
   the weekend; humidity, pressure and wind only when extreme; "precipitation" instead of "rain" when snow
   is possible; onboarding to help configure the app. Section "Summaries: what they say".
+- **2026-11-21 (the user):** snow-only says "snow"; the rain/snow/precipitation rule applies to
+  This week too, for consistency.
 
 ## Backlog (user notes, 2026-11-18)
 

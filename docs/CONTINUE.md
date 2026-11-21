@@ -42,7 +42,8 @@ Where things stand and how to pick the work up anywhere. The plan, decisions and
    | `moon_lit_growing` / `_shrinking` | The moon is %1$s lit and growing. | Tonight the moon will be %1$s lit and still growing. (shrinking: "…and already shrinking.") |
    | `moon_rises_then_sets` / `moon_sets_then_rises` | It rises at %1$s and sets at %2$s. | It will rise at %1$s and set at %2$s. (and "It will set at %1$s and rise again at %2$s.") |
    - **Changed after (2026-11-21):** the "…rain expected…" texts say **"precipitation"** when snow is
-     possible too (PLAN.md "Summaries: what they say"); rain-only stays "rain".
+     possible too, "snow" when only snow is (PLAN.md "Summaries: what they say"); rain-only stays "rain".
+     Same rule for the This week texts (draft wording in PLAN.md, show the user first).
    - **Unchanged on purpose:** every "…rain expected…" text (`shell_rain_starts_in`, the plural, `shell_rain_next_hour`, `shell_no_rain`), "Expect [icon] … on %1$s", `moon_full_in` / `moon_full_today`.
    - The warmest/coldest pair becomes **two sentences**: `week_warmest` = "%1$s will be the warmest day, at"
      + temperature + ". "; `week_coldest_night` = "The coldest night will be on %1$s, at" + temperature + "."
