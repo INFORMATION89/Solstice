@@ -104,6 +104,7 @@ import org.breezyweather.ui.expressive.components.rememberSolsticeSheetState
 import org.breezyweather.ui.expressive.search.RecentSearches
 import org.breezyweather.ui.expressive.search.SearchOverlay
 import org.breezyweather.ui.expressive.sky.AnimatedSkyBackground
+import org.breezyweather.ui.expressive.sky.SkyEffects
 import org.breezyweather.ui.expressive.sky.SkyPalette
 import org.breezyweather.ui.expressive.sky.SkyState
 import org.breezyweather.ui.expressive.sky.SkySystemBars
@@ -419,7 +420,9 @@ fun SolsticeShell(
                 visible = {
                     abs(visualPosition() - PAGE_FORECAST) < 0.999f &&
                         windowPresence.value < 0.999f
-                }
+                },
+                // Stars on a clear night (F4).
+                effects = SkyEffects.of(sky, SkyWeather.of(location?.weather?.current?.weatherCode))
             ) {
                 Box(Modifier.fillMaxSize().plainPageBackdrop({ visualPosition() }, PAGE_FORECAST, page))
                 HorizontalPager(

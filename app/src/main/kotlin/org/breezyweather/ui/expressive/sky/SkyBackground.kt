@@ -48,6 +48,7 @@ import kotlin.random.Random
 fun SkyBackground(
     state: SkyState,
     modifier: Modifier = Modifier,
+    effects: SkyEffects = SkyEffects.None,
     content: @Composable () -> Unit = {},
 ) {
     Box(
@@ -56,11 +57,19 @@ fun SkyBackground(
             // that image (one cheap blit), even while it moves during a swipe.
             val bw = (size.width / BAKE_SCALE).toInt().coerceAtLeast(1)
             val bh = (size.height / BAKE_SCALE).toInt().coerceAtLeast(1)
-            val key = BakeKey(state.palette, (state.sunX * 100).toInt(), (state.sunY * 100).toInt(), bw, bh)
+            val key = BakeKey(
+                state.palette,
+                (state.sunX * 100).toInt(),
+                (state.sunY * 100).toInt(),
+                bw,
+                bh,
+                (effects.stars * 20).toInt()
+            )
             val baked = bakedSkies.getOrPut(key) {
                 ImageBitmap(bw, bh).also { image ->
                     CanvasDrawScope().draw(this, layoutDirection, Canvas(image), Size(bw.toFloat(), bh.toFloat())) {
                         drawSky(state)
+                        drawStars(state, effects.stars)
                     }
                 }
             }
@@ -88,7 +97,37 @@ private val bakedSkies = object : LinkedHashMap<BakeKey, ImageBitmap>(8, 0.75f, 
 }
 
 /** Sun position is rounded to 1 % so a slowly moving sun doesn't re-bake on every tiny step. */
-private data class BakeKey(val palette: SkyPalette, val sunX: Int, val sunY: Int, val w: Int, val h: Int)
+private data class BakeKey(
+    val palette: SkyPalette,
+    val sunX: Int,
+    val sunY: Int,
+    val w: Int,
+    val h: Int,
+    val stars: Int,
+)
+
+/**
+ * Stars baked into the static sky (F4, below Android 13 or with motion off): the same idea as the
+ * shader's (a fixed random field, brighter towards the top, hidden under the sun/moon glow), drawn
+ * once into the cached image. No twinkle.
+ */
+private fun DrawScope.drawStars(state: SkyState, amount: Float) {
+    if (amount <= 0.01f) return
+    val w = size.width
+    val h = size.height
+    val unit = max(w, h)
+    val random = java.util.Random(7)
+    val count = (220 * amount).toInt()
+    val glow = Offset(state.sunX * w, state.sunY * h)
+    repeat(count) {
+        val p = Offset(random.nextFloat() * w, random.nextFloat() * h * 0.85f)
+        val fadeDown = (1f - p.y / (h * 0.85f)).coerceIn(0f, 1f)
+        val nearGlow = ((p - glow).getDistance() / (0.25f * unit)).coerceIn(0f, 1f)
+        val b = (0.35f + 0.65f * random.nextFloat()) * fadeDown * nearGlow * amount
+        val r = (0.6f + 1.2f * random.nextFloat()) * unit / 2160f
+        drawCircle(androidx.compose.ui.graphics.Color.White.copy(alpha = b.coerceIn(0f, 1f)), radius = r, center = p)
+    }
+}
 
 private fun DrawScope.drawSky(state: SkyState) {
     val palette = state.palette

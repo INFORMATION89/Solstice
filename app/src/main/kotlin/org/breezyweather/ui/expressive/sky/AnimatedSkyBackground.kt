@@ -42,6 +42,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import io.github.information89.motion.rememberAmbientClock
+import io.github.information89.motion.rememberAmbientMotionAllowed
 import org.breezyweather.ui.expressive.components.GlassSource
 import org.breezyweather.ui.expressive.components.LocalPageGlass
 import org.breezyweather.ui.expressive.components.LocalSkyGlass
@@ -67,6 +69,8 @@ fun AnimatedSkyBackground(
     // Whether the sky can be seen right now (read every frame): covered, it stops drifting, so the
     // whole screen isn't redrawn 30 times a second for nothing.
     visible: () -> Boolean = { true },
+    // Effects drawn into the sky (F4): stars now, weather later.
+    effects: SkyEffects = SkyEffects.None,
     content: @Composable () -> Unit = {},
 ) {
     val inner: @Composable () -> Unit = if (skyGlass == null) {
@@ -78,25 +82,15 @@ fun AnimatedSkyBackground(
             }
         }
     }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && rememberSkyMotionAllowed()) {
-        ShaderSky(state, modifier, skyGlass, visible, inner)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && rememberAmbientMotionAllowed()) {
+        ShaderSky(state, modifier, skyGlass, visible, effects, inner)
     } else if (skyGlass != null) {
         Box(modifier) {
-            SkyBackground(state, Modifier.fillMaxSize().glassSource(skyGlass))
+            SkyBackground(state, Modifier.fillMaxSize().glassSource(skyGlass), effects)
             inner()
         }
     } else {
-        SkyBackground(state, modifier, content)
-    }
-}
-
-/** Motion is off in battery saver and when the system animation scale is zero. */
-@Composable
-private fun rememberSkyMotionAllowed(): Boolean {
-    val context = LocalContext.current
-    return remember(context) {
-        val powerSave = context.getSystemService(PowerManager::class.java)?.isPowerSaveMode == true
-        ValueAnimator.areAnimatorsEnabled() && !powerSave
+        SkyBackground(state, modifier, effects, content)
     }
 }
 
@@ -107,26 +101,14 @@ private fun ShaderSky(
     modifier: Modifier,
     skyGlass: GlassSource?,
     visible: () -> Boolean,
+    effects: SkyEffects,
     content: @Composable () -> Unit,
 ) {
     val shader = remember { RuntimeShader(SKY_AGSL) }
     val brush = remember(shader) { ShaderBrush(shader) }
-    // Seconds on a wall-clock base, so the drift continues where it was when coming back.
-    var seconds by remember { mutableFloatStateOf(clockSeconds()) }
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    LaunchedEffect(lifecycle) {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            var last = 0L
-            while (true) {
-                withFrameNanos { now ->
-                    if (now - last >= FRAME_NANOS && visible()) {
-                        last = now
-                        seconds = clockSeconds()
-                    }
-                }
-            }
-        }
-    }
+    // :motion's ambient clock (F4): capped at 30 fps, only while resumed and visible, wall-clock based
+    // so the drift continues where it was when coming back.
+    val clock = rememberAmbientClock(fps = FPS, running = visible)
     Box(modifier) {
         // The sky in its own offscreen layer: the GPU runs the shader only when the sky changes
         // (30 fps clock, palette, size). Frames in between, e.g. a 90 fps page swipe, reuse it.
@@ -138,7 +120,7 @@ private fun ShaderSky(
                 .drawBehind {
                     val p = state.palette
                     shader.setFloatUniform("uSize", size.width, size.height)
-                    shader.setFloatUniform("uTime", seconds) // reading it here only redraws, no recomposition
+                    shader.setFloatUniform("uTime", clock.value) // reading it here only redraws, no recomposition
                     shader.color("uBase", p.base)
                     shader.color("uC1", p.blobs[0])
                     shader.color("uC2", p.blobs[1])
@@ -147,6 +129,8 @@ private fun ShaderSky(
                     shader.setFloatUniform("uSunPos", state.sunX, state.sunY, SUN_RADIUS)
                     shader.setFloatUniform("uSunStrength", p.sunStrength)
                     shader.setFloatUniform("uGrain", p.grain)
+                    shader.setFloatUniform("uStars", effects.stars)
+                    shader.setFloatUniform("uTwinkle", if (effects.twinkle) 1f else 0f)
                     drawRect(brush)
                 }
         )
@@ -157,10 +141,7 @@ private fun ShaderSky(
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun RuntimeShader.color(name: String, color: Color) = setColorUniform(name, color.toArgb())
 
-private fun clockSeconds() = (System.currentTimeMillis() % 3_600_000L) / 1000f
-
 private const val FPS = 30
-private const val FRAME_NANOS = 1_000_000_000L / FPS
 private const val SUN_RADIUS = 0.42f
 
 /**
@@ -178,6 +159,8 @@ layout(color) uniform half4 uSun;
 uniform float3 uSunPos;
 uniform float uSunStrength;
 uniform float uGrain;
+uniform float uStars;
+uniform float uTwinkle;
 
 float field(float2 p, float2 centre, float radius, float unit) {
     float d = distance(p, centre * uSize) / (radius * unit);
@@ -186,6 +169,29 @@ float field(float2 p, float2 centre, float radius, float unit) {
 
 float hash(float2 p) {
     return fract(sin(dot(p, float2(12.9898, 78.233))) * 43758.5453);
+}
+
+// Stars (F4): one per lucky cell of a hashed grid, jittered, with a size and brightness of its own;
+// no list, no allocation, in the same pass. Twinkle (off until agreed) is a slow per-star wave.
+float stars(float2 p, float unit, float t) {
+    float cell = unit / 40.0;
+    float2 g = floor(p / cell);
+    float acc = 0.0;
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            float2 c = g + float2(float(dx), float(dy));
+            float h = hash(c);
+            if (h < 0.24) {
+                float2 pos = (c + float2(hash(c + 3.1), hash(c + 7.7))) * cell;
+                float r = mix(0.6, 1.8, hash(c + 11.3)) * unit / 1080.0;
+                float b = mix(0.35, 1.0, hash(c + 5.9));
+                float wave = 0.65 + 0.35 * sin(t * mix(0.08, 0.22, hash(c + 2.2)) + h * 40.0);
+                b *= mix(1.0, wave, uTwinkle);
+                acc += b * smoothstep(r * 1.8, 0.0, distance(p, pos));
+            }
+        }
+    }
+    return acc;
 }
 
 half4 main(float2 p) {
@@ -202,6 +208,12 @@ half4 main(float2 p) {
     col = mix(col, uC3.rgb, half(field(p, float2(0.18, 0.98) + d3, 0.60, unit)));
     float s = field(p, uSunPos.xy + ds, uSunPos.z, unit);
     col = mix(col, uSun.rgb, half(s * uSunStrength));
+    if (uStars > 0.01) {
+        // Brighter towards the top, none at the very bottom, hidden under the sun/moon glow.
+        float fadeDown = clamp(1.0 - p.y / (uSize.y * 0.85), 0.0, 1.0);
+        float st = stars(p, unit, t) * uStars * fadeDown * (1.0 - clamp(s * 1.6, 0.0, 1.0));
+        col = mix(col, half3(1.0), half(clamp(st, 0.0, 1.0)));
+    }
 
     half3 g = half3(hash(floor(p * 0.5)));
     half3 overlay = mix(2.0 * col * g, 1.0 - 2.0 * (1.0 - col) * (1.0 - g), step(half3(0.5), col));

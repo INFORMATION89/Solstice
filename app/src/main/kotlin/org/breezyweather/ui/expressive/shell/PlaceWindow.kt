@@ -92,6 +92,7 @@ import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.components.glassSource
 import org.breezyweather.ui.expressive.components.rememberGlassSource
 import org.breezyweather.ui.expressive.sky.SkyBackground
+import org.breezyweather.ui.expressive.sky.SkyEffects
 import org.breezyweather.ui.expressive.sky.SkySystemBars
 import org.breezyweather.ui.expressive.sky.SkyWeather
 import org.breezyweather.ui.expressive.theme.Corners
@@ -308,6 +309,8 @@ internal fun PlaceWindow(
                 // The postcard's sky is what grows: laid out full screen and scaled down onto the card.
                 SkyBackground(
                     state = sky,
+                    // Stars on a clear night (F4), baked into the window's sky.
+                    effects = SkyEffects.of(sky, SkyWeather.of(location.weather?.current?.weatherCode)),
                     modifier = Modifier.fillMaxSize().glassSource(windowSky).graphicsLayer {
                         val p = progress().coerceIn(0f, 1f)
                         val from = origin ?: Rect(0f, 0f, size.width, size.height)

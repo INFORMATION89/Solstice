@@ -2661,4 +2661,19 @@ Steps:
   - **Lab:** a "Dial" demo, ±14 days in 6-hour steps, with switches for labels, curvature and
     snapping.
   - **The moon card keeps its own dial until F5** moves it onto this one.
+- **2026-11-21: F4, sky effects with stars, built.** Not seen on the phone.
+  - **`:motion` `rememberAmbientClock(fps, running)` and `rememberAmbientMotionAllowed()`:** the
+    sky's clock and its "motion allowed" rule moved into the library. Capped fps, only while
+    resumed and visible, wall-clock based; off in battery saver or with animations off.
+  - **`SkyEffects`** (`sky/SkyEffects.kt`): the sky system's effect description. Stars now; rain,
+    snow, fog and lightning later plug in the same way.
+    - `SkyEffects.of(sky, weather)`: stars come out as the sun sets, only on clear nights, 45 % on
+      partly cloudy ones.
+  - **Animated sky (Android 13+):** stars in the same AGSL pass, one per lucky cell of a hashed grid,
+    jittered, each with its own size and brightness. They're brighter towards the top and hidden
+    under the sun/moon glow.
+  - **Twinkle:** a slow per-star wave, built but off (`TWINKLE_AGREED = false`) until the user agrees.
+  - **Static sky (below 13, or motion off):** stars baked once into the cached image (seeded), no
+    twinkle.
+  - **Used by** the home sky and the postcard window's sky. The moon sheet uses it in F5.
 

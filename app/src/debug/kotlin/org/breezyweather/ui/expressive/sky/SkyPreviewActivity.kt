@@ -91,7 +91,7 @@ class SkyPreviewActivity : ComponentActivity() {
                     if (animated) {
                         AnimatedSkyBackground(sky, skyModifier, content = body)
                     } else {
-                        SkyBackground(sky, skyModifier, body)
+                        SkyBackground(sky, skyModifier, content = body)
                     }
                 }
                 val current = skyAt(weathers[pager.currentPage], now, sunrise, sunset).palette
