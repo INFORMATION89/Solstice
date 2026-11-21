@@ -116,7 +116,8 @@ Where things stand and how to pick the work up anywhere. The plan, decisions and
    sentence and the evening-time setting before shipping.** Onboarding steps: propose to the user first.
    - **Engine built 2026-11-21** (`shell/Summary.kt`, 5 tests in `SummaryTest`): `Summary(rules, max = 2)`,
      `SummaryRule`, `SummaryLine` (with a topic, so two lines never say the same thing), `SummaryTime`
-     (evening from 6 PM, adjustable), `Precipitation` (rain vs precipitation). **Not wired to any page yet:**
+     (evening from 6 PM, adjustable), `Precipitation` (rain, snow, or mixed; `combine` for the week from
+     each day's kind). **Not wired to any page yet:**
      next, write Forecast's and This week's rule lists and show the user every sentence first.
 6. Then continue with **F5, the moon card** (below), which includes 4.
 

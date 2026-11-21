@@ -66,12 +66,14 @@ internal object SummaryTime {
 }
 
 /**
- * Which word a summary uses for what falls (agreed 2026-11-21): "rain" when only rain is possible,
- * "precipitation" when snow, sleet or hail could fall too. Snow-only saying "snow" is still to confirm.
+ * Which word a summary uses for what falls (agreed 2026-11-21, the same on every page, This week
+ * included): "rain" when only rain is possible, "snow" when only snow is, "precipitation" (or "rain or
+ * snow") when both could fall, or sleet or hail.
  */
 internal enum class Precipitation {
     NONE,
     RAIN,
+    SNOW,
     MIXED,
     ;
 
@@ -80,19 +82,34 @@ internal enum class Precipitation {
             breezyweather.domain.weather.reference.WeatherCode.RAIN,
             breezyweather.domain.weather.reference.WeatherCode.THUNDERSTORM
         )
-        private val FROZEN_CODES = setOf(
-            breezyweather.domain.weather.reference.WeatherCode.SNOW,
+        private val SNOW_CODES = setOf(breezyweather.domain.weather.reference.WeatherCode.SNOW)
+        private val MIXED_CODES = setOf(
             breezyweather.domain.weather.reference.WeatherCode.SLEET,
             breezyweather.domain.weather.reference.WeatherCode.HAIL
         )
 
-        /** The kind over a span of [codes] (e.g. the next hours, or the week). */
+        /** The kind over a span of [codes] (e.g. the next hours, or one day). */
         fun of(codes: Iterable<breezyweather.domain.weather.reference.WeatherCode?>): Precipitation {
             val set = codes.filterNotNull().toSet()
-            return when {
-                set.any { it in FROZEN_CODES } -> MIXED
-                set.any { it in RAIN_CODES } -> RAIN
-                else -> NONE
+            return combine(
+                buildList {
+                    if (set.any { it in RAIN_CODES }) add(RAIN)
+                    if (set.any { it in SNOW_CODES }) add(SNOW)
+                    if (set.any { it in MIXED_CODES }) add(MIXED)
+                }
+            )
+        }
+
+        /**
+         * The kind over several spans (e.g. the week from each day's own kind): one kind if they all
+         * agree, [MIXED] if they differ.
+         */
+        fun combine(kinds: Iterable<Precipitation>): Precipitation {
+            val wet = kinds.filter { it != NONE }.toSet()
+            return when (wet.size) {
+                0 -> NONE
+                1 -> wet.first()
+                else -> MIXED
             }
         }
     }

@@ -64,10 +64,21 @@ class SummaryTest {
     }
 
     @Test
-    fun `rain alone says rain, anything frozen says precipitation`() {
+    fun `rain alone says rain, snow alone says snow, both say precipitation`() {
         assertEquals(Precipitation.NONE, Precipitation.of(listOf(WeatherCode.CLEAR, null)))
         assertEquals(Precipitation.RAIN, Precipitation.of(listOf(WeatherCode.CLOUDY, WeatherCode.RAIN)))
-        assertEquals(Precipitation.MIXED, Precipitation.of(listOf(WeatherCode.RAIN, WeatherCode.SLEET)))
-        assertEquals(Precipitation.MIXED, Precipitation.of(listOf(WeatherCode.SNOW)))
+        assertEquals(Precipitation.SNOW, Precipitation.of(listOf(WeatherCode.SNOW, WeatherCode.CLOUDY)))
+        assertEquals(Precipitation.MIXED, Precipitation.of(listOf(WeatherCode.RAIN, WeatherCode.SNOW)))
+        assertEquals(Precipitation.MIXED, Precipitation.of(listOf(WeatherCode.SLEET)))
+    }
+
+    @Test
+    fun `a week of one kind keeps its word, days that differ make it mixed`() {
+        assertEquals(
+            Precipitation.SNOW,
+            Precipitation.combine(listOf(Precipitation.NONE, Precipitation.SNOW, Precipitation.SNOW))
+        )
+        assertEquals(Precipitation.MIXED, Precipitation.combine(listOf(Precipitation.RAIN, Precipitation.SNOW)))
+        assertEquals(Precipitation.NONE, Precipitation.combine(listOf(Precipitation.NONE)))
     }
 }
