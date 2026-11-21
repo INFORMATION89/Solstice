@@ -77,6 +77,15 @@
     <string name="week_warmest">%1$s will be the warmest day, at</string>
     <string name="week_coldest_night">The coldest night will be on %1$s, at</string>
     <string name="week_coldest_tonight">The coldest night will be tonight, at</string>
+    <!-- The quiet "last updated" line at the end of Forecast (agreed 2026-11-21). -->
+    <string name="shell_updated_just_now">Updated just now</string>
+    <string name="shell_updated_minutes">Updated %1$d min ago</string>
+    <string name="shell_updated_at">Updated at %1$s</string>
+    <string name="shell_updated_yesterday">Updated yesterday at %1$s</string>
+    <string name="shell_updated_on">Updated %1$s</string>
+    <string name="shell_updating">Updating…</string>
+    <string name="shell_update_failed">Couldn’t update</string>
+    <string name="shell_try_again">Try again</string>
     <string name="moon_title">Moon</string>
     <string name="moon_lit_growing">Tonight the moon will be %1$s lit and still growing.</string>
     <string name="moon_lit_shrinking">Tonight the moon will be %1$s lit and already shrinking.</string>

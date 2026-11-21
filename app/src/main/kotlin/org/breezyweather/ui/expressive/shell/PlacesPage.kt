@@ -76,12 +76,14 @@ import breezyweather.domain.location.model.Location
 import io.github.information89.motion.Haptic
 import io.github.information89.motion.Motion
 import io.github.information89.motion.haptics
+import io.github.information89.motion.morphSource
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.breezyweather.R
 import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.theme.CornerShapes
+import org.breezyweather.ui.expressive.theme.Corners
 import org.breezyweather.ui.expressive.theme.Elevation
 import org.breezyweather.ui.expressive.theme.Sizes
 import org.breezyweather.ui.expressive.theme.Space
@@ -280,7 +282,7 @@ internal fun PlacesPage(
                             // Long-press lifts the card; drag to move it, or release without moving to edit.
                             modifier = Modifier.onGloballyPositioned {
                                 cardBounds[id] = it.boundsInRoot()
-                            }.pointerInput(id) {
+                            }.morphSource(postcardKey(id), cornerRadius = Corners.L).pointerInput(id) {
                                 var moved = 0f
                                 // The finger's vertical speed at the drop, carried into the settle.
                                 val tracker = VelocityTracker()

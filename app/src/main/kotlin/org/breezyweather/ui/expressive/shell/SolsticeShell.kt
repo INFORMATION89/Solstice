@@ -56,6 +56,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -76,10 +77,12 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import breezyweather.domain.location.model.Location
+import io.github.information89.motion.MorphAnchor
 import io.github.information89.motion.Motion
 import io.github.information89.motion.MotionPhysics
 import io.github.information89.motion.pageSettleFling
 import io.github.information89.motion.pageTransition
+import io.github.information89.motion.rememberMorphMotion
 import io.github.information89.motion.rememberMotionValue
 import io.github.information89.motion.rememberPageTransition
 import kotlinx.coroutines.Job
@@ -267,76 +270,40 @@ fun SolsticeShell(
     // A postcard opened as a window (agreed 2026-11-18): one spring grows it from its card and back.
     var windowId by rememberSaveable { mutableStateOf<String?>(null) }
     var windowOrigin by remember { mutableStateOf<Rect?>(null) }
-    // The window's motion (agreed 2026-11-19): presence opens on Motion.container and closes on
-    // dismiss; pull is the swipe-down (1 = the dismiss point). Both can be caught mid-motion.
-    // UIKit's normal deceleration for both, like the moon card and search (rounds 1 and 2).
-    val windowPresence = rememberMotionValue(
-        initial = 0f,
-        overMin = 0.05f,
-        overMax = 0.02f,
-        deceleration = MotionPhysics.DECELERATION_NORMAL
-    )
-    val windowPull = rememberMotionValue(
-        initial = 0f,
-        overMin = 0.15f,
-        overMax = 0.6f,
-        deceleration = MotionPhysics.DECELERATION_NORMAL
-    )
-    var windowClosing by remember { mutableStateOf(false) }
+    // The window's motion: SpringMorph's five springs (the user, 2026-11-21: the new morph applies to
+    // postcards too). A touch catches it while it moves; a pull, back or a flick folds it home.
+    val windowMotion = rememberMorphMotion()
     // System bar icons follow whatever is behind them; a postcard window sets its own once it's
     // mostly open.
-    val windowCovers by remember { derivedStateOf { windowId != null && windowPresence.value > 0.5f } }
+    val windowCovers by remember { derivedStateOf { windowId != null && windowMotion.progress > 0.5f } }
     if (!windowCovers) {
         SkySystemBars(if (pager.currentPage == PAGE_FORECAST) sky.palette else plainPalette(page, onPage))
     }
-    var windowFade by remember { mutableStateOf(false) }
     // Grows once the place is in the list (a place just picked in search is added a moment later),
     // so the window never pops in half-way.
     val windowReady = windowId != null && locations.any { it.formattedId == windowId }
     LaunchedEffect(windowId, windowReady) {
-        if (windowReady) {
-            windowClosing = false
-            windowPull.snapTo(0f)
-            windowPresence.animateTo(1f)
-        }
-    }
-    // How far the window's top travels as it folds back (roughly), to turn a fling into its speed.
-    val windowFoldPx = with(LocalDensity.current) { 700.dp.toPx() }
-
-    // velocity: a swipe-down's speed (px/s), carried into the fold back; NaN for none.
-    fun closeWindow(velocity: Float = Float.NaN) {
-        val leaving = windowId
-        // A visit that isn't kept fades away as it shrinks (it has no slot to land in).
-        windowFade = leaving != null && leaving in Visits.all(context) && leaving !in starred
-        windowClosing = true
-        if (velocity.isNaN()) {
-            windowPresence.animateTo(0f)
-        } else {
-            windowPresence.animateTo(0f, -velocity / windowFoldPx)
-        }
+        if (windowReady) windowMotion.open()
     }
 
-    // Caught while closing and thrown back up.
-    fun reopenWindow() {
-        windowClosing = false
-        windowPresence.animateTo(1f)
-        windowPull.animateTo(0f)
-    }
+    fun closeWindow() = windowMotion.close()
+
     // Once folded all the way back (not caught), the window goes.
-    LaunchedEffect(windowClosing) {
-        if (!windowClosing) return@LaunchedEffect
-        snapshotFlow { windowPresence.isRunning to windowPresence.value }
-            .first { (running, v) -> !running && v <= 0.001f }
-        windowClosing = false
-        run {
-            val id = windowId
-            windowId = null
-            // A visit you didn't pin (or star) is gone once you go back.
-            if (id != null && id in Visits.all(context) && id !in starred) {
-                val index = viewModel.validLocationList.value.indexOfFirst { it.formattedId == id }
-                if (index >= 0) viewModel.deleteLocation(index)
-                Visits.unmark(context, id)
-                controller.visitsChanged++
+    LaunchedEffect(windowMotion) {
+        var opened = false
+        snapshotFlow { windowMotion.isOpen to windowMotion.isVisible }.collect { (open, visible) ->
+            if (open) opened = true
+            if (opened && !open && !visible) {
+                opened = false
+                val id = windowId
+                windowId = null
+                // A visit you didn't pin (or star) is gone once you go back.
+                if (id != null && id in Visits.all(context) && id !in starred) {
+                    val index = viewModel.validLocationList.value.indexOfFirst { it.formattedId == id }
+                    if (index >= 0) viewModel.deleteLocation(index)
+                    Visits.unmark(context, id)
+                    controller.visitsChanged++
+                }
             }
         }
     }
@@ -419,7 +386,7 @@ fun SolsticeShell(
                 // Only while the Forecast page shows some of it and no postcard window covers it.
                 visible = {
                     abs(visualPosition() - PAGE_FORECAST) < 0.999f &&
-                        windowPresence.value < 0.999f
+                        windowMotion.progress < 0.999f
                 },
                 // Stars on a clear night (F4).
                 effects = SkyEffects.of(sky, SkyWeather.of(location?.weather?.current?.weatherCode))
@@ -460,7 +427,8 @@ fun SolsticeShell(
                                     )
                                 },
                                 onDetails = actions::openDetails,
-                                onOpenPlaces = { navigate(PAGE_PLACES) }
+                                onOpenPlaces = { navigate(PAGE_PLACES) },
+                                source = location?.let { sourceManager.getWeatherSource(it.forecastSource)?.name }
                             )
                             else -> PlacesPage(
                                 // The visit open in a window isn't listed until you pin it.
@@ -536,7 +504,10 @@ fun SolsticeShell(
                 }
             }
             // The toolbar steps aside while search or a place window is open.
-            ToolbarDock(alpha = { 1f - maxOf(searchSheet.presence.value.coerceIn(0f, 1f), windowPresence.value) }) {
+            ToolbarDock(alpha = {
+                1f -
+                    maxOf(searchSheet.presence.value.coerceIn(0f, 1f), windowMotion.progress.coerceIn(0f, 1f))
+            }) {
                 ShellMessageHost(messages, glass)
                 ShellToolbar(
                     pager = pager,
@@ -584,23 +555,34 @@ fun SolsticeShell(
             )
             // Above search: a city picked there grows into its window right where the search card was.
             val windowPlace = locations.firstOrNull { it.formattedId == windowId }
+            val cornerPx = with(LocalDensity.current) { org.breezyweather.ui.expressive.theme.Corners.L.toPx() }
+            val screen = androidx.compose.ui.platform.LocalWindowInfo.current.containerSize
+            val screenW = screen.width.toFloat()
+            val screenH = screen.height.toFloat()
             if (windowPlace != null) {
+                val id = windowPlace.formattedId
+                // Where it grows from: the postcard (or the search card), captured when it opened, since a
+                // visit's postcard leaves the list while its window is open.
+                val fromBounds = remember(windowOrigin) {
+                    val r = windowOrigin
+                    if (r != null) {
+                        MorphAnchor(r, cornerPx)
+                    } else {
+                        MorphAnchor(Rect(Offset(screenW / 2f - 1f, screenH / 2f - 1f), Size(2f, 2f)), cornerPx)
+                    }
+                }
                 PlaceWindow(
                     location = windowPlace,
-                    origin = windowOrigin,
-                    presence = windowPresence,
-                    pull = windowPull,
-                    closing = windowClosing,
+                    motion = windowMotion,
+                    from = postcardKey(id),
+                    fromBounds = fromBounds,
                     now = now,
-                    onBackProgress = { e -> windowPresence.snapTo(1f - 0.5f * e) },
-                    onBackCancelled = { windowPresence.animateTo(1f) },
-                    onClose = { v -> closeWindow(v) },
-                    onReopen = { reopenWindow() },
-                    pinned = windowPlace.formattedId !in visiting,
-                    fadeOut = windowFade,
+                    onClose = { closeWindow() },
+                    pinned = id !in visiting,
+                    fadeOut = id in visiting && id !in starred,
                     weather = SkyWeather.of(windowPlace.weather?.current?.weatherCode),
+                    source = sourceManager.getWeatherSource(windowPlace.forecastSource)?.name,
                     onPin = {
-                        val id = windowPlace.formattedId
                         if (id in visiting) Visits.unmark(context, id) else Visits.mark(context, id)
                         controller.visitsChanged++
                     },

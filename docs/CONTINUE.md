@@ -65,6 +65,12 @@ Where things stand and how to pick the work up anywhere. The plan, decisions and
      interactive part: a real text button, 48 dp target).
    - Use what exists: the location's `refreshTime` and the sources' names/attribution already in the app
      (upstream showed both); no new data.
+   - **Built 2026-11-21, look not yet checked on the phone with the user.** Shared pieces in
+     `shell/Freshness.kt`: `Freshness` (pure, 3 tests in `FreshnessTest`), `freshnessText`, and `UpdatedLine`
+     (any page or card can use it). On Forecast and in the postcard window (no "Try again" there). A refresh
+     counts as failed when it ends without moving the place's update time forward. Times follow the
+     system's 12/24-hour setting; older than yesterday shows the date. **Still open:** only the forecast
+     source is named; "+N more" waits on checking which sources' licences ask to be named.
 3. **Refresh on a cold start: the main place** (the user's decision, replaces the 30-min proposal). When the app
    starts from a cold start (`MainActivity`'s `isLaunch`, `savedInstanceState == null`), refresh the **main
    place** (the first one on home) **whatever its age**; resuming from the background keeps today's rule. Then
@@ -125,6 +131,27 @@ Where things stand and how to pick the work up anywhere. The plan, decisions and
 items 1 and 3 can be built and unit-tested without it.
 
 ## Pick up here
+
+**Moon card on `SpringMorph` (2026-11-21, the user asked; tested on the Pixel):** opens from the pill with
+the five springs and blur replace, the dial scrubs while open, a flick down folds it home. `SpringMorph`
+gained (generic, `:motion`): a `material` slot (glass at the surface's bounds), a `shape` hook (the sheet
+squares its docked corners), and touches for the content once open and at rest (taps and sideways
+drags are the content's; a vertical drag no child took pulls the surface). Drags now track 1:1 on
+screen as the surface scales. The label no longer flies to the heading (blur replace instead, as in the
+lab). Fixed after the user's phone check: the pill's label is centred during the hand-off, and drags are
+measured on screen (measured inside the shrinking surface, a pull ran away to the bottom on its own);
+a finger's drag range is how far an edge travels.
+
+**Postcard windows on `SpringMorph` (2026-11-21, built, NOT yet tested on the phone; the user said to
+keep testing for later):** `PlaceWindow` is now a `SpringMorph` from the postcard (or the search card):
+the postcard (`PlaceCard`) blurs out as the window sharpens in; the window is carried at full layout.
+The old paper frame thinning, stamp fade and non-uniform sky stretch are gone (replaced by the blur
+replace). `SpringMorph` gained `fromBounds` (grow from a rectangle; the key only hides the source),
+`canPull` (a pull at the top of the page closes; otherwise the page scrolls), and `MorphMotion.scrub`
+(predictive back). Postcards are `morphSource`s (`postcardKey`). The shell has one `windowMotion`
+(no more presence/pull/closing). **To test on the phone:** open from a postcard and from search; pull
+down at the top of Forecast and of This week (and scrolled down: it should scroll first); back gesture
+(follow, cancel, commit); tap while closing reopens; an unkept visit fades away; pin.
 
 **Built 2026-11-21 but not yet tested on the phone** (one pass, profile build, Pixel 7; details in the
 PLAN.md log):

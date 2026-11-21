@@ -129,21 +129,15 @@ import breezyweather.domain.location.model.Location
 import io.github.information89.motion.Haptic
 import io.github.information89.motion.Morph
 import io.github.information89.motion.MorphAnchor
-import io.github.information89.motion.MorphGeometry
 import io.github.information89.motion.MorphHost
 import io.github.information89.motion.MorphStyle
 import io.github.information89.motion.Motion
-import io.github.information89.motion.MotionPhysics
 import io.github.information89.motion.MotionValue
+import io.github.information89.motion.SpringMorph
 import io.github.information89.motion.haptics
 import io.github.information89.motion.morphAnchor
-import io.github.information89.motion.morphAnchorOf
-import io.github.information89.motion.morphFrom
 import io.github.information89.motion.morphSource
-import io.github.information89.motion.motionDrag
-import io.github.information89.motion.rememberMorphDrawn
-import io.github.information89.motion.rememberMotionValue
-import io.github.information89.motion.reveal
+import io.github.information89.motion.rememberMorphMotion
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -229,28 +223,9 @@ private val dialDecay = FloatExponentialDecaySpec(frictionMultiplier = 1.6f)
 /** The dial's settle spring. */
 private val moonSettle = Motion.settle.spec<Float>()
 
-private fun hhmm(zone: java.util.TimeZone) = SimpleDateFormat("HH:mm", Locale.getDefault()).apply { timeZone = zone }
-
 /** Morph keys for a place's moon button and its label. */
 private fun pillKey(location: Location) = "moon-pill-${location.formattedId}"
 private fun labelKey(location: Location) = "moon-label-${location.formattedId}"
-
-/**
- * Choreography on the morph's value (M3, 2026-11-19): the pill's own look (outline, "· 71 %") fades
- * over the first 30 % while the sheet's glass fades in over the same stretch; the label hands over to
- * the heading in the first 15 %. Closing plays the same windows backwards.
- */
-private const val MATERIAL_SPAN = 0.3f
-private const val LABEL_SPAN = 0.15f
-
-/**
- * How far the sheet's top travels between the pill and open, for the drag, until the pill has been
- * measured (then the real distance is used, so the top edge stays under the finger, like iOS).
- */
-private val MOON_RANGE = 420.dp
-
-/** iOS: a sheet pulled past open travels up to about 100 pt. */
-private val MOON_OVER_PULL = 100.dp
 
 private fun smooth(t: Float) = t * t * (3 - 2 * t)
 
@@ -329,9 +304,6 @@ private fun MoonPillContent(phase: String, suffix: String, text: Color, labelMod
 internal object MoonCardState {
     var request by androidx.compose.runtime.mutableStateOf<Pair<Location, Long>?>(null)
 
-    /** The open card's morph value (0 closed … 1 open), while it's on screen. */
-    var motion by androidx.compose.runtime.mutableStateOf<MotionValue?>(null)
-
     /** The button's label. */
     var label: String = ""
 
@@ -368,10 +340,10 @@ internal object MoonCardState {
  * Reads the morph's value when the outline is built (every size change, i.e. every frame of the
  * morph).
  */
-private class MoonSheetShape(private val motion: MotionValue, private val radius: Float) : Shape {
+private class MoonSheetShape(private val radius: Float, private val progress: Float) : Shape {
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
         val top = minOf(radius, size.minDimension / 2)
-        val bottom = top * (1f - motion.value.coerceIn(0f, 1f))
+        val bottom = top * (1f - progress.coerceIn(0f, 1f))
         return Outline.Rounded(
             RoundRect(
                 0f,
@@ -404,40 +376,26 @@ internal fun MoonCardOverlay(glass: GlassSource) {
 @Composable
 private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
     val density = LocalDensity.current
-    val motion = rememberMotionValue(
-        initial = 0f,
-        overMin = 0.02f,
-        overMax = MOON_OVER_PULL / MOON_RANGE,
-        // UIKit's normal deceleration for the fling (agreed 2026-11-19): a medium flick down closes
-        // it, as an iOS sheet would; a slow lift still springs back open.
-        deceleration = MotionPhysics.DECELERATION_NORMAL
-    )
-    androidx.compose.runtime.DisposableEffect(motion) {
-        MoonCardState.motion = motion
-        onDispose { if (MoonCardState.motion === motion) MoonCardState.motion = null }
-    }
-    // Opening: the container's spring from the button, once the morph is on screen as the button
-    // (rememberMorphDrawn), so it visibly starts from the pill however long the sheet takes to build.
-    val drawn = rememberMorphDrawn(pillKey(location))
+    // The new morph (SpringMorph, agreed in the lab 2026-11-21, applied to the moon card at the user's
+    // request): five springs grow the pill into the sheet; a touch catches it mid-flight, a tap turns it
+    // back, a drag takes it over and a flick throws it.
+    val motion = rememberMorphMotion()
+    LaunchedEffect(motion) { motion.open() }
+    // Tell the shell how far it is, and finish once it's home.
     LaunchedEffect(motion) {
-        androidx.compose.runtime.snapshotFlow { drawn.value }.first { it }
-        motion.animateTo(1f, velocity = 0f)
-    }
-    // Tell the shell how far it is (the page recedes), and finish once it has closed.
-    LaunchedEffect(motion) {
-        var opening = false
-        androidx.compose.runtime.snapshotFlow { Triple(motion.value, motion.target, motion.isRunning) }
-            .collect { (v, target, running) ->
-                MoonCardState.progress = v.coerceIn(0f, 1f)
-                if (target == 1f) opening = true
-                if (opening && target == 0f && !running && v <= 0.001f) {
+        var opened = false
+        androidx.compose.runtime.snapshotFlow { Triple(motion.progress, motion.isOpen, motion.isVisible) }
+            .collect { (p, open, visible) ->
+                MoonCardState.progress = p.coerceIn(0f, 1f)
+                if (open) opened = true
+                if (opened && !open && !visible) {
                     MoonCardState.progress = 0f
                     MoonCardState.request = null
                 }
             }
     }
-    fun close() = motion.animateTo(0f)
-    BackHandler { close() }
+    fun close() = motion.close()
+    BackHandler(enabled = motion.isOpen) { close() }
 
     // The forecast's tint: the sky's base colour, darkened at night (the card goes dark mode when it's
     // night at the place) and lightened by day.
@@ -451,41 +409,29 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
     }
     val status = WindowInsets.statusBars
     // Where the sheet rests: full width, docked at the bottom, at full screen height below the status
-    // bar (agreed 2026-11-19). Known up front, so the morph draws from its first frame.
+    // bar (agreed 2026-11-19).
     val window = androidx.compose.ui.platform.LocalWindowInfo.current.containerSize
     val radius = with(density) { Corners.XL.toPx() }
     val top = status.getTop(density) + with(density) { Space.S3.toPx() }
     val target = remember(window, top, radius) {
         MorphAnchor(Rect(0f, top, window.width.toFloat(), window.height.toFloat()), radius)
     }
-    val shape = remember(motion, radius) { MoonSheetShape(motion, radius) }
-    // The drag tracks the finger 1:1 (agreed 2026-11-19): one unit of the morph is the distance the
-    // sheet's top travels, from the moon pill to open.
-    val pill = morphAnchorOf(pillKey(location))
-    val range = pill?.let { with(density) { (it.bounds.top - top).coerceAtLeast(1f).toDp() } }
-        ?.coerceAtLeast(200.dp) ?: MOON_RANGE
+    // Round on top like the button; the bottom corners square off as it docks.
+    val sheetShape = remember { { r: Float, p: Float -> MoonSheetShape(r, p) } }
+    fun shown() = motion.progress.coerceIn(0f, 1f)
 
-    // Closing (agreed 2026-11-21, MOTION.md: animations never block input): once it heads back to the
-    // pill, only the sheet as drawn catches a touch (to grab it mid-close); everywhere else, taps reach
-    // the page underneath at once.
-    val closing by remember(motion) { androidx.compose.runtime.derivedStateOf { motion.target == 0f } }
-    // Gestures on the whole screen while open (the sheet shrinks under the finger while a pull scrubs
-    // it, so a drag measured on it would run ahead): vertical pulls drive the morph, a tap above it
-    // closes.
+    // While open, a tap above the sheet closes it. Closing, nothing here takes touches: the page
+    // underneath gets them at once, and only the sheet as drawn catches one (SpringMorph).
     Box(
         Modifier
             .fillMaxSize()
             .then(
-                if (closing) {
-                    Modifier
+                if (motion.isOpen) {
+                    Modifier.pointerInput(Unit) {
+                        detectTapGestures { tap -> if (tap.y < status.getTop(this) + Space.S3.toPx()) close() }
+                    }
                 } else {
                     Modifier
-                        .motionDrag(motion, Orientation.Vertical, range, reverseDirection = true)
-                        .pointerInput(Unit) {
-                            detectTapGestures { tap ->
-                                if (tap.y < status.getTop(this) + Space.S3.toPx()) close()
-                            }
-                        }
                 }
             )
     ) {
@@ -493,25 +439,17 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
         Box(
             Modifier
                 .fillMaxSize()
-                .graphicsLayer { alpha = motion.value.coerceIn(0f, 1f) }
+                .graphicsLayer { alpha = shown() }
                 .background(Color.Black.copy(alpha = 0.25f))
         )
-        Morph(
+        SpringMorph(
             from = pillKey(location),
             target = target,
-            value = motion,
-            modifier = Modifier.fillMaxSize(),
-            // Laid out once at the sheet's final size and centred, so nothing reflows while the glass
-            // grows around it.
-            contentAlignment = Alignment.TopCenter,
-            shape = { _, _ -> shape },
-            // Starts as the pill itself (the same glass, its label) and grows into the sheet: one
-            // material the whole way (MOTION.md), only the shape, size and content change.
-            fromStyle = MorphStyle(material = 1f),
-            toStyle = MorphStyle(material = 1f),
-            styleWindow = 0f..MATERIAL_SPAN,
-            material = { amount -> glass(MoonCardState.glass ?: glass, shape, tint, alpha = amount) },
-            sourceWindow = 0f..LABEL_SPAN,
+            motion = motion,
+            // One material the whole way (MOTION.md): the pill's own glass grows into the sheet's.
+            material = { shape -> glass(MoonCardState.glass ?: glass, shape, tint) },
+            shape = sheetShape,
+            // The pill's label blurs out as the sheet's content sharpens in (and back on the way home).
             sourceContent = {
                 val label = MoonCardState.label
                 val phase = label.substringBefore(" · ")
@@ -525,20 +463,22 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
                         location,
                         now,
                         ink,
-                        // The button's label flies to the heading and hands over in the first 15 %.
-                        headingModifier = Modifier
-                            .morphFrom(labelKey(location))
-                            .graphicsLayer { alpha = motion.window(0f, LABEL_SPAN) },
                         dateModifier = Modifier.graphicsLayer {
                             // Last in, first out: only once the heading has landed.
-                            alpha = motion.window(0.85f, 1f)
+                            alpha = MotionValue.window(motion.progress, 0.85f, 1f)
                         },
                         deferRest = true,
-                        interactive = !closing,
+                        interactive = motion.isOpen,
                         restModifier = Modifier.graphicsLayer {
                             // Choreographed (agreed): the content fades and scales in from 92 % as the
                             // glass reaches ~70 % of its size, and leaves first when it closes.
-                            val e = smooth(motion.window(SolsticeMotion.CONTENT_FROM, SolsticeMotion.CONTENT_TO))
+                            val e = smooth(
+                                MotionValue.window(
+                                    motion.progress,
+                                    SolsticeMotion.CONTENT_FROM,
+                                    SolsticeMotion.CONTENT_TO
+                                )
+                            )
                             alpha = e
                             val k = SolsticeMotion.CONTENT_START_SCALE + (1f - SolsticeMotion.CONTENT_START_SCALE) * e
                             transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0f)
@@ -547,37 +487,23 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
                         }
                     )
                 }
-                // The handle, like search's: it comes and goes with the content (it sat on the pill at
-                // the end of a close).
+                // The handle, like search's: it comes and goes with the content.
                 Box(
                     Modifier
                         .align(Alignment.TopCenter)
-                        .reveal(motion, SolsticeMotion.CONTENT_FROM, SolsticeMotion.CONTENT_TO, startScale = 1f)
+                        .graphicsLayer {
+                            alpha = MotionValue.window(
+                                motion.progress,
+                                SolsticeMotion.CONTENT_FROM,
+                                SolsticeMotion.CONTENT_TO
+                            )
+                        }
                         .padding(top = Space.S3)
                         .width(Sizes.HandleWidth)
                         .height(Sizes.HandleThickness)
                         .background(ink.copy(alpha = 0.4f), CircleShape)
                 )
             }
-        }
-        // While closing: a catcher exactly where the sheet is drawn this frame, so the shrinking sheet
-        // can still be grabbed (and pulled back open) without blocking the rest of the screen.
-        if (closing && pill != null) {
-            Box(
-                Modifier
-                    .offset {
-                        val r = MorphGeometry.frame(pill, target, motion.value).bounds
-                        IntOffset(r.left.roundToInt(), r.top.roundToInt())
-                    }
-                    .layout { measurable, _ ->
-                        val r = MorphGeometry.frame(pill, target, motion.value).bounds
-                        val w = r.width.roundToInt().coerceAtLeast(0)
-                        val h = r.height.roundToInt().coerceAtLeast(0)
-                        val placeable = measurable.measure(Constraints.fixed(w, h))
-                        layout(w, h) { placeable.place(0, 0) }
-                    }
-                    .motionDrag(motion, Orientation.Vertical, range, reverseDirection = true)
-            )
         }
     }
 }
@@ -916,8 +842,7 @@ private fun MoonCard(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                     Spacer(Modifier.height(Space.S4))
-                    fun hm(d: Date?) =
-                        d?.let { hhmm(zone).format(it) } ?: "–"
+                    fun hm(d: Date?) = d?.let { sentenceTime(context, it.time, zone) } ?: "–"
                     // The details in a sentence (design A), values bold and underlined like This week.
                     val days = ((full.time - at.time) / DAY.toDouble()).roundToInt().coerceAtLeast(0)
                     val km = "%,d km".format(distance.roundToInt())

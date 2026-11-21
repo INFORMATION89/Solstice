@@ -103,7 +103,12 @@ internal fun ForecastPage(
     // Off in a postcard window, whose label already gives the local time.
     showLocalTime: Boolean = true,
     pullToRefresh: Boolean = true,
+    // The forecast source's name, for the "last updated" line.
+    source: String? = null,
+    // Its scroll (hoisted by a window that needs to know when it's at the top).
+    scroll: androidx.compose.foundation.ScrollState? = null,
 ) {
+    val scrollState = scroll ?: rememberScrollState()
     val text = sky.palette.text
     if (location == null) {
         EmptyForecast(text, onOpenPlaces)
@@ -136,7 +141,7 @@ internal fun ForecastPage(
                         null
                     }
                 }
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .statusBarsPadding()
                 .padding(horizontal = Space.S5)
                 .padding(top = Space.S10, bottom = 120.dp)
@@ -229,6 +234,17 @@ internal fun ForecastPage(
             TextButton(onClick = onDetails) {
                 Text(stringResource(R.string.shell_more_details), color = text)
             }
+            // When this was updated and where it's from (agreed 2026-11-21), quiet, at the very end.
+            Spacer(Modifier.height(Space.S2))
+            UpdatedLine(
+                updated = weather?.base?.refreshTime?.time,
+                source = source,
+                now = now,
+                zone = TimeZone.getDefault(),
+                refreshing = refreshing,
+                text = text,
+                onRetry = if (pullToRefresh) onRefresh else null
+            )
         }
     }
     if (pullToRefresh) {

@@ -26,12 +26,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
@@ -44,8 +46,11 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.layout
@@ -233,6 +238,25 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
     }
 
     /**
+     * Puts it at [progress] along the path (0 = the source, 1 = the target) at once, e.g. following a
+     * predictive back gesture. Then [open] (cancelled) or [close] (committed) carries on from there.
+     */
+    fun scrub(progress: Float) {
+        val s = source ?: return
+        val t = target ?: return
+        val p = progress.coerceIn(-0.05f, 1.08f)
+        val a = values(s)
+        val b = values(t)
+        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            cx.snapTo(lerp(a[0], b[0], p))
+            cy.snapTo(lerp(a[1], b[1], p))
+            w.snapTo(lerp(a[2], b[2], p))
+            h.snapTo(lerp(a[3], b[3], p))
+            r.snapTo(lerp(a[4], b[4], p))
+        }
+    }
+
+    /**
      * Let go at [velocity] (path per second, + towards the target). The projected fling picks open or
      * closed (WWDC18: the nearest end to where it would land); each spring starts with the finger's
      * velocity, and a flick with momentum gets the slight overshoot.
@@ -273,7 +297,7 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
     }
 
     /** Whether any of the springs is moving. */
-    internal val isMoving: Boolean
+    val isMoving: Boolean
         get() = cx.isRunning || cy.isRunning || w.isRunning || h.isRunning || r.isRunning
 
     /**
@@ -309,7 +333,14 @@ fun rememberMorphMotion(): MorphMotion {
  *   target's content sharpens in, so two readable things never overlap;
  * - the real source hides while this draws it (as [morphSource] does), and reappears once it's home.
  *
- * Its look comes from [fromStyle] / [toStyle] (fill, outline), following [MorphMotion.progress].
+ * Its look comes from [fromStyle] / [toStyle] (fill, outline), following [MorphMotion.progress], over
+ * an optional app [material] (e.g. glass) drawn on its own layer at the surface's bounds; [shape] gives
+ * the surface's outline (e.g. a sheet that squares its docked corners as it opens).
+ *
+ * Touch: while it moves, a touch on the surface catches it (a tap turns it back, a drag takes it over).
+ * Once it's open and at rest, its content owns taps and sideways drags (e.g. a dial inside); a downward
+ * drag pulls the surface when [canPull] (e.g. its page is scrolled to the top), measured on screen, so
+ * the surface follows the finger however it scales.
  */
 @Composable
 fun SpringMorph(
@@ -322,25 +353,52 @@ fun SpringMorph(
     handOff: ClosedFloatingPointRange<Float> = MorphHandOff.Window,
     handOffBlur: Dp = MorphHandOff.Blur,
     draggable: Boolean = true,
-    // A tap on the surface; by default it turns back the other way ([MorphMotion.toggle]).
+    // A tap on the moving surface; by default it turns back the other way ([MorphMotion.toggle]).
     onTap: (() -> Unit)? = null,
+    // The surface's outline for its corner radius and progress (default: evenly rounded).
+    shape: ((radius: Float, progress: Float) -> Shape)? = null,
+    // The app's material (e.g. glass) in the given outline, drawn behind the fill and the content.
+    material: (@Composable Modifier.(Shape) -> Modifier)? = null,
+    // Where it grows from when that isn't a registered [morphSource] (e.g. a card that has just closed
+    // into this); [from] is then only the key to hide.
+    fromBounds: MorphAnchor? = null,
+    // Whether a downward drag on the open surface pulls it (true unless its content is scrolled
+    // down: then the content scrolls back first).
+    canPull: () -> Boolean = { true },
     sourceContent: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    val registry = LocalMorphRegistry.current ?: return
-    val source = registry[from] ?: return
+    val registry = LocalMorphRegistry.current
+    val source = fromBounds ?: registry?.get(from) ?: return
     motion.source = source
     motion.target = target
     val density = LocalDensity.current
-    val dragRange = with(density) { (target.bounds.height - source.bounds.height).coerceAtLeast(200.dp.toPx()) }
+    // How far a finger travels for the whole path: the farthest an edge moves between source and target,
+    // so the edge under the finger keeps up with it (2026-11-21: by the change in height, the moon sheet
+    // moved at half the finger's speed).
+    val dragRange = with(density) {
+        maxOf(
+            abs(target.bounds.top - source.bounds.top),
+            abs(target.bounds.bottom - source.bounds.bottom)
+        ).coerceAtLeast(200.dp.toPx())
+    }
 
     // The real source hides while this is on screen, and comes back once it has landed.
     LaunchedEffect(motion, from) {
         snapshotFlow { motion.isVisible }.collect { visible ->
+            if (registry == null) return@collect
             if (visible) registry.covered[from] = 1 else registry.covered.remove(from)
         }
     }
     if (!motion.isVisible) return
+    val outline = remember(motion, shape) { LiveMorphShape(motion, shape) }
+    // Each touch layer's transform as last drawn: scale x, scale y, left, top. A finger's position in a
+    // layer that moves and scales under it is turned back into screen space with these, so a drag
+    // follows the finger (2026-11-21: measured in the layer, a pull ran away to the bottom on its own).
+    val contentDrawn = remember { floatArrayOf(1f, 1f, 0f, 0f) }
+    val catcherDrawn = remember { floatArrayOf(1f, 1f, 0f, 0f) }
+    // At rest and open, the content owns its touches; while it moves, the surface catches them.
+    val restingOpen by remember(motion) { derivedStateOf { motion.isOpen && !motion.isMoving } }
 
     fun hand(): Float = MotionValue.window(motion.progress, handOff.start, handOff.endInclusive).let {
         it * it *
@@ -348,16 +406,37 @@ fun SpringMorph(
     }
 
     Box(modifier.fillMaxSize()) {
+        // The app's material at the surface's bounds (laid out each frame: a material like glass
+        // needs a real node where the surface is, to blur what's behind it).
+        if (material != null) {
+            Box(
+                Modifier
+                    .layout { measurable, constraints ->
+                        val b = motion.bounds
+                        val placeable = measurable.measure(
+                            Constraints.fixed(
+                                b.width.roundToInt().coerceAtLeast(0),
+                                b.height.roundToInt().coerceAtLeast(0)
+                            )
+                        )
+                        layout(constraints.maxWidth, constraints.maxHeight) {
+                            placeable.place(b.left.roundToInt(), b.top.roundToInt())
+                        }
+                    }
+                    .material(outline)
+            )
+        }
         // The surface's look at its current bounds: drawn, never re-laid out.
         Box(
             Modifier.fillMaxSize().drawBehind {
                 val b = motion.bounds
                 val st = MorphStyle.lerp(fromStyle, toStyle, hand())
-                val rr = RoundRect(b, CornerRadius(motion.cornerRadius.coerceAtMost(b.minDimension / 2f)))
-                val path = androidx.compose.ui.graphics.Path().apply { addRoundRect(rr) }
-                if (st.fill.alpha > 0f) drawPath(path, st.fill)
-                if (st.border.alpha > 0f && st.borderWidth.value > 0f) {
-                    drawPath(path, st.border, style = Stroke(st.borderWidth.toPx()))
+                val hasBorder = st.border.alpha > 0f && st.borderWidth.value > 0f
+                if (st.fill.alpha <= 0f && !hasBorder) return@drawBehind
+                val o = outline.createOutline(b.size, layoutDirection, this)
+                translate(b.left, b.top) {
+                    if (st.fill.alpha > 0f) drawOutline(o, st.fill)
+                    if (hasBorder) drawOutline(o, st.border, style = Stroke(st.borderWidth.toPx()))
                 }
             }
         )
@@ -379,10 +458,14 @@ fun SpringMorph(
                     scaleY = k
                     translationX = b.left
                     translationY = b.top
+                    contentDrawn[0] = k
+                    contentDrawn[1] = k
+                    contentDrawn[2] = b.left
+                    contentDrawn[3] = b.top
                     // The clip in the layer's own (unscaled) coordinates: the surface's height and
                     // corner divided by the scale (a new value each change, so the layer notices).
                     val height = b.height / k
-                    shape =
+                    this.shape =
                         MorphClip(
                             height,
                             (motion.cornerRadius / k).coerceAtMost(minOf(target.bounds.width, height) / 2f)
@@ -397,73 +480,128 @@ fun SpringMorph(
                         null
                     }
                 }
-        ) { content() }
-        // Touch: only the surface as drawn this frame (laid out once at the target's size and transformed
-        // onto the current bounds, so hit-testing follows it). Everywhere else, touches reach the page
-        // at once; on it, a tap turns it back from wherever it is and a drag takes it over (MOTION.md:
-        // animations never block input).
-        Box(
-            Modifier
-                .layout { measurable, constraints ->
-                    val tw = target.bounds.width.roundToInt().coerceAtLeast(0)
-                    val th = target.bounds.height.roundToInt().coerceAtLeast(0)
-                    val placeable = measurable.measure(Constraints.fixed(tw, th))
-                    layout(constraints.maxWidth, constraints.maxHeight) { placeable.place(0, 0) }
-                }
-                .graphicsLayer {
-                    val b = motion.bounds
-                    transformOrigin = TransformOrigin(0f, 0f)
-                    scaleX = (b.width / target.bounds.width.coerceAtLeast(1f)).coerceAtLeast(0.001f)
-                    scaleY = (b.height / target.bounds.height.coerceAtLeast(1f)).coerceAtLeast(0.001f)
-                    translationX = b.left
-                    translationY = b.top
-                }
-                // One gesture, the iOS way (user 2026-11-21: it couldn't be reopened while closing). A
-                // touch catches it where it is; moving past the touch slop makes it a drag that follows
-                // the finger and is thrown on release; lifting without moving is a tap that turns it back.
-                .pointerInput(motion, draggable, dragRange) {
+        ) {
+            Box(
+                Modifier.pointerInput(motion, draggable, dragRange, restingOpen) {
+                    if (!restingOpen || !draggable) return@pointerInput
+                    // Seen before the content (Initial pass), so a pull can be taken before a page
+                    // scrolls; otherwise left to the content, and dropped once a child takes it.
                     awaitEachGesture {
-                        val down = awaitFirstDown(requireUnconsumed = false)
-                        down.consume()
-                        motion.catch()
+                        val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
                         val tracker = VelocityTracker()
-                        tracker.addPosition(down.uptimeMillis, down.position)
+                        var last = onScreen(down.position, contentDrawn)
+                        tracker.addPosition(down.uptimeMillis, last)
                         var dragging = false
-                        var travelled = 0f
+                        var dx = 0f
+                        var dy = 0f
                         while (true) {
-                            val event = awaitPointerEvent()
+                            val event = awaitPointerEvent(PointerEventPass.Initial)
                             val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                            val now = onScreen(change.position, contentDrawn)
                             if (!change.pressed) {
-                                motion.unpress()
                                 if (dragging) {
-                                    val v = tracker.calculateVelocity().y
-                                    motion.release(-v / dragRange)
-                                } else {
-                                    onTap?.invoke() ?: motion.toggle()
+                                    motion.release(-tracker.calculateVelocity().y / dragRange)
+                                    change.consume()
                                 }
-                                change.consume()
                                 break
                             }
-                            val dy = change.position.y - change.previousPosition.y
-                            travelled += abs(change.position.y - change.previousPosition.y) +
-                                abs(change.position.x - change.previousPosition.x)
-                            tracker.addPosition(change.uptimeMillis, change.position)
-                            if (!dragging && draggable && travelled > viewConfiguration.touchSlop) {
-                                dragging = true
-                                // Dragging, it follows the finger at full size.
-                                motion.unpress()
+                            tracker.addPosition(change.uptimeMillis, now)
+                            val step = now - last
+                            last = now
+                            if (!dragging) {
+                                dx += abs(step.x)
+                                dy += step.y
+                                if (dy > viewConfiguration.touchSlop && dy > dx && canPull()) dragging = true
                             }
-                            if (dragging) motion.drag(-dy / dragRange)
-                            change.consume()
+                            if (dragging) {
+                                motion.drag(-step.y / dragRange)
+                                change.consume()
+                            } else {
+                                // A child took it (a dial, a scroll): it's theirs.
+                                val after = awaitPointerEvent(PointerEventPass.Final)
+                                if (after.changes.any { it.id == down.id && it.isConsumed }) break
+                            }
                         }
                     }
                 }
-        )
+            ) { content() }
+        }
+        // Touch while it moves: only the surface as drawn this frame (laid out once at the target's size and transformed
+        // onto the current bounds, so hit-testing follows it). Everywhere else, touches reach the page
+        // at once; on it, a tap turns it back from wherever it is and a drag takes it over (MOTION.md:
+        // animations never block input).
+        if (!restingOpen) {
+            Box(
+                Modifier
+                    .layout { measurable, constraints ->
+                        val tw = target.bounds.width.roundToInt().coerceAtLeast(0)
+                        val th = target.bounds.height.roundToInt().coerceAtLeast(0)
+                        val placeable = measurable.measure(Constraints.fixed(tw, th))
+                        layout(constraints.maxWidth, constraints.maxHeight) { placeable.place(0, 0) }
+                    }
+                    .graphicsLayer {
+                        val b = motion.bounds
+                        transformOrigin = TransformOrigin(0f, 0f)
+                        scaleX = (b.width / target.bounds.width.coerceAtLeast(1f)).coerceAtLeast(0.001f)
+                        scaleY = (b.height / target.bounds.height.coerceAtLeast(1f)).coerceAtLeast(0.001f)
+                        translationX = b.left
+                        translationY = b.top
+                        catcherDrawn[0] = scaleX
+                        catcherDrawn[1] = scaleY
+                        catcherDrawn[2] = b.left
+                        catcherDrawn[3] = b.top
+                    }
+                    // One gesture, the iOS way (user 2026-11-21: it couldn't be reopened while closing). A
+                    // touch catches it where it is; moving past the touch slop makes it a drag that follows
+                    // the finger and is thrown on release; lifting without moving is a tap that turns it back.
+                    .pointerInput(motion, draggable, dragRange) {
+                        awaitEachGesture {
+                            val down = awaitFirstDown(requireUnconsumed = false)
+                            down.consume()
+                            motion.catch()
+                            val tracker = VelocityTracker()
+                            var last = onScreen(down.position, catcherDrawn)
+                            tracker.addPosition(down.uptimeMillis, last)
+                            var dragging = false
+                            var travelled = 0f
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                                val now = onScreen(change.position, catcherDrawn)
+                                if (!change.pressed) {
+                                    motion.unpress()
+                                    if (dragging) {
+                                        motion.release(-tracker.calculateVelocity().y / dragRange)
+                                    } else {
+                                        onTap?.invoke() ?: motion.toggle()
+                                    }
+                                    change.consume()
+                                    break
+                                }
+                                val step = now - last
+                                last = now
+                                travelled += abs(step.x) + abs(step.y)
+                                tracker.addPosition(change.uptimeMillis, now)
+                                if (!dragging && draggable && travelled > viewConfiguration.touchSlop) {
+                                    dragging = true
+                                    // Dragging, it follows the finger at full size.
+                                    motion.unpress()
+                                }
+                                if (dragging) motion.drag(-step.y / dragRange)
+                                change.consume()
+                            }
+                        }
+                    }
+            )
+        }
         // The source's own content, at its own size, riding at the top of the surface and centred:
         // blurs and fades out as the target's sharpens in (and back on the way home).
         if (sourceContent != null) {
+            // Centred in the source's size, as a button centres its label (2026-11-21: pinned to the
+            // corner, the moon pill's label sat up and to the left during the hand-off).
             Box(
-                Modifier
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
                     .layout { measurable, constraints ->
                         val sw = source.bounds.width.roundToInt().coerceAtLeast(0)
                         val sh = source.bounds.height.roundToInt().coerceAtLeast(0)
@@ -498,6 +636,25 @@ object MorphHandOff {
      * (user 2026-11-21: 8 dp was too subtle).
      */
     val Blur: Dp = 20.dp
+}
+
+/** A position in a layer drawn with [drawn] (scale x, scale y, left, top) as a position on screen. */
+private fun onScreen(local: Offset, drawn: FloatArray): Offset =
+    Offset(local.x * drawn[0] + drawn[2], local.y * drawn[1] + drawn[3])
+
+/**
+ * The surface's outline as it is now: [custom] for the current radius and progress, or evenly rounded.
+ * Reads the motion when asked, so one instance serves every frame.
+ */
+private class LiveMorphShape(
+    private val motion: MorphMotion,
+    private val custom: ((radius: Float, progress: Float) -> Shape)?,
+) : Shape {
+    override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
+        val radius = motion.cornerRadius.coerceAtMost(size.minDimension / 2f)
+        custom?.let { return it(radius, motion.progress).createOutline(size, layoutDirection, density) }
+        return Outline.Rounded(RoundRect(0f, 0f, size.width, size.height, CornerRadius(radius)))
+    }
 }
 
 /** [SpringMorph]'s content clip: [height] and [radius] in the content layer's unscaled coordinates. */
