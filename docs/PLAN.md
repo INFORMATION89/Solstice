@@ -2677,3 +2677,9 @@ Steps:
     twinkle.
   - **Used by** the home sky and the postcard window's sky. The moon sheet uses it in F5.
 
+- **2026-11-21 (agreed with the user in chat): plan for right now** (CONTINUE.md "Right now"): the summary
+  texts (table of agreed strings; "rain expected" texts stay); "last updated" and the weather source as a quiet
+  line at the bottom of Forecast; **refresh the main place on every cold start** (replaces the 30-min
+  proposal), then count the API requests and check sources' rules before calling it done; **"Will I see it
+  tonight?"** in the moon card (moon up at night + hourly cloud cover; texts in WRITING.md's style, to show the
+  user); then F5.

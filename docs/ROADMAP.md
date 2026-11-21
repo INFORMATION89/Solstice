@@ -93,9 +93,9 @@ comparison to Google's libraries, no weather references), and Apple's principles
   itself becomes the card; blur to hide text changes; text transformations (label into title, replace,
   rolling numbers); a lab demo per kind of animation; the toolbar's animations into `:motion` and the lab.
   PLAN.md "Morph refining".
-- [ ] 💬 **"Last updated" text** on Forecast (relative, "Updating…", "Couldn't update"). PLAN.md.
-- [ ] 💬 **Refresh on open** without overdoing it: shown place only, 30 min freshness (to agree), sources'
-  rules, back-off after failures, reuse a recent position. PLAN.md "Last updated text and refresh on open".
+- [ ] **"Last updated" and the weather source** at the bottom of Forecast (agreed 2026-11-21; CONTINUE.md "Right now").
+- [ ] **Refresh the main place on a cold start** (agreed 2026-11-21), then check the API cost with the user.
+- [ ] **"Will I see it tonight?"** in the moon card (agreed 2026-11-21, with F5).
 - [ ] **Fix:** one toolbar for home and the postcard window (the window's This week title doesn't fold;
   no page jump; missing hooks). Shared state + host, only configuration differs (CONTINUE.md 0b.3).
 - [x] 💬 **Solstice's opinion** (DESIGN.md, written with the user 2026-11-21).
@@ -103,7 +103,7 @@ comparison to Google's libraries, no weather references), and Apple's principles
   proactive channels (Live Updates, daily brief, clothing). PLAN.md "Research queue".
 - [ ] **Design audits** (DESIGN.md): empty/loading/error/offline states everywhere; affordances vs behaviour;
   dead ends and links between information; landscape/foldable/tablet layouts; settings that shouldn't exist.
-- [ ] **Summary wording** to WRITING.md's "natural, not generated" rule (week summary first).
+- [ ] **Summary wording** (agreed table in CONTINUE.md "Right now").
 - [x] 💬 **Moon card redesign** designed in chat: direction A with changes (2026-11-21).
 - [ ] ⭐ **Foundations for it** (PLAN.md): ~~F1 haptics system~~ (built 2026-11-21), ~~F2 edge blur generalized~~ (built 2026-11-21), ~~F3 dial~~ (built 2026-11-21), ~~F4 sky effects~~ (built 2026-11-21)
   (stars, twinkle ready but off, ready for weather effects), then F5 the moon card.
