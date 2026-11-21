@@ -28,6 +28,10 @@ Where things stand and how to pick the work up anywhere. The plan, decisions and
 ## Right now (2026-11-21 afternoon, agreed with the user in chat), in this order
 
 1. **Summary texts** (agreed wording; WRITING.md "natural, not generated"). No phone needed to build.
+   - **Built 2026-11-21** (not seen on the phone). Two additions so "Today" reads right: `week_one_wet_today`
+     ("You'll need an umbrella today") and `week_coldest_tonight` ("The coldest night will be tonight, at").
+     The moon's rise/set lines say "The moon will…" (the user's later rule: never "it"). `shell_hourly_steady`
+     now takes the temperature. No translations of these strings existed, so none to mark.
    | String | Now | New |
    |---|---|---|
    | `week_dry` | A dry week ahead | No rain expected this week |
@@ -68,6 +72,17 @@ Where things stand and how to pick the work up anywhere. The plan, decisions and
    plus secondary sources), confirm we honour MET Norway's `Expires` / `If-Modified-Since` and any source's rate
    limits, and how often Android cold-starts the app in normal use. Bring the numbers to the user; if needed,
    propose a small floor (e.g. skip when updated under 5–10 min ago).
+   - **Built 2026-11-21** (not checked on the phone): `MainActivity` (cold start) → `requestColdStartRefresh()`;
+     the next update check refreshes the main place once if it's the place shown. The "too frequent"
+     snackbar now only shows when the user asked for the refresh.
+   - **API cost (measured from the code):** a refresh asks each source only for features past their own
+     wait (`RefreshHelper`: forecast 5 min, 15 min for restricted sources; air quality, pollen, alerts 5 min
+     to 1 h). So a cold start within 5 min of the last update makes **no weather requests**. Otherwise,
+     with Open-Meteo for everything: **2 requests** (forecast with current and minutely; air quality with
+     pollen). "auto" may mix in a national source for alerts or minutely: **+1–2**. Reverse geocoding is
+     offline (Natural Earth). OkHttp has a 50 MB HTTP cache, so `Expires` / `Last-Modified` (MET Norway)
+     are honoured with conditional requests. **No extra floor needed**; how often Android cold-starts the
+     app is still to watch on the phone.
 4. **"Will I see it tonight?" in the moon card** (approved idea; part of F5). A tile or one line, written by
    WRITING.md's rules (future tense, natural, one fact per sentence, only what helps decide):
    - Data: the moon's time above the horizon tonight (rise/set from `MoonSky`), the night hours, and hourly
@@ -99,6 +114,10 @@ Where things stand and how to pick the work up anywhere. The plan, decisions and
    priority-list summary engine (shared, unit-tested; no phone needed), the 6 PM evening switch, the
    "precipitation" rule, and check whether our sources give yesterday's data. **Show the user every new
    sentence and the evening-time setting before shipping.** Onboarding steps: propose to the user first.
+   - **Engine built 2026-11-21** (`shell/Summary.kt`, 5 tests in `SummaryTest`): `Summary(rules, max = 2)`,
+     `SummaryRule`, `SummaryLine` (with a topic, so two lines never say the same thing), `SummaryTime`
+     (evening from 6 PM, adjustable), `Precipitation` (rain vs precipitation). **Not wired to any page yet:**
+     next, write Forecast's and This week's rule lists and show the user every sentence first.
 6. Then continue with **F5, the moon card** (below), which includes 4.
 
 **Phone pass still due** for everything built today (list below). The user tests when the phone is connected;

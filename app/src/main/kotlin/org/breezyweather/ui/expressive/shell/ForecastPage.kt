@@ -531,7 +531,10 @@ private fun hourlyHeadline(context: Context, hours: List<breezyweather.domain.we
             hours[maxIdx].temperature?.temperature?.let { degrees(context, it) } ?: "",
             maxIdx.coerceAtLeast(1)
         )
-        else -> context.getString(R.string.shell_hourly_steady, hours.first().weatherText?.lowercase() ?: "")
+        else -> context.getString(
+            R.string.shell_hourly_steady,
+            hours.first().temperature?.temperature?.let { degrees(context, it) } ?: return null
+        )
     }
 }
 

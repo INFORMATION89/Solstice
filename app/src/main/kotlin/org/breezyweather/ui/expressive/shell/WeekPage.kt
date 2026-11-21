@@ -126,6 +126,7 @@ private fun WeekSummary(
     fun name(i: Int) = if (i == 0) context.getString(R.string.shell_today) else dayLong(days[i].date, location.timeZone)
     val headline = when {
         wetDays.isEmpty() -> context.getString(R.string.week_dry)
+        wetDays.size == 1 && wetDays.first() == 0 -> context.getString(R.string.week_one_wet_today)
         wetDays.size == 1 -> context.getString(R.string.week_one_wet, name(wetDays.first()))
         wetDays.size >= days.size - 1 -> context.getString(R.string.week_mostly_wet)
         else -> context.getString(R.string.week_some_wet, countWord(context, wetDays.size))
@@ -142,9 +143,17 @@ private fun WeekSummary(
         if (hottest != null) {
             append(context.getString(R.string.week_warmest, name(hottest)) + " ")
             withStyle(ValueStyle) { append(degrees(context, highs[hottest]!!)) }
+            append(".")
         }
         if (coldest != null) {
-            append(context.getString(R.string.week_coldest_night, name(coldest)) + " ")
+            if (hottest != null) append(" ")
+            append(
+                if (coldest == 0) {
+                    context.getString(R.string.week_coldest_tonight)
+                } else {
+                    context.getString(R.string.week_coldest_night, name(coldest))
+                } + " "
+            )
             withStyle(ValueStyle) { append(degrees(context, lows[coldest]!!)) }
             append(".")
         }

@@ -41,9 +41,9 @@
     <string name="shell_sun_mild">Mild sun</string>
     <string name="shell_sun_strong">Strong sun</string>
     <string name="shell_sun_very_strong">Very strong sun</string>
-    <string name="shell_hourly_down">Going down to %1$s in the next %2$d hours</string>
-    <string name="shell_hourly_up">Going up to %1$s in the next %2$d hours</string>
-    <string name="shell_hourly_steady">Steady, %1$s for the next hours</string>
+    <string name="shell_hourly_down">It will drop to %1$s over the next %2$d hours</string>
+    <string name="shell_hourly_up">It will climb to %1$s over the next %2$d hours</string>
+    <string name="shell_hourly_steady">It will stay around %1$s for the next few hours</string>
     <string name="shell_hourly_rain_at">%1$s from %2$s</string>
     <string-array name="shell_rain_strength">
         <item>Light</item>
@@ -51,7 +51,7 @@
         <item>Heavy</item>
     </string-array>
     <string name="shell_rain_next_hour">%1$s rain expected in the next hour</string>
-    <string name="shell_rain_stops_in">Rain expected to stop in %1$d minutes</string>
+    <string name="shell_rain_stops_in">Rain should stop in about %1$d minutes</string>
     <string name="shell_rain_starts_in">%1$s rain expected in %2$d minutes</string>
     <plurals name="shell_rain_in_hours">
         <item quantity="one">%1$s rain expected in about %2$d hour</item>
@@ -67,19 +67,21 @@
     <string name="settings_feels_like_main">Show feels-like as the main temperature</string>
     <string name="shell_actual_temperature">Actual %1$s</string>
     <string name="shell_now_main_place">This is now your main place</string>
-    <string name="week_dry">A dry week ahead</string>
-    <string name="week_one_wet">Only %1$s needs an umbrella</string>
-    <string name="week_some_wet">It’s raining %1$s days this week</string>
-    <string name="week_mostly_wet">A wet week, keep an umbrella close</string>
+    <string name="week_dry">No rain expected this week</string>
+    <string name="week_one_wet">You’ll need an umbrella on %1$s</string>
+    <string name="week_one_wet_today">You’ll need an umbrella today</string>
+    <string name="week_some_wet">It will rain on %1$s days this week</string>
+    <string name="week_mostly_wet">It will rain most of the week. Keep an umbrella close.</string>
     <string name="week_expect">Expect</string>
     <string name="week_on">on %1$s</string>
-    <string name="week_warmest">%1$s is the warmest at</string>
-    <string name="week_coldest_night">, and the coldest night is %1$s at</string>
+    <string name="week_warmest">%1$s will be the warmest day, at</string>
+    <string name="week_coldest_night">The coldest night will be on %1$s, at</string>
+    <string name="week_coldest_tonight">The coldest night will be tonight, at</string>
     <string name="moon_title">Moon</string>
-    <string name="moon_lit_growing">The moon is %1$s lit and growing.</string>
-    <string name="moon_lit_shrinking">The moon is %1$s lit and shrinking.</string>
-    <string name="moon_rises_then_sets">It rises at %1$s and sets at %2$s.</string>
-    <string name="moon_sets_then_rises">It sets at %1$s and rises again at %2$s.</string>
+    <string name="moon_lit_growing">Tonight the moon will be %1$s lit and still growing.</string>
+    <string name="moon_lit_shrinking">Tonight the moon will be %1$s lit and already shrinking.</string>
+    <string name="moon_rises_then_sets">The moon will rise at %1$s and set at %2$s.</string>
+    <string name="moon_sets_then_rises">The moon will set at %1$s and rise again at %2$s.</string>
     <string name="moon_full_in">Full moon in %1$s, %2$s away.</string>
     <string name="moon_full_today">Full moon today, %1$s away.</string>
     <!-- "Will I see it tonight?" (agreed 2026-11-21): always "The moon…", "from" for a start time. -->

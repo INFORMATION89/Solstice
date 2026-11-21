@@ -119,6 +119,14 @@ class MainActivityViewModel @Inject constructor(
     val initCompleted = _initCompleted.asStateFlow()
     private var updating = false
 
+    // Solstice (agreed 2026-11-21): a cold start refreshes the main place whatever its age, once.
+    private var refreshMainOnStart = false
+
+    /** Called on a cold start: the next update check refreshes the main place even if it's still valid. */
+    fun requestColdStartRefresh() {
+        refreshMainOnStart = true
+    }
+
     // life cycle.
     fun init(formattedId: String? = null) {
         onCleared()
@@ -312,8 +320,12 @@ class MainActivityViewModel @Inject constructor(
     private fun checkToUpdateCurrentLocation() {
         // is not loading
         if (!updating) {
+            // Solstice: on a cold start the main place (first in the list) refreshes whatever its age.
+            val main = validLocationList.value.firstOrNull()?.formattedId
+            val coldStart = refreshMainOnStart && main != null && currentLocation.value?.location?.formattedId == main
+            refreshMainOnStart = false
             // if already valid, just return.
-            if (currentLocationIsValid()) return
+            if (!coldStart && currentLocationIsValid()) return
 
             // If we don't have any location yet, just return
             if (currentLocation.value?.location == null) {
@@ -370,10 +382,13 @@ class MainActivityViewModel @Inject constructor(
         ) {
             _loading.value = true
             _loading.value = false
-            SnackbarHelper.showSnackbar(
-                getApplication<Application>()
-                    .getString(R.string.weather_message_too_frequent_refreshes)
-            )
+            // Solstice: only tell the user when they asked (not on an automatic check, e.g. a cold start).
+            if (triggeredByUser) {
+                SnackbarHelper.showSnackbar(
+                    getApplication<Application>()
+                        .getString(R.string.weather_message_too_frequent_refreshes)
+                )
+            }
             return
         }
         _loading.value = true

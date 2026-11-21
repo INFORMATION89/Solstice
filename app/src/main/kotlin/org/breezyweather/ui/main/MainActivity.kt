@@ -266,6 +266,7 @@ class MainActivity : BreezyActivity(), HomeFragment.Callback, ManagementFragment
         setContentView(binding.root)
 
         initModel(savedInstanceState == null)
+        if (isLaunch) viewModel.requestColdStartRefresh() // Solstice: refresh the main place (agreed 2026-11-21)
         initView()
         initShell() // Solstice
 
