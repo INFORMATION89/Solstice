@@ -343,7 +343,7 @@ internal object MoonCardState {
  * Reads the morph's value when the outline is built (every size change, i.e. every frame of the
  * morph).
  */
-private class MoonSheetShape(private val radius: Float, private val progress: Float) : Shape {
+internal class MoonSheetShape(private val radius: Float, private val progress: Float) : Shape {
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
         val top = minOf(radius, size.minDimension / 2)
         val bottom = top * (1f - progress.coerceIn(0f, 1f))

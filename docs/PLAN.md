@@ -2763,3 +2763,18 @@ Steps:
   refreshes the place (`refreshPlace(pause = 0, onDone)`); a pull from the top strip (status bar +
   56 dp, the "Visiting" line) still folds it home. `SpringMorph.canPull` now gets the start point.
   Built and installed (profile); not yet felt on the phone.
+- **2026-11-21 (planned, the user): an analog clock icon.** The clock beside a visit's local time (and the
+  Forecast's local-time line) shows the actual time there as an analog face, hands at that hour and
+  minute, instead of a fixed clock symbol. Not built; propose its look before building.
+- **2026-11-21: second round from the user's phone check.** (1) Reopening while closing (moon card,
+  postcard window): catching a closing morph stopped its springs, so `isVisible` went false and the
+  app tore it down (the lab has no teardown, so it worked there); `MorphMotion` now stays visible while
+  caught. (2) A tap never closes a postcard window (caught opening, it carries on; closing, it reopens).
+  (3) **The postcard window is a sheet** (agreed, "sheet with a handle"): it grows from the postcard
+  into a sheet below the status bar, rounded on top (`MoonSheetShape`), with a handle; the page behind
+  dims; a pull from the top 64 dp of the sheet folds it home, a pull on the page refreshes, a tap above
+  closes. (4) **"Visiting" line in the page frame**: `LocalVisit` + `VisitingLine` in `PageFrame.kt`;
+  `PageScaffold` and the Forecast page show it at the top of the page, scrolling with it, and start at
+  the sheet's top (`pageTopInset()`). "Visiting" only until pinned. (5) **A dry week's headline is the
+  temperature trend** (agreed): warming / getting colder / steady, first three highs vs last three,
+  3 °C threshold (`weekTrend`). Built and installed; not yet felt on the phone.

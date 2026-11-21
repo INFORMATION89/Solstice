@@ -106,6 +106,24 @@ internal fun DaysPage(
 private fun isWet(w: SkyWeather) = w == SkyWeather.RAIN || w == SkyWeather.THUNDERSTORM || w == SkyWeather.SNOW
 
 /**
+ * A dry week's headline (agreed 2026-11-21): the trend of the highs, the first three days against the
+ * last three; a change of [TREND_DEGREES] °C or more is warming up or getting colder, otherwise steady.
+ */
+internal fun weekTrend(highs: List<Double?>): Int {
+    val known = highs.filterNotNull()
+    if (known.size < 4) return R.string.week_steady
+    val n = minOf(3, known.size / 2)
+    val change = known.takeLast(n).average() - known.take(n).average()
+    return when {
+        change >= TREND_DEGREES -> R.string.week_warming
+        change <= -TREND_DEGREES -> R.string.week_cooling
+        else -> R.string.week_steady
+    }
+}
+
+private const val TREND_DEGREES = 3.0
+
+/**
  * The week in words (agreed 2026-11-18, design B): a headline and a sentence. A condition named in
  * the text has its small icon inline ("Expect [rain] on Saturday"); temperatures are bold and
  * underlined, ready to become links to that day's card.
@@ -125,7 +143,8 @@ private fun WeekSummary(
     val wetDays = days.indices.filter { isWet(SkyWeather.of(days[it].day?.weatherCode)) }
     fun name(i: Int) = if (i == 0) context.getString(R.string.shell_today) else dayLong(days[i].date, location.timeZone)
     val headline = when {
-        wetDays.isEmpty() -> context.getString(R.string.week_dry)
+        // A dry week says how it feels instead (user 2026-11-21: "no rain expected" isn't useful).
+        wetDays.isEmpty() -> context.getString(weekTrend(highs.map { it?.inCelsius }))
         wetDays.size == 1 && wetDays.first() == 0 -> context.getString(R.string.week_one_wet_today)
         wetDays.size == 1 -> context.getString(R.string.week_one_wet, name(wetDays.first()))
         wetDays.size >= days.size - 1 -> context.getString(R.string.week_mostly_wet)

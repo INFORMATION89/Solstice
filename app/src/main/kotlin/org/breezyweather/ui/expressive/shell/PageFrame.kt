@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,26 +31,35 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import breezyweather.domain.location.model.Location
 import io.github.information89.motion.EdgeBand
 import io.github.information89.motion.Motion
 import io.github.information89.motion.edgeBlur
+import org.breezyweather.R
+import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.theme.Sizes
 import org.breezyweather.ui.expressive.theme.Space
 import kotlin.math.abs
@@ -101,6 +111,48 @@ internal fun ToolbarDock(alpha: () -> Float = { 1f }, content: @Composable Colum
     }
 }
 
+/**
+ * A place being visited in a postcard window (null on home): every page frame shows its "Visiting"
+ * line at the top of the page, scrolling with it, and starts at the sheet's top instead of under the
+ * status bar (user 2026-11-21: the line stayed fixed on top while the page scrolled).
+ */
+internal data class Visit(val location: Location, val now: Long, val pinned: Boolean)
+
+internal val LocalVisit = compositionLocalOf<Visit?> { null }
+
+/** Where a page's content starts: under the status bar, or at the top of a postcard window's sheet. */
+@Composable
+internal fun pageTopInset(): Dp =
+    if (LocalVisit.current != null) 0.dp else WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+
+/**
+ * A visit's line: "[landing plane] Visiting" until it's pinned, and its local time when that differs
+ * from yours ("[clock] 2:33 PM, +14 h"). Nothing on home.
+ */
+@Composable
+internal fun VisitingLine(ink: Color, modifier: Modifier = Modifier) {
+    val visit = LocalVisit.current ?: return
+    val context = LocalContext.current
+    val localTime = timeDifference(visit.location.timeZone, visit.now)?.let { diff ->
+        time(context, java.util.Date(visit.now), visit.location.timeZone) + ", " + diff
+    }
+    if (visit.pinned && localTime == null) return
+    val style = MaterialTheme.typography.labelLarge
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
+        if (!visit.pinned) {
+            Icon(SolsticeIcons.Small.FlightLand, null, tint = ink, modifier = Modifier.size(Sizes.IconSmall))
+            Spacer(Modifier.width(Space.S1))
+            Text(stringResource(R.string.shell_visiting), style = style, color = ink)
+            if (localTime != null) Text(" · ", style = style, color = ink)
+        }
+        if (localTime != null) {
+            Icon(SolsticeIcons.Small.Schedule, null, tint = ink, modifier = Modifier.size(Sizes.IconSmall))
+            Spacer(Modifier.width(Space.S1))
+            Text(localTime, style = style, color = ink)
+        }
+    }
+}
+
 /** The large title's distance below the status bar on plain pages. */
 private val PageTitleTop = 34.dp
 
@@ -124,7 +176,8 @@ internal fun PageScaffold(
     action: (@Composable () -> Unit)? = null,
     content: LazyListScope.() -> Unit,
 ) {
-    val top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val top = pageTopInset()
+    val visiting = LocalVisit.current != null
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(
@@ -141,6 +194,9 @@ internal fun PageScaffold(
             strength = pageFade
         )
     ) {
+        if (visiting) {
+            item(key = "visit") { VisitingLine(onPage.copy(alpha = 0.85f), Modifier.padding(start = Space.S1)) }
+        }
         item(key = "header") {
             // As tall as an icon button, with or without one, so the title sits at the same height.
             Row(

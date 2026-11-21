@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.TextAutoSize
@@ -141,10 +140,12 @@ internal fun ForecastPage(
                     }
                 }
                 .verticalScroll(scrollState)
-                .statusBarsPadding()
+                .padding(top = pageTopInset())
                 .padding(horizontal = Space.S5)
                 .padding(top = Space.S10, bottom = 120.dp)
         ) {
+            // A visit's line above the title, scrolling with the page (postcard windows only).
+            VisitingLine(text.copy(alpha = 0.85f), Modifier.padding(bottom = Space.S2))
             // Only the location's title at the top (plus an icon for the current position).
             val (title, city) = placeName(context, location)
             Row(verticalAlignment = Alignment.CenterVertically) {

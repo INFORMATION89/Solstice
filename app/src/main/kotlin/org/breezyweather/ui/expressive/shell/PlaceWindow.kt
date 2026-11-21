@@ -22,6 +22,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -31,6 +32,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -75,6 +77,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -108,8 +111,8 @@ import org.breezyweather.ui.expressive.theme.Space
 import org.breezyweather.ui.theme.compose.BreezyWeatherTheme
 import kotlin.math.abs
 
-/** How far below the status bar a pull still closes the window (the "Visiting" line). */
-private val CLOSE_STRIP = 56.dp
+/** How far below the sheet's top a pull closes the window (the handle and the "Visiting" line). */
+private val CLOSE_STRIP = 64.dp
 
 /** The morph key of a place's postcard (its window grows out of it). */
 internal fun postcardKey(id: String) = "postcard-$id"
@@ -160,9 +163,16 @@ internal fun PlaceWindow(
     }
     fun progress() = motion.progress
     val window = androidx.compose.ui.platform.LocalWindowInfo.current.containerSize
-    val target = remember(window) {
-        MorphAnchor(Rect(0f, 0f, window.width.toFloat(), window.height.toFloat()), 0f)
+    // A sheet like the moon card's (agreed 2026-11-21): docked at the bottom, its top just below the
+    // status bar, rounded on top with a handle; the bottom corners square off as it docks.
+    val density = LocalDensity.current
+    val statusTop = WindowInsets.statusBars.getTop(density)
+    val sheetTop = statusTop + with(density) { Space.S3.toPx() }
+    val radius = with(density) { Corners.XL.toPx() }
+    val target = remember(window, sheetTop, radius) {
+        MorphAnchor(Rect(0f, sheetTop, window.width.toFloat(), window.height.toFloat()), radius)
     }
+    val sheetShape = remember { { r: Float, p: Float -> MoonSheetShape(r, p) } }
     val sky = skyFor(location, now)
     // Night there: the window's own interface is dark (the main screen keeps your setting).
     val night = sky.sunHeight < 0f
@@ -184,9 +194,21 @@ internal fun PlaceWindow(
             SkySystemBars(if (pager.currentPage == 1) sky.palette else plainPalette(page, onPage))
         }
         val context = LocalContext.current
-        val density = LocalDensity.current
-        val statusTop = WindowInsets.statusBars.getTop(density)
-        val closeStrip = statusTop + with(density) { CLOSE_STRIP.toPx() }
+        val closeStrip = sheetTop + with(density) { CLOSE_STRIP.toPx() }
+        // While open, the page behind dims a little, and a tap above the sheet closes it.
+        Box(
+            Modifier
+                .fillMaxSize()
+                .graphicsLayer { alpha = progress().coerceIn(0f, 1f) }
+                .background(Color.Black.copy(alpha = 0.25f))
+        )
+        if (motion.isOpen) {
+            Box(
+                Modifier.fillMaxWidth().height(with(density) { sheetTop.toDp() }).pointerInput(Unit) {
+                    detectTapGestures { onClose() }
+                }
+            )
+        }
         SpringMorph(
             from = from,
             target = target,
@@ -196,9 +218,13 @@ internal fun PlaceWindow(
             modifier = Modifier.graphicsLayer {
                 alpha = if (fadeOut && !motion.isOpen) progress().coerceIn(0f, 1f) else 1f
             },
-            // A pull on the page refreshes, like home (user 2026-11-21); a pull from the window's top strip
-            // (the status bar and the "Visiting" line) folds it back into its postcard.
+            shape = sheetShape,
+            // A pull on the page refreshes, like home (user 2026-11-21); a pull from the sheet's top (its
+            // handle and the "Visiting" line) folds it back into its postcard.
             canPull = { start -> start.y < closeStrip },
+            // A tap never closes a window (user 2026-11-21: a tap just after opening a postcard dismissed
+            // it): caught while opening, it carries on; caught while closing, it opens again.
+            onTap = { motion.open() },
             // The postcard itself blurs out as the window sharpens in (and back on the way home).
             sourceContent = {
                 PlaceCard(
@@ -233,77 +259,52 @@ internal fun PlaceWindow(
                             // This week sits on the plain page, like Outlook.
                             .plainPageBackdrop({ nav.visualPosition() }, skyPage = 1, page = page)
                     ) {
-                        HorizontalPager(
-                            state = pager,
-                            beyondViewportPageCount = 1,
-                            flingBehavior = nav.fling,
-                            modifier = Modifier.fillMaxSize().pageTransition(nav.pageChange)
-                        ) { index ->
-                            Box(Modifier.fillMaxSize().pageSwipeBlur({ nav.visualPosition() }, index)) {
-                                if (index == 0) {
-                                    DaysPage(location, onPage, page, days) {
-                                        abs(nav.visualPosition() - 1f).coerceIn(0f, 1f)
-                                    }
-                                } else {
-                                    CompositionLocalProvider(
-                                        LocalSkyGlass provides windowSky,
-                                        LocalPageGlass provides windowGlass
-                                    ) {
-                                        ForecastPage(
-                                            location = location,
-                                            sky = sky,
-                                            now = now,
-                                            refreshing = refreshing,
-                                            onRefresh = onRefresh,
-                                            onDetails = onDetails,
-                                            onOpenPlaces = { onClose() },
-                                            showLocalTime = false,
-                                            source = source,
-                                            scroll = forecastScroll
-                                        )
+                        CompositionLocalProvider(LocalVisit provides Visit(location, now, pinned)) {
+                            HorizontalPager(
+                                state = pager,
+                                beyondViewportPageCount = 1,
+                                flingBehavior = nav.fling,
+                                modifier = Modifier.fillMaxSize().pageTransition(nav.pageChange)
+                            ) { index ->
+                                Box(Modifier.fillMaxSize().pageSwipeBlur({ nav.visualPosition() }, index)) {
+                                    if (index == 0) {
+                                        DaysPage(location, onPage, page, days) {
+                                            abs(nav.visualPosition() - 1f).coerceIn(0f, 1f)
+                                        }
+                                    } else {
+                                        CompositionLocalProvider(
+                                            LocalSkyGlass provides windowSky,
+                                            LocalPageGlass provides windowGlass
+                                        ) {
+                                            ForecastPage(
+                                                location = location,
+                                                sky = sky,
+                                                now = now,
+                                                refreshing = refreshing,
+                                                onRefresh = onRefresh,
+                                                onDetails = onDetails,
+                                                onOpenPlaces = { onClose() },
+                                                showLocalTime = false,
+                                                source = source,
+                                                scroll = forecastScroll
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
-                        // "Visiting" until you pin it, and its local time when it differs from yours.
-                        // "[landing plane] Visiting · [clock] 2:33 PM, 14 hours ahead".
-                        val localTime = timeDifference(location.timeZone, now)?.let { diff ->
-                            time(context, java.util.Date(now), location.timeZone) + ", " + diff
-                        }
-                        val ink = sky.palette.text.copy(alpha = 0.85f)
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .align(Alignment.TopCenter)
-                                .statusBarsPadding()
-                                .padding(top = Space.S2)
-                        ) {
-                            Icon(
-                                SolsticeIcons.Small.FlightLand,
-                                contentDescription = null,
-                                tint = ink,
-                                modifier = Modifier.size(Sizes.IconSmall)
-                            )
-                            Spacer(Modifier.width(Space.S1))
-                            Text(
-                                stringResource(R.string.shell_visiting),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = ink
-                            )
-                            if (localTime != null) {
-                                Text(" · ", style = MaterialTheme.typography.labelLarge, color = ink)
-                                Icon(
-                                    SolsticeIcons.Small.Schedule,
-                                    contentDescription = null,
-                                    tint = ink,
-                                    modifier = Modifier.size(Sizes.IconSmall)
-                                )
-                                Spacer(Modifier.width(Space.S1))
-                                Text(localTime, style = MaterialTheme.typography.labelLarge, color = ink)
-                            }
-                        }
                     }
                 }
+                // The handle, like the moon card's.
+                Box(
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .graphicsLayer { alpha = ((progress() - 0.25f) / 0.5f).coerceIn(0f, 1f) }
+                        .padding(top = Space.S3)
+                        .width(Sizes.HandleWidth)
+                        .height(Sizes.HandleThickness)
+                        .background(sky.palette.text.copy(alpha = 0.4f), CircleShape)
+                )
                 // The home toolbar, as is: This week and Forecast, and Pin budding out of Forecast like search
                 // does out of Places (pin keeps the place; otherwise it's gone when you go back).
                 val scope = rememberCoroutineScope()

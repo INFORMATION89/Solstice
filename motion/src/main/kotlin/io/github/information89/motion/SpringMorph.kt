@@ -132,9 +132,16 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
     var isOpen by mutableStateOf(false)
         private set
 
-    /** Whether it's on screen: open, or still moving back into its source. */
+    // Held still under a finger (caught): stopped, but still on screen until the finger decides.
+    private var caught by mutableStateOf(false)
+
+    /**
+     * Whether it's on screen: open, still moving back into its source, or caught on the way (2026-11-21:
+     * a card caught while closing read as "closed" the moment its springs stopped, so the app removed it
+     * and a tap couldn't reopen it).
+     */
     val isVisible: Boolean
-        get() = isOpen || cx.isRunning || cy.isRunning || w.isRunning || h.isRunning || r.isRunning
+        get() = isOpen || caught || cx.isRunning || cy.isRunning || w.isRunning || h.isRunning || r.isRunning
 
     /** The surface's bounds now, in the host's coordinates. */
     val bounds: Rect
@@ -188,6 +195,7 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
     /** Springs every property to [to] with [springs], each from its current velocity plus [kick]. */
     private fun animate(to: MorphAnchor, springs: MorphSprings, kick: List<Float> = List(5) { 0f }) {
         val v = values(to)
+        caught = false
         val props = listOf(
             cx to springs.position,
             cy to springs.position,
@@ -313,6 +321,7 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
      * cancelled); a drag carries on from there, a tap turns it back.
      */
     internal fun catch() {
+        caught = true
         scope.launch { press.animateTo(1f, Motion.snappy.spec()) }
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
             cx.stop()
