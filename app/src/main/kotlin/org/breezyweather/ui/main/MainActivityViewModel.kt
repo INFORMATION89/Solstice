@@ -480,11 +480,11 @@ class MainActivityViewModel @Inject constructor(
     }
 
     /** Solstice: fetch one place's weather without selecting it (a postcard window from search). */
-    fun refreshPlace(context: Context, place: Location) {
+    fun refreshPlace(context: Context, place: Location, pause: Long = 500, onDone: () -> Unit = {}) {
         // Off the main thread (address lookup and fetching can block), and after a short pause so
         // the postcard window can open smoothly first.
         viewModelScope.launch(Dispatchers.IO) {
-            delay(500)
+            delay(pause)
             getWeather(
                 context,
                 place,
@@ -492,7 +492,10 @@ class MainActivityViewModel @Inject constructor(
                     override fun onCompleted(location: Location, errors: List<RefreshError>) {
                         // Replace exactly the place that was fetched (its id can change once its
                         // address is looked up), never the selected one.
-                        viewModelScope.launch(Dispatchers.Main) { updateInnerData(location, oldLocation = place) }
+                        viewModelScope.launch(Dispatchers.Main) {
+                            updateInnerData(location, oldLocation = place)
+                            onDone()
+                        }
                     }
                 }
             )

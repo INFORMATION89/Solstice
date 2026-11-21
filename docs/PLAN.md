@@ -2752,3 +2752,14 @@ Steps:
   proposal), then count the API requests and check sources' rules before calling it done; **"Will I see it
   tonight?"** in the moon card (moon up at night + hourly cloud cover; texts in WRITING.md's style, to show the
   user); then F5.
+- **2026-11-21: three fixes from the user's phone check.** (1) Holding the moon card closed it:
+  `SpringMorph`'s springs settled to 0.01 px, so an open card stayed "moving" for a long invisible
+  tail and a touch was caught as a tap that turned it back; they now settle within 0.5 px, a hold
+  (past the long-press timeout) or a catch at the target just carries on (`MorphMotion.resume`),
+  and the catcher stays under the finger until it lifts (it used to vanish once the springs stopped,
+  leaving the card pressed in). (2) The moon pill had no background: it blurred the page glass it
+  sits inside, which can't blur itself; it now blurs the sky (`LocalSkyGlass`), like the page's cards.
+  (3) A postcard window can refresh (agreed: "pull refreshes, like home"): a pull on its Forecast
+  refreshes the place (`refreshPlace(pause = 0, onDone)`); a pull from the top strip (status bar +
+  56 dp, the "Visiting" line) still folds it home. `SpringMorph.canPull` now gets the start point.
+  Built and installed (profile); not yet felt on the phone.

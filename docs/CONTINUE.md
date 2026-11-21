@@ -153,6 +153,11 @@ replace). `SpringMorph` gained `fromBounds` (grow from a rectangle; the key only
 down at the top of Forecast and of This week (and scrolled down: it should scroll first); back gesture
 (follow, cancel, commit); tap while closing reopens; an unkept visit fades away; pin.
 
+**Fixed 2026-11-21 evening, to check on the phone** (PLAN.md log): holding the open moon card no longer
+closes it; the moon pill has its glass background (sky glass); a postcard window refreshes on a pull,
+and closes on a pull from its top strip ("Visiting" line) or back. **Next after this: the moon card
+(F5).**
+
 **Built 2026-11-21 but not yet tested on the phone** (one pass, profile build, Pixel 7; details in the
 PLAN.md log):
 - Motion Lab: "Morph, iOS way (new)" (`SpringMorph`, with the 6 AM changes: reopen while closing,

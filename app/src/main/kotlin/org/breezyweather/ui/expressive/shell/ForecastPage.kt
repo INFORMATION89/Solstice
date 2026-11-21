@@ -125,7 +125,6 @@ internal fun ForecastPage(
         // A timed effect (agreed 2026-11-19 as one of the few exceptions): a photo developing.
         if (hasData) develop.animateTo(1f, tween(700)) else develop.snapTo(0f)
     }
-    // In a postcard window there's nothing to refresh, and a pull down at the top closes the window.
     val content: @Composable BoxScope.() -> Unit = {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

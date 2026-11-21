@@ -29,11 +29,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -106,6 +108,9 @@ import org.breezyweather.ui.expressive.theme.Space
 import org.breezyweather.ui.theme.compose.BreezyWeatherTheme
 import kotlin.math.abs
 
+/** How far below the status bar a pull still closes the window (the "Visiting" line). */
+private val CLOSE_STRIP = 56.dp
+
 /** The morph key of a place's postcard (its window grows out of it). */
 internal fun postcardKey(id: String) = "postcard-$id"
 
@@ -116,9 +121,10 @@ internal fun postcardKey(id: String) = "postcard-$id"
  * On `SpringMorph` (the user, 2026-11-21: the new morph applies to postcards too): five springs grow it
  * from the postcard; the postcard blurs out as the window sharpens in, and the window is carried at
  * its full layout, growing uniformly. A touch catches it while it moves (a tap turns it back, a drag
- * takes it over). Open, a pull down at the top of its page drags it back towards its postcard and a
- * release past halfway (or a flick) folds it home. Back follows the finger (predictive back). The
- * window only shows the place: it doesn't change the selected or main place.
+ * takes it over). Open, a pull down from its top strip (status bar and "Visiting" line) drags it back
+ * towards its postcard and a release past halfway (or a flick) folds it home; a pull on the page
+ * refreshes, like home. Back follows the finger (predictive back). The window only shows the place:
+ * it doesn't change the selected or main place.
  *
  * [fromBounds] is where it grows from (the postcard, or the search card it was picked in); [from] the
  * postcard's key, hidden while the window draws it. A visit you didn't keep ([fadeOut]) fades away as
@@ -139,6 +145,9 @@ internal fun PlaceWindow(
     weather: SkyWeather,
     // The forecast source's name, for the "last updated" line.
     source: String? = null,
+    // Pull to refresh on its Forecast, like home (user 2026-11-21).
+    refreshing: Boolean = false,
+    onRefresh: () -> Unit = {},
 ) {
     PredictiveBackHandler(enabled = motion.isOpen) { events ->
         try {
@@ -175,6 +184,9 @@ internal fun PlaceWindow(
             SkySystemBars(if (pager.currentPage == 1) sky.palette else plainPalette(page, onPage))
         }
         val context = LocalContext.current
+        val density = LocalDensity.current
+        val statusTop = WindowInsets.statusBars.getTop(density)
+        val closeStrip = statusTop + with(density) { CLOSE_STRIP.toPx() }
         SpringMorph(
             from = from,
             target = target,
@@ -184,14 +196,9 @@ internal fun PlaceWindow(
             modifier = Modifier.graphicsLayer {
                 alpha = if (fadeOut && !motion.isOpen) progress().coerceIn(0f, 1f) else 1f
             },
-            // A pull down closes it only from the top of the page; otherwise the page scrolls back first.
-            canPull = {
-                if (pager.currentPage == 1) {
-                    forecastScroll.value == 0
-                } else {
-                    days.firstVisibleItemIndex == 0 && days.firstVisibleItemScrollOffset == 0
-                }
-            },
+            // A pull on the page refreshes, like home (user 2026-11-21); a pull from the window's top strip
+            // (the status bar and the "Visiting" line) folds it back into its postcard.
+            canPull = { start -> start.y < closeStrip },
             // The postcard itself blurs out as the window sharpens in (and back on the way home).
             sourceContent = {
                 PlaceCard(
@@ -246,12 +253,11 @@ internal fun PlaceWindow(
                                             location = location,
                                             sky = sky,
                                             now = now,
-                                            refreshing = false,
-                                            onRefresh = {},
+                                            refreshing = refreshing,
+                                            onRefresh = onRefresh,
                                             onDetails = onDetails,
                                             onOpenPlaces = { onClose() },
                                             showLocalTime = false,
-                                            pullToRefresh = false,
                                             source = source,
                                             scroll = forecastScroll
                                         )

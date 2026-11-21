@@ -253,6 +253,9 @@ internal fun MoonButton(
     val suffix = " · ${(lit * 100).roundToInt()} %"
     // The screen it's on (home, or a postcard window): the card blurs that.
     val pageGlass = org.breezyweather.ui.expressive.components.LocalPageGlass.current
+    // The pill's own glass blurs the sky behind it, like the cards on the page: it sits inside the page
+    // glass, which can't blur itself (2026-11-21: on the page glass the pill had no background at all).
+    val skyGlass = org.breezyweather.ui.expressive.components.LocalSkyGlass.current
     // Get the moon's texture ready in the background, so opening the card doesn't wait for it.
     LaunchedEffect(Unit) {
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) { MoonRenderer.prewarm(context) }
@@ -267,7 +270,7 @@ internal fun MoonButton(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .morphSource(pillKey(location), cornerRadius = 100.dp)
-            .glass(pageGlass, pill, moonGlassTint(palette, night))
+            .glass(skyGlass, pill, moonGlassTint(palette, night))
             .clip(pill)
             .clickable(role = androidx.compose.ui.semantics.Role.Button) {
                 MoonCardState.glass = pageGlass

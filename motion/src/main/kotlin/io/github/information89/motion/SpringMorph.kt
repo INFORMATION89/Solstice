@@ -197,9 +197,14 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
         )
         props.forEachIndexed { i, (a, spring) ->
             val velocity = a.velocity + kick[i]
-            scope.launch { a.animateTo(v[i], spring.spec(), initialVelocity = velocity) }
+            // Settled within half a pixel (the default 0.01 kept a resting surface "moving" for a long
+            // tail of invisible motion, so a touch on an open card was caught as a tap that closed it).
+            scope.launch { a.animateTo(v[i], spring.spec(SETTLED_PX), initialVelocity = velocity) }
         }
     }
+
+    /** Carries on to where it was heading (open or closed), from wherever it is now. */
+    fun resume() = if (isOpen) open() else close()
 
     /** Opens, from wherever it is now (a tap: no bounce). */
     fun open(springs: MorphSprings = MorphSprings.Open) {
@@ -289,6 +294,9 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
 
         /** The fastest the springs are thrown, in path per second (~1/4 s for the whole way). */
         const val MAX_VELOCITY = 4f
+
+        /** How close (px) a spring must be to count as settled. */
+        const val SETTLED_PX = 0.5f
     }
 
     /** The finger lifted: the surface springs back up with a little bounce. */
@@ -362,9 +370,9 @@ fun SpringMorph(
     // Where it grows from when that isn't a registered [morphSource] (e.g. a card that has just closed
     // into this); [from] is then only the key to hide.
     fromBounds: MorphAnchor? = null,
-    // Whether a downward drag on the open surface pulls it (true unless its content is scrolled
-    // down: then the content scrolls back first).
-    canPull: () -> Boolean = { true },
+    // Whether a downward drag on the open surface, starting at this point on screen, pulls it (e.g.
+    // only from the top of its page, or only from a strip, leaving the page's own pull to refresh).
+    canPull: (start: Offset) -> Boolean = { true },
     sourceContent: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
@@ -398,7 +406,10 @@ fun SpringMorph(
     val contentDrawn = remember { floatArrayOf(1f, 1f, 0f, 0f) }
     val catcherDrawn = remember { floatArrayOf(1f, 1f, 0f, 0f) }
     // At rest and open, the content owns its touches; while it moves, the surface catches them.
-    val restingOpen by remember(motion) { derivedStateOf { motion.isOpen && !motion.isMoving } }
+    // A finger on the catcher keeps it there until it lifts (2026-11-21: caught, the springs stopped,
+    // the catcher went away under the finger and the surface stayed pressed in).
+    var held by remember { mutableStateOf(false) }
+    val restingOpen by remember(motion) { derivedStateOf { motion.isOpen && !motion.isMoving && !held } }
 
     fun hand(): Float = MotionValue.window(motion.progress, handOff.start, handOff.endInclusive).let {
         it * it *
@@ -490,6 +501,7 @@ fun SpringMorph(
                         val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
                         val tracker = VelocityTracker()
                         var last = onScreen(down.position, contentDrawn)
+                        val start = last
                         tracker.addPosition(down.uptimeMillis, last)
                         var dragging = false
                         var dx = 0f
@@ -511,7 +523,7 @@ fun SpringMorph(
                             if (!dragging) {
                                 dx += abs(step.x)
                                 dy += step.y
-                                if (dy > viewConfiguration.touchSlop && dy > dx && canPull()) dragging = true
+                                if (dy > viewConfiguration.touchSlop && dy > dx && canPull(start)) dragging = true
                             }
                             if (dragging) {
                                 motion.drag(-step.y / dragRange)
@@ -558,37 +570,55 @@ fun SpringMorph(
                         awaitEachGesture {
                             val down = awaitFirstDown(requireUnconsumed = false)
                             down.consume()
+                            held = true
+                            // Caught at (or within a hair of) where it was heading: lifting just lets it
+                            // carry on, it isn't a tap that turns it back.
+                            val arrived = motion.isOpen && motion.progress > ARRIVED
                             motion.catch()
                             val tracker = VelocityTracker()
                             var last = onScreen(down.position, catcherDrawn)
                             tracker.addPosition(down.uptimeMillis, last)
                             var dragging = false
                             var travelled = 0f
-                            while (true) {
-                                val event = awaitPointerEvent()
-                                val change = event.changes.firstOrNull { it.id == down.id } ?: break
-                                val now = onScreen(change.position, catcherDrawn)
-                                if (!change.pressed) {
-                                    motion.unpress()
-                                    if (dragging) {
-                                        motion.release(-tracker.calculateVelocity().y / dragRange)
-                                    } else {
-                                        onTap?.invoke() ?: motion.toggle()
+                            var released = false
+                            try {
+                                while (true) {
+                                    val event = awaitPointerEvent()
+                                    val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                                    val now = onScreen(change.position, catcherDrawn)
+                                    if (!change.pressed) {
+                                        released = true
+                                        motion.unpress()
+                                        val long = change.uptimeMillis - down.uptimeMillis >
+                                            viewConfiguration.longPressTimeoutMillis
+                                        when {
+                                            dragging -> motion.release(-tracker.calculateVelocity().y / dragRange)
+                                            // A hold isn't a tap (user 2026-11-21: holding the card closed it).
+                                            long || arrived -> motion.resume()
+                                            else -> onTap?.invoke() ?: motion.toggle()
+                                        }
+                                        change.consume()
+                                        break
                                     }
+                                    val step = now - last
+                                    last = now
+                                    travelled += abs(step.x) + abs(step.y)
+                                    tracker.addPosition(change.uptimeMillis, now)
+                                    if (!dragging && draggable && travelled > viewConfiguration.touchSlop) {
+                                        dragging = true
+                                        // Dragging, it follows the finger at full size.
+                                        motion.unpress()
+                                    }
+                                    if (dragging) motion.drag(-step.y / dragRange)
                                     change.consume()
-                                    break
                                 }
-                                val step = now - last
-                                last = now
-                                travelled += abs(step.x) + abs(step.y)
-                                tracker.addPosition(change.uptimeMillis, now)
-                                if (!dragging && draggable && travelled > viewConfiguration.touchSlop) {
-                                    dragging = true
-                                    // Dragging, it follows the finger at full size.
+                            } finally {
+                                held = false
+                                // Cancelled (the touch was taken away): never left caught and pressed in.
+                                if (!released) {
                                     motion.unpress()
+                                    motion.resume()
                                 }
-                                if (dragging) motion.drag(-step.y / dragRange)
-                                change.consume()
                             }
                         }
                     }
@@ -625,6 +655,9 @@ fun SpringMorph(
         }
     }
 }
+
+/** Progress past which a caught surface counts as having arrived open. */
+private const val ARRIVED = 0.98f
 
 /** Defaults for [SpringMorph]'s hand-over from the source's content to the target's. */
 object MorphHandOff {
