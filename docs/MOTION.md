@@ -100,6 +100,8 @@ squished while the container first stretches:
   and the moon's drift (timed effects / a slow drift, not gestures). The moon card keeps its own
   MotionValue (a full-height sheet whose pull plays the morph backwards).
 - **Motion lab** (M5, 2026-11-19): Settings → Debug → Motion lab; slow motion is `MotionTime.scale`.
+- **Haptics** (2026-11-21, F1): `:motion` `Haptic` tokens via `haptics().perform(...)`; no direct
+  vibrator or `HapticFeedbackType` calls in the app, and no new haptics without agreeing them.
 - **Page changes** (2026-11-21): `:motion` `PageTransition`; the pages switch at once and the
   change is drawn on top, so taps are never swallowed. Home's tab taps use it.
 - **README** (2026-11-19): `motion/README.md` (pieces, tokens, rules, examples).

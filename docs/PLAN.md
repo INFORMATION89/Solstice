@@ -2606,4 +2606,34 @@ Steps:
     the parallactic angle eased by altitude and averaged over ±4 h per hour), and
     `iconRotation(phase, limb, parallactic)`, the same orientation the card's shader draws.
   - **`drawMoonPhaseIcon(…, rotation)`:** the diagram turns the outline icon by it.
+- **2026-11-21: F1, haptics in `:motion`, built** (spec: "Moon card redesign and its foundations").
+  Not felt on the phone yet.
+  - **`Haptic` tokens** named by purpose, each mapped to iOS's feedback:
+    - `tick`: selection;
+    - `detent`: a major step;
+    - `edge`: impact rigid;
+    - `snap`: impact soft;
+    - `press`: impact medium;
+    - `release`: impact light;
+    - `threshold`: a point of no return;
+    - `confirm` and `reject`: success and error.
+  - **Each token:** a Composition primitive at an intensity, editable live and with a reset, plus a
+    view-feedback fallback (primitives need Android 11+, THUD and LOW_TICK 12+, checked with
+    `areAllPrimitivesSupported`).
+  - **`MotionHaptics`:**
+    - a minimum gap per token, so fast drags don't buzz;
+    - `speedFade` ticks get up to 70 % lighter on fast gestures;
+    - follows the system touch-feedback setting;
+    - one global intensity;
+    - falls back to view feedback if vibrating fails.
+  - **Access:** `LocalHaptics`, `ProvideHaptics`, `haptics()`.
+  - **Permission:** `:motion` declares VIBRATE (a normal permission, no prompt).
+  - **The 12 existing calls moved onto tokens,** same moments and no new haptics:
+    - reorder: a step is a detent, the long press a press, the handle a threshold;
+    - Places: a step is a detent, the long press a press, a swipe stage a threshold;
+    - the postcard sticker: press;
+    - the pin: press;
+    - the moon dial: a day is a detent, 6 hours a tick, double tap a snap.
+  - **Lab:** a "Haptics" panel to feel each token and change its primitive, intensity and the overall
+    intensity.
 

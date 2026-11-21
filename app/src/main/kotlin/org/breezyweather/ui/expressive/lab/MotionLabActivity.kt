@@ -179,6 +179,14 @@ private fun MotionLab(onBack: () -> Unit) {
             }
             item {
                 Section(
+                    "Haptics",
+                    "Feel each token, named for what it's for (tick, detent, edge, snap, press, release, " +
+                        "threshold, confirm, reject). Tap a chip to change its primitive; slide its intensity. " +
+                        "Fine ticks get lighter on fast gestures and never buzz."
+                ) { HapticsDemo() }
+            }
+            item {
+                Section(
                     "Toolbar",
                     "The app's toolbar on the same navigation as home, and the postcard window's (tap the " +
                         "pin). Every spring and amount below is the app's own (ToolbarMotion): changes apply " +

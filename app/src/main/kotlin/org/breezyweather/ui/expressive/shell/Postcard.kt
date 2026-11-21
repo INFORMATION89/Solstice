@@ -73,10 +73,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -89,7 +87,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import breezyweather.domain.location.model.Location
+import io.github.information89.motion.Haptic
 import io.github.information89.motion.Motion
+import io.github.information89.motion.haptics
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.breezyweather.R
@@ -146,7 +146,7 @@ internal fun PlaceCard(
     var hadStar by remember { mutableStateOf(starred) }
     val peel = remember { Animatable(1f) }
     val shine = remember { Animatable(1f) }
-    val haptics = LocalHapticFeedback.current
+    val haptics = haptics()
     LaunchedEffect(starred) {
         if (starred && !hadStar) {
             peel.snapTo(0f)
@@ -154,7 +154,7 @@ internal fun PlaceCard(
             delay(520)
             launch {
                 delay(330)
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                haptics.perform(Haptic.press)
             }
             // A timed effect, not a motion (agreed 2026-11-19 as one of the few exceptions): the
             // sticker's drop, press and shine are keyframes along this one clock.

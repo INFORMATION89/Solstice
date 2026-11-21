@@ -106,7 +106,6 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.boundsInRoot
@@ -115,7 +114,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -128,6 +126,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import breezyweather.domain.location.model.Location
+import io.github.information89.motion.Haptic
 import io.github.information89.motion.Morph
 import io.github.information89.motion.MorphAnchor
 import io.github.information89.motion.MorphGeometry
@@ -136,6 +135,7 @@ import io.github.information89.motion.MorphStyle
 import io.github.information89.motion.Motion
 import io.github.information89.motion.MotionPhysics
 import io.github.information89.motion.MotionValue
+import io.github.information89.motion.haptics
 import io.github.information89.motion.morphAnchor
 import io.github.information89.motion.morphAnchorOf
 import io.github.information89.motion.morphFrom
@@ -609,7 +609,7 @@ private fun MoonCard(
     val context = LocalContext.current
     // Scrubbing offset in days (fractional while dragging).
     var offset by remember { mutableFloatStateOf(0f) }
-    val haptics = LocalHapticFeedback.current
+    val haptics = haptics()
     val phaseIcons = rememberMoonPhaseIcons()
     // The principal phases within the dial's range, and their angles. Worked out in the background
     // (2026-11-19): on the main thread they held up the first frame of the card's opening, and the
@@ -640,9 +640,9 @@ private fun MoonCard(
     fun tick(before: Float, after: Float) {
         when {
             kotlin.math.floor(before + 0.5f) != kotlin.math.floor(after + 0.5f) ->
-                haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                haptics.perform(Haptic.detent)
             kotlin.math.floor(before * 4f + 0.5f) != kotlin.math.floor(after * 4f + 0.5f) ->
-                haptics.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+                haptics.perform(Haptic.tick)
         }
     }
     val moon = MoonRenderer.remember()
@@ -809,7 +809,7 @@ private fun MoonCard(
                                                         ->
                                                         offset = v
                                                     }
-                                                    haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                                                    haptics.perform(Haptic.snap)
                                                 }
                                             })
                                         }

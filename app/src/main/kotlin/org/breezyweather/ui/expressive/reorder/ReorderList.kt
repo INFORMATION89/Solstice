@@ -39,8 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
@@ -48,6 +46,8 @@ import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import io.github.information89.motion.Haptic
+import io.github.information89.motion.haptics
 import org.breezyweather.R
 import org.breezyweather.ui.expressive.theme.Corners
 import org.breezyweather.ui.expressive.theme.Elevation
@@ -73,12 +73,12 @@ fun <T : Any> ReorderList(
     listState: LazyListState = rememberLazyListState(),
     footer: LazyListScope.() -> Unit = {},
 ) {
-    val haptics = LocalHapticFeedback.current
+    val haptics = haptics()
 
     fun move(from: Int, to: Int) {
         if (from == to || from !in items.indices || to !in items.indices) return
         items.add(to, items.removeAt(from))
-        haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
+        haptics.perform(Haptic.detent)
     }
 
     // Moves by key, so the footer's items (hidden chips) are never drop targets.
@@ -124,7 +124,7 @@ fun <T : Any> ReorderList(
                         .fillMaxWidth()
                         .padding(bottom = Space.Half)
                         .longPressDraggableHandle(
-                            onDragStarted = { haptics.performHapticFeedback(HapticFeedbackType.LongPress) }
+                            onDragStarted = { haptics.perform(Haptic.press) }
                         )
                         .semantics {
                             customActions = listOf(
@@ -157,7 +157,7 @@ fun <T : Any> ReorderList(
                                 .size(Sizes.TouchTarget)
                                 .draggableHandle(
                                     onDragStarted = {
-                                        haptics.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                                        haptics.perform(Haptic.threshold)
                                     }
                                 )
                                 .padding(Space.S3)

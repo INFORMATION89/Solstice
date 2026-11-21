@@ -58,7 +58,6 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
@@ -66,7 +65,6 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
@@ -75,7 +73,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import breezyweather.domain.location.model.Location
+import io.github.information89.motion.Haptic
 import io.github.information89.motion.Motion
+import io.github.information89.motion.haptics
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -113,7 +113,7 @@ internal fun PlacesPage(
     pageFade: () -> Float = { 1f },
 ) {
     val context = LocalContext.current
-    val haptics = LocalHapticFeedback.current
+    val haptics = haptics()
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     val byId = locations.associateBy { it.formattedId }
@@ -152,7 +152,7 @@ internal fun PlacesPage(
         val to = order.indexOf(target.key)
         order.add(to, order.removeAt(from))
         carryY += cur.offset - target.offset
-        haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
+        haptics.perform(Haptic.detent)
     }
 
     // Neighbours lean out of the carried card's way as it approaches: the push rises and falls back
@@ -290,7 +290,7 @@ internal fun PlacesPage(
                                         moved = 0f
                                         tracker.resetTracking()
                                         travelled = 0f
-                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        haptics.perform(Haptic.press)
                                         order.clear()
                                         order.addAll(sortedIds)
                                         carryY = 0f
@@ -375,7 +375,7 @@ private fun SwipeablePlace(
     content: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val haptics = LocalHapticFeedback.current
+    val haptics = haptics()
     // The drag moves the card directly (no queued coroutines); only the release animates, and a
     // new touch cancels that animation, so the card can never get stuck mid-way.
     var x by remember { mutableFloatStateOf(0f) }
@@ -411,7 +411,7 @@ private fun SwipeablePlace(
         val pulled = -x
         val stage = stageOf(pulled)
         LaunchedEffect(stage) {
-            if (stage > 0) haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
+            if (stage > 0) haptics.perform(Haptic.threshold)
         }
         // What the swipe reveals behind the card.
         val behind = if (stage ==

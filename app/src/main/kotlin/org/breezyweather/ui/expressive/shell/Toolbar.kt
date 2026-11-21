@@ -62,13 +62,11 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -79,7 +77,9 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import io.github.information89.motion.Haptic
 import io.github.information89.motion.Motion
+import io.github.information89.motion.haptics
 import kotlinx.coroutines.launch
 import org.breezyweather.R
 import org.breezyweather.ui.expressive.components.GlassSource
@@ -226,11 +226,11 @@ internal fun ShellToolbar(
             // stands it up in the Forecast colour; unpinning pops it back out with a little tilt.
             val jab = remember { Animatable(0f) }
             var wasChecked by remember { mutableStateOf(budChecked) }
-            val haptics = LocalHapticFeedback.current
+            val haptics = haptics()
             LaunchedEffect(budChecked) {
                 if (budChecked != wasChecked) {
                     jab.snapTo(if (budChecked) 1f else -1f)
-                    if (budChecked) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    if (budChecked) haptics.perform(Haptic.press)
                     jab.animateTo(0f, ToolbarMotion.jab.spec())
                 }
                 wasChecked = budChecked
