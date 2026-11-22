@@ -2887,3 +2887,35 @@ in-card contexts; the **handle stays fixed at the top**, drawn above everything;
   0.69 %, but a tap during the settle first stops the pager. First try at A drew the recording itself
   instead of a copy: wrong, a recording points at the pages, so after the jump it showed the new page
   twice (caught by a mid-settle screenshot, fixed). Waiting on the user to feel them and pick.
+
+### Contextual toolbar (agreed with the user 2026-11-21, after research; part of round 4)
+
+**Research** (Apple HIG tab bars, toolbars, sheets, modality; WWDC18 fluid interfaces, WWDC25 Liquid
+Glass; M3 Expressive toolbars): a tab bar is navigation only, never actions; a screen's actions live in
+a toolbar, and tab bars and toolbars don't share a view; iOS 26 lets one ongoing feature sit beside the
+tab bar as an *accessory*; a sheet's Cancel/Close sits at the top, with swipe (and on Android, back) as
+the main way out; refresh is pull + automatic (Mail, Weather); fluid motion comes from one gesture-driven,
+interruptible source.
+
+**Decisions (user: "plan it" with these):**
+- **One toolbar** at the shell level, above the window (the window's own copy goes). Two parts on the
+  shared glass: the **pages pill** (navigation only) and **one accessory** (home: Search; window: Pin).
+- **Contexts as data:** each context lists its tabs and its accessory (home: This week, Forecast,
+  Places + Search; window: This week, Forecast + Pin). No special cases in the toolbar for "window".
+- **Driven by the window's morph progress** (follows a back gesture or a drag, reverses when the window
+  is caught): Places folds out of the pill, the highlight moves from the home pager's tab to the
+  window pager's, Search becomes Pin (blur replace, as the morph does). Each piece settles on its own
+  spring, timed off that progress.
+- **Close:** a ✕ glass button at the **top**, at the start of the window's pinned header (Visiting ·
+  time stays centred); back and predictive back still close; the window's handle goes (a full-screen
+  window isn't resizable). Handles stay on the moon card and search, without taps.
+- **Refresh:** pull + automatic; no button. **No minimize on scroll.**
+- Motion Lab first (a contextual toolbar demo driven by a slider and by a real morph), then the app.
+  `TOOLBAR_MOTION_PLAN.md`'s principles (velocity, highlight as a morph, press) come after, still to agree.
+
+**Where it goes in round 4:** after the glass system (phase 2, the toolbar and the ✕ use it) and the page
+frame (phase 4, the ✕ lives in its pinned header); built alongside the morph kinds (phase 5).
+
+**Also done meanwhile (fork session, b7b9706):** the swipe-settle A/B comparison is in the Motion Lab
+(Now / A / B); on the phone A cuts the pause after letting go from ~29 ms to ~9 ms, B has none. The
+user picks one before the app changes.
