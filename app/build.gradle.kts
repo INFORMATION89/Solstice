@@ -483,7 +483,7 @@ dependencies {
     implementation(projects.data)
     implementation(projects.domain)
     implementation(projects.mapsUtils)
-    implementation(projects.motion)
+    implementation("io.github.information89:motion")
     implementation(libs.haze)
     implementation(libs.haze.blur)
     implementation(libs.reorderable)

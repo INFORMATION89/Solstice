@@ -11,6 +11,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Motion (INFORMATION89/Motion) is a submodule at motion/, built from source.
+          submodules: true
 
       - name: Set up JDK
         uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
@@ -28,8 +31,8 @@ jobs:
       - name: No old Material Icons
         run: "! grep -rn 'androidx.compose.material.icons' --include=*.kt --include=*.kts --include=*.toml ."
 
-      - name: Unit tests (:motion)
-        run: ./gradlew :motion:test
+      - name: Unit tests (Motion)
+        run: ./gradlew :motion:motion:testDebugUnitTest
 
       # Never build with -Pbreezy: that config is reserved for the official Breezy Weather app.
       - name: Assemble basic debug
@@ -55,6 +58,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Motion (INFORMATION89/Motion) is a submodule at motion/, built from source.
+          submodules: true
         with:
           fetch-depth: 0
 

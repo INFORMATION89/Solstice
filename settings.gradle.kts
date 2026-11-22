@@ -34,9 +34,17 @@ include(":app")
 include(":data")
 include(":domain")
 include(":maps-utils")
-include(":motion")
 include(":ui-weather-view")
 include(":weather-unit")
+
+// Motion (INFORMATION89/Motion, Apache-2.0) is a git submodule at motion/, built from source: its
+// `io.github.information89:motion` is that build's `:motion` project. Clone Solstice with
+// `--recurse-submodules` (or run `git submodule update --init`). Workflow: docs/CONTINUE.md, "Motion".
+includeBuild("motion") {
+    dependencySubstitution {
+        substitute(module("io.github.information89:motion")).using(project(":motion"))
+    }
+}
 
 // To test local changes
 /*includeBuild("../breezy-weather-data-sharing-lib/") {
