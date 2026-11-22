@@ -59,6 +59,30 @@ import org.breezyweather.ui.expressive.theme.CornerShapes
 import org.breezyweather.ui.expressive.theme.Space
 import java.util.Locale
 
+/** The lab's stand-in pages (the app's three tabs), shared by the pager demos. */
+internal val LabPages = listOf(
+    "This week" to Color(0xFF6F7FD8),
+    "Forecast" to Color(0xFFE9A15B),
+    "Places" to Color(0xFF5BA98A)
+)
+
+/** How tall the lab's pager demos are. */
+internal val LabPagerHeight = 300.dp
+
+/** Page [i] of [LabPages]: its colour fading down, its name in the middle. */
+@Composable
+internal fun LabPage(i: Int, modifier: Modifier = Modifier) {
+    val (name, color) = LabPages[i]
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .fillMaxSize()
+            .background(Brush.verticalGradient(listOf(color, color.copy(alpha = 0.5f))))
+    ) {
+        Text(name, style = MaterialTheme.typography.headlineSmall, color = Color.White)
+    }
+}
+
 /**
  * The toolbar in the lab (PLAN.md "Morph refining", point 5): the app's own toolbar over three
  * stand-in pages, on the same navigation as home (tab taps, swipes, slide to switch, the search bud
@@ -73,13 +97,12 @@ internal fun ToolbarDemo() {
     val glass = rememberGlassSource()
     val sky = remember { skyAt(SkyWeather.CLEAR, System.currentTimeMillis(), null, null) }
     var pinned by remember { mutableStateOf(false) }
-    val pages = listOf("This week" to Color(0xFF6F7FD8), "Forecast" to Color(0xFFE9A15B), "Places" to Color(0xFF5BA98A))
 
     Column(verticalArrangement = Arrangement.spacedBy(Space.S3)) {
         Box(
             Modifier
                 .fillMaxWidth()
-                .height(300.dp)
+                .height(LabPagerHeight)
                 .clip(CornerShapes.L)
                 .glassSource(glass)
         ) {
@@ -88,15 +111,7 @@ internal fun ToolbarDemo() {
                 flingBehavior = nav.fling,
                 modifier = Modifier.fillMaxSize().pageTransition(nav.pageChange)
             ) { i ->
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .pageSwipeBlur({ nav.visualPosition() }, i)
-                        .background(Brush.verticalGradient(listOf(pages[i].second, pages[i].second.copy(alpha = 0.5f))))
-                ) {
-                    Text(pages[i].first, style = MaterialTheme.typography.headlineSmall, color = Color.White)
-                }
+                LabPage(i, Modifier.pageSwipeBlur({ nav.visualPosition() }, i))
             }
             Box(Modifier.align(Alignment.BottomCenter).padding(bottom = Space.S3)) {
                 ShellToolbar(

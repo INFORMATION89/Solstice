@@ -84,6 +84,22 @@ class PageTransition internal constructor(
      * the new page hasn't covered yet is drawn.
      */
     internal var partialFrom by mutableFloatStateOf(0f)
+
+    // Settle option A (Motion Lab, 2026-11-21): while a finger drags the pages, they're recorded into
+    // [leaving] every frame, so a release only has to copy that recording into an image, without
+    // [freeze]'s two frame waits. (The recording itself can't be drawn instead of the image: it points
+    // at the pages rather than copying them, so after the jump it would show the new page.)
+    internal var recording by mutableStateOf(false)
+    internal var hasFrame = false
+
+    /**
+     * Option A: tell it while a finger is dragging the pages (e.g. from the pager's
+     * `interactionSource`), so [settle] can start from the frame recorded last.
+     */
+    fun dragging(active: Boolean) {
+        if (active) hasFrame = false
+        recording = active
+    }
     private var startSlide = 1f
     private var settleJob: Job? = null
 
@@ -158,7 +174,15 @@ class PageTransition internal constructor(
     ) {
         stopSettle()
         rest()
-        freeze()
+        if (hasFrame) {
+            // Option A: the pages as they were when let go are already recorded; copy them now.
+            recording = false
+            hasFrame = false
+            image = runCatching { leaving.toImageBitmap() }.getOrNull()
+            if (image == null) freeze()
+        } else {
+            freeze()
+        }
         direction = if (forward) 1f else -1f
         partialFrom = from
         startSlide = from
@@ -200,9 +224,10 @@ fun rememberPageTransition(leavingBlur: Dp = 4.dp, arrivingBlur: Dp = 5.dp): Pag
  */
 fun Modifier.pageTransition(transition: PageTransition): Modifier = this
     .drawWithContent {
-        if (transition.capture) {
+        if (transition.capture || transition.recording) {
             transition.leaving.record { this@drawWithContent.drawContent() }
             transition.capture = false
+            if (transition.recording) transition.hasFrame = true
         }
         drawContent()
         // The page being left, on top: it stays opaque and slides out the other way, with a touch

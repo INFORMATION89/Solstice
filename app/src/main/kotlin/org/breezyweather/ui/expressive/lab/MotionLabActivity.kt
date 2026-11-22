@@ -201,6 +201,13 @@ private fun MotionLab(onBack: () -> Unit) {
             }
             item {
                 Section(
+                    "Swipe settle, A/B",
+                    "The same pages and spring, three ways to finish a swipe. Pick one, swipe and let go " +
+                        "part-way or with a flick; watch the frame counter."
+                ) { SettleDemo() }
+            }
+            item {
+                Section(
                     "Toolbar",
                     "The app's toolbar on the same navigation as home, and the postcard window's (tap the " +
                         "pin). Every spring and amount below is the app's own (ToolbarMotion): changes apply " +

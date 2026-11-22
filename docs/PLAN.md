@@ -2879,3 +2879,11 @@ in-card contexts; the **handle stays fixed at the top**, drawn above everything;
    (`playful`), the settle frame-skip fix; then window, moon card and search on them; search's literals
    become kind parameters or layout-derived values (listed for the user to review).
 6. Small: remove handle taps; "Visiting" always.
+- **2026-11-21: Motion Lab "Swipe settle, A/B" built and measured on the Pixel (profile, adb, 6 part-way
+  swipes + 6 flicks each, same pages and spring, `Motion.content`).** Now (the app): a release waits
+  ~29 ms (2–3 frames at 90 Hz) to record and copy the pages before sliding; janky 1.76 %. **A**: the
+  pages are recorded every frame while dragging (`PageTransition.dragging`), so a release only copies:
+  ~9 ms wait; janky 1.32 %. **B**: the pager springs itself from the finger's speed: no wait; janky
+  0.69 %, but a tap during the settle first stops the pager. First try at A drew the recording itself
+  instead of a copy: wrong, a recording points at the pages, so after the jump it showed the new page
+  twice (caught by a mid-settle screenshot, fixed). Waiting on the user to feel them and pick.
