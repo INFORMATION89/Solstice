@@ -3001,7 +3001,12 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   is per screen (`MoonCards`, `LocalMoonCards`, no default): home and each postcard window draw their own,
   so one opened in a window closes and goes with the window (and takes its theme). Built; not checked on
   the Pixel.
-- **2026-11-21 (user):** round 4 phase 1 (the frame skip as a morph settles) is fixed in Motion, along
-  with a new, improved animation and handling for moving between tabs. Not yet on Motion's GitHub main
-  when last checked (latest 4cc4f03); once it is, bump Motion in Solstice and move `ShellNavigation`
-  onto the new tab handling.
+- **2026-11-21 (user):** round 4 phase 1 (the frame skip as a morph settles) is fixed; the improved tab
+  animation and handling the user meant is 8162bff ("One page spring for swipes and tab taps"), already in
+  Solstice. Nothing to bump.
+- **2026-11-21: round 4 phase 4a built, not checked on the phone.** A postcard window has a pinned header
+  on each page (`VisitHeader` in `PageFrame.kt`): the visit's line centred, a close button at the start on
+  the one glass (the window's sky on Forecast, the tint on This week), one touch target tall, sliding with
+  its page and not scrolling; `pageTopInset()` puts the page below it. The window's handle is gone (close
+  button, back, swipe); handles on the moon card and search stay, without taps (`SheetHandle` has no
+  `onClose`). Next: 4b, edge blur (values to agree).

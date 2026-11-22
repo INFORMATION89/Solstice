@@ -455,10 +455,9 @@ private fun MoonSheet(cards: MoonCards, location: Location, now: Long, glass: Gl
                         }
                     )
                 }
-                // The shared handle: it comes and goes with the content; drag it down or tap it to close.
+                // The shared handle: it comes and goes with the content; drag it down to close.
                 SheetHandle(
                     ink = ink,
-                    onClose = { close() },
                     modifier = Modifier
                         .align(Alignment.TopCenter)
                         .graphicsLayer {

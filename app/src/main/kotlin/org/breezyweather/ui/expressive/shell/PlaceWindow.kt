@@ -129,8 +129,8 @@ internal fun postcardKey(id: String) = "postcard-$id"
  * from the postcard; the postcard blurs out as the window sharpens in, and the window is carried at
  * its full layout, growing uniformly. A touch catches it while it moves (a tap opens it, a vertical drag
  * takes it over, a sideways swipe is the page's below). Open, it's full screen with its corners on the
- * screen's own (agreed 2026-11-21); its handle closes it: drag it down (a release past halfway or a
- * flick folds it home) or tap it. A pull on the page refreshes, like home. Back follows the finger
+ * screen's own (agreed 2026-11-21) and a pinned header on each page with a close button (no handle: a
+ * full-screen window isn't resizable). A pull on the page refreshes, like home. Back follows the finger
  * (predictive back). The window only shows the place: it doesn't change the selected or main place.
  *
  * [fromBounds] is the search card it was picked in, when it was (null: it grows from and folds back
@@ -169,10 +169,10 @@ internal fun PlaceWindow(
     }
     fun progress() = motion.progress
 
-    // The window's content, toolbar and handle fade in over the middle half of the growth (as before).
+    // The window's content and toolbar fade in over the middle half of the growth (as before).
     fun contentShown() = ((progress() - 0.25f) / 0.5f).coerceIn(0f, 1f)
     val window = androidx.compose.ui.platform.LocalWindowInfo.current.containerSize
-    // Full screen, keeping its handle (agreed 2026-11-21): its corners grow from the postcard's into
+    // Full screen (agreed 2026-11-21): its corners grow from the postcard's into
     // the screen's own, top and bottom, so they line up with the glass the whole way.
     val screenCorners = org.breezyweather.ui.expressive.components.rememberScreenCorners()
     val target = remember(window, screenCorners) {
@@ -210,8 +210,8 @@ internal fun PlaceWindow(
                 alpha = if (fadeOut && !motion.isOpen) progress().coerceIn(0f, 1f) else 1f
             },
             shape = windowShape,
-            // Only the handle pulls the window (morphHandle); a pull on the page refreshes, like home
-            // (agreed 2026-11-21).
+            // A pull on the page refreshes, like home; it closes with its close button or back (agreed
+            // 2026-11-21).
             canPull = { false },
             // Opening, the window owns the screen; closing, a sideways swipe is home's, and it folds home
             // inside its postcard's page (agreed 2026-11-21).
@@ -290,21 +290,20 @@ internal fun PlaceWindow(
                                                 )
                                             }
                                         }
+                                        // The window's header, pinned at the top of each page and sliding with it
+                                        // (agreed 2026-11-21): the visit's line and the close button. On Forecast its
+                                        // glass blurs the window's sky; on This week (a plain page) it's just the tint.
+                                        VisitHeader(
+                                            ink = if (index == 1) sky.palette.text else onPage,
+                                            glass = if (index == 1) windowSky else null,
+                                            onClose = onClose,
+                                            modifier = Modifier.align(Alignment.TopCenter)
+                                        )
                                     }
                                 }
                             }
                         }
                     }
-                    // The shared handle under the status bar: drag it down to fold the window home, or tap it.
-                    SheetHandle(
-                        ink = sky.palette.text,
-                        onClose = onClose,
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .statusBarsPadding()
-                            .graphicsLayer { alpha = contentShown() }
-                            .morphHandle(motion)
-                    )
                     // The home toolbar, as is: This week and Forecast, and Pin budding out of Forecast like search
                     // does out of Places (pin keeps the place; otherwise it's gone when you go back).
                     val scope = rememberCoroutineScope()

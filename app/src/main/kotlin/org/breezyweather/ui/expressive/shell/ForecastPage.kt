@@ -144,8 +144,6 @@ internal fun ForecastPage(
                 .padding(horizontal = Space.S5)
                 .padding(top = Space.S10, bottom = 120.dp)
         ) {
-            // A visit's line above the title, scrolling with the page (postcard windows only).
-            VisitingLine(text.copy(alpha = Emphasis.High), Modifier.padding(bottom = Space.S2))
             // Only the location's title at the top (plus an icon for the current position).
             val (title, city) = placeName(context, location)
             Row(verticalAlignment = Alignment.CenterVertically) {

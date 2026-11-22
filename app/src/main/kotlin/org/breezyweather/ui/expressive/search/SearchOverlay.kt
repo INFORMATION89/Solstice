@@ -454,7 +454,6 @@ fun SearchOverlay(
             // The handle's touch area is taller than it looks (it overlaps the top of the results).
             Handle(
                 modifier = Modifier.align(Alignment.TopCenter).graphicsLayer { alpha = inside() },
-                onClose = onClose,
                 moving = { sheet.presence.isRunning || sheet.detent.isRunning },
                 onStart = { sheet.catch() },
                 onDelta = { drag(it) },
@@ -494,7 +493,6 @@ fun SearchOverlay(
 @Composable
 private fun Handle(
     modifier: Modifier,
-    onClose: () -> Unit,
     moving: () -> Boolean,
     onStart: () -> Unit,
     onDelta: (Float) -> Unit,
@@ -514,7 +512,7 @@ private fun Handle(
                 onDragStopped = { velocity -> onRelease(velocity) }
             )
     ) {
-        SheetHandle(MaterialTheme.colorScheme.onSurfaceVariant, onClose)
+        SheetHandle(MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

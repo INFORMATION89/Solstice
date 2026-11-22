@@ -16,6 +16,7 @@
 
 package org.breezyweather.ui.expressive.shell
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.TargetedFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,17 +29,20 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -60,8 +65,10 @@ import io.github.information89.motion.EdgeBand
 import io.github.information89.motion.Motion
 import io.github.information89.motion.edgeBlur
 import org.breezyweather.R
+import org.breezyweather.ui.expressive.components.GlassSource
 import org.breezyweather.ui.expressive.components.LocalSkyGlass
 import org.breezyweather.ui.expressive.components.SolsticeIcons
+import org.breezyweather.ui.expressive.components.glass
 import org.breezyweather.ui.expressive.theme.Emphasis
 import org.breezyweather.ui.expressive.theme.Sizes
 import org.breezyweather.ui.expressive.theme.Space
@@ -123,9 +130,45 @@ internal data class Visit(val location: Location, val now: Long, val pinned: Boo
 
 internal val LocalVisit = compositionLocalOf<Visit?> { null }
 
-/** Where a page's content starts: under the status bar (home and the full-screen postcard window). */
+/**
+ * Where a page's content starts: under the status bar, and in a postcard window also under its pinned
+ * header ([VisitHeader], one touch target tall).
+ */
 @Composable
-internal fun pageTopInset(): Dp = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+internal fun pageTopInset(): Dp {
+    val status = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    return if (LocalVisit.current != null) status + Sizes.TouchTarget else status
+}
+
+/**
+ * A postcard window's header, pinned at the top of each of its pages (agreed 2026-11-21): it slides with
+ * its page but doesn't scroll. The visit's line in the middle in [ink] (the page's), and the close button
+ * at the start (Material's full-screen convention; back and swipe still close too), on the one glass
+ * over [glass] (the page's sky, or none on a plain page), its icon in the theme's ink on glass.
+ */
+@Composable
+internal fun VisitHeader(ink: Color, glass: GlassSource?, onClose: () -> Unit, modifier: Modifier = Modifier) {
+    Box(
+        modifier
+            .fillMaxWidth()
+            .statusBarsPadding()
+            .height(Sizes.TouchTarget)
+            .padding(horizontal = Space.S4)
+    ) {
+        val label = stringResource(R.string.action_close)
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .size(Sizes.TouchTarget)
+                .glass(glass, CircleShape)
+                .clickable(onClickLabel = label, role = Role.Button, onClick = onClose)
+        ) {
+            Icon(SolsticeIcons.Close, contentDescription = label, tint = MaterialTheme.colorScheme.onSurface)
+        }
+        VisitingLine(ink, Modifier.align(Alignment.Center))
+    }
+}
 
 /**
  * A visit's line: "[landing plane] Visiting" in any window (agreed 2026-11-21), and its local time from
@@ -171,7 +214,6 @@ internal fun PageScaffold(
     content: LazyListScope.() -> Unit,
 ) {
     val top = pageTopInset()
-    val visiting = LocalVisit.current != null
     // A plain page has no sky behind its cards: their glass is just the tint (agreed 2026-11-21).
     CompositionLocalProvider(LocalSkyGlass provides null) {
         LazyColumn(
@@ -190,11 +232,6 @@ internal fun PageScaffold(
                 strength = pageFade
             )
         ) {
-            if (visiting) {
-                item(key = "visit") {
-                    VisitingLine(onPage.copy(alpha = Emphasis.High), Modifier.padding(start = Space.S1))
-                }
-            }
             item(key = "header") {
                 // As tall as an icon button, with or without one, so the title sits at the same height.
                 Row(

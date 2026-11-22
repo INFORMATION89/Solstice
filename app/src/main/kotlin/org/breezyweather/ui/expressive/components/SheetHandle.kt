@@ -37,23 +37,14 @@ import org.breezyweather.ui.expressive.theme.Sizes
  * The one drag handle for every sheet (search, moon card, postcard window; agreed 2026-11-21):
  * Material 3's — a 32 × 4 dp bar in [ink] at M3's 40 %, centred in the sheet's handle strip at the top
  * of at least a 48 dp touch target (which reaches below the strip, over the sheet's content).
- * Tapping it calls [onClose]; dragging is the sheet's (pass `Modifier.morphHandle(motion)` for a
- * morph, or the sheet's own drag).
+ * Dragging is the sheet's (pass `Modifier.morphHandle(motion)` for a morph, or the sheet's own drag); a
+ * tap does nothing (agreed 2026-11-21).
  */
 @Composable
-internal fun SheetHandle(ink: Color, onClose: (() -> Unit)?, modifier: Modifier = Modifier) {
-    val label = stringResource(R.string.action_close)
+internal fun SheetHandle(ink: Color, modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.TopCenter,
-        modifier = modifier
-            .sizeIn(minWidth = Sizes.TouchTarget, minHeight = Sizes.TouchTarget)
-            .then(
-                if (onClose != null) {
-                    Modifier.clickable(onClickLabel = label, role = Role.Button, onClick = onClose)
-                } else {
-                    Modifier
-                }
-            )
+        modifier = modifier.sizeIn(minWidth = Sizes.TouchTarget, minHeight = Sizes.TouchTarget)
     ) {
         Box(Modifier.height(Sizes.HandleStrip), contentAlignment = Alignment.Center) {
             Box(
