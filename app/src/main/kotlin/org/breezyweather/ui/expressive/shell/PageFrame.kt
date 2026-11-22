@@ -150,16 +150,16 @@ internal val LocalVisit = compositionLocalOf<Visit?> { null }
 
 /**
  * Where a page's content starts: under the status bar, and in a postcard window also under its pinned
- * header ([VisitHeader], one touch target tall).
+ * frame header ([FrameHeader], one touch target tall).
  */
 @Composable
 internal fun pageTopInset(): Dp {
     val status = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-    return if (LocalVisit.current != null) status + VisitHeaderHeight else status
+    return if (LocalVisit.current != null) status + FrameHeaderHeight else status
 }
 
-/** A postcard window's header height: one touch target (its close button). */
-private val VisitHeaderHeight = Sizes.TouchTarget
+/** A frame header's height (a postcard window's): one touch target (its close button). */
+private val FrameHeaderHeight = Sizes.TouchTarget
 
 /**
  * A page's top edge blur (agreed 2026-11-21): under the status bar (and a window's header) fully, then
@@ -169,36 +169,45 @@ private val VisitHeaderHeight = Sizes.TouchTarget
 internal fun pageTopEdge(fadeTo: Color?): EdgeBand = EdgeBlurDefaults.top(
     chrome = pageTopInset(),
     fadeTo = fadeTo,
-    transition = if (LocalVisit.current != null) VisitHeaderHeight else 0.dp
+    transition = if (LocalVisit.current != null) FrameHeaderHeight else 0.dp
 )
 
 /**
- * A postcard window's header, pinned at the top of each of its pages (agreed 2026-11-21): it slides with
- * its page but doesn't scroll. The visit's line in the middle in [ink] (the page's), and the close button
- * at the start (Material's full-screen convention; back and swipe still close too), on the one glass
- * over [glass] (the page's sky, or none on a plain page), its icon in the theme's ink on glass.
+ * A frame header (agreed 2026-11-21): text pinned to the frame of a set of pages, not to any page, so it
+ * stays put while the pages slide underneath and never scrolls. One touch target tall under the status
+ * bar; [content] in the middle, drawn in [ink]; an optional close button at the end ([onClose]) on the
+ * one glass over [glass] (what the frame shows behind it), its icon in the theme's ink on glass. Pages
+ * under it start below it ([pageTopInset]).
  */
 @Composable
-internal fun VisitHeader(ink: Color, glass: GlassSource?, onClose: () -> Unit, modifier: Modifier = Modifier) {
+internal fun FrameHeader(
+    ink: Color,
+    glass: GlassSource?,
+    modifier: Modifier = Modifier,
+    onClose: (() -> Unit)? = null,
+    content: @Composable (ink: Color) -> Unit,
+) {
     Box(
         modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .height(VisitHeaderHeight)
+            .height(FrameHeaderHeight)
             .padding(horizontal = Space.S4)
     ) {
-        val label = stringResource(R.string.action_close)
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .size(Sizes.TouchTarget)
-                .glass(glass, CircleShape)
-                .clickable(onClickLabel = label, role = Role.Button, onClick = onClose)
-        ) {
-            Icon(SolsticeIcons.Close, contentDescription = label, tint = MaterialTheme.colorScheme.onSurface)
+        Box(Modifier.align(Alignment.Center)) { content(ink) }
+        if (onClose != null) {
+            val label = stringResource(R.string.action_close)
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(Sizes.TouchTarget)
+                    .glass(glass, CircleShape)
+                    .clickable(onClickLabel = label, role = Role.Button, onClick = onClose)
+            ) {
+                Icon(SolsticeIcons.Close, contentDescription = label, tint = MaterialTheme.colorScheme.onSurface)
+            }
         }
-        VisitingLine(ink, Modifier.align(Alignment.Center))
     }
 }
 

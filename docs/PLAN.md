@@ -3024,3 +3024,9 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   `pageTopEdge()` in `PageFrame.kt` is the one top edge for pages. Also checked on the Pixel this round:
   glass (home, window, search, moon), live clocks, the window header and close button, edge blur on
   Places, the moon card's stars.
+- **2026-11-22: frame header, close at the end, moon card owns the screen while opening (checked on the
+  Pixel).** `FrameHeader` in `PageFrame.kt` is the page framework's option for text pinned to the
+  frame, not a page: the window shows one "Visiting · time" line, centred, that stays put while the
+  pages slide and scroll under it (its ink follows the pages); its close button is at the end (user).
+  `LocalVisit` is provided window-wide. Motion cfcb505: morphs take all touches while opening and settling by
+  default (`MorphTouches.WhileClosing`); a scroll right after opening the moon card no longer moves the page.

@@ -71,6 +71,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -91,7 +92,6 @@ import io.github.information89.motion.MorphAnchor
 import io.github.information89.motion.MorphMotion
 import io.github.information89.motion.MorphPage
 import io.github.information89.motion.MorphSettings
-import io.github.information89.motion.MorphTouches
 import io.github.information89.motion.MotionPhysics
 import io.github.information89.motion.MotionValue
 import io.github.information89.motion.SpringMorph
@@ -215,7 +215,7 @@ internal fun PlaceWindow(
             canPull = { false },
             // Opening, the window owns the screen; closing, a sideways swipe is home's, and it folds home
             // inside its postcard's page (agreed 2026-11-21).
-            settings = MorphSettings(touches = MorphTouches.WhileClosing, page = morphPage),
+            settings = MorphSettings(page = morphPage),
             // A tap never closes a window (user 2026-11-21: a tap just after opening a postcard dismissed
             // it): caught while opening, it carries on; caught while closing, it opens again.
             onTap = { motion.open() },
@@ -237,7 +237,11 @@ internal fun PlaceWindow(
             // The window's own moon card (agreed 2026-11-21): opened here, it lives and closes with it.
             val windowMoonCards = remember { MoonCards() }
             Box(Modifier.fillMaxSize()) {
-                CompositionLocalProvider(LocalMoonCards provides windowMoonCards) {
+                // The visit, for the frame header and the pages under it; the window's own moon card.
+                CompositionLocalProvider(
+                    LocalMoonCards provides windowMoonCards,
+                    LocalVisit provides Visit(location, now, pinned)
+                ) {
                     // The window's own glass: its toolbar blurs the window's sky and pages, like the home toolbar.
                     val windowGlass = rememberGlassSource()
                     // The window's sky alone, for its Forecast cards' blur.
@@ -257,53 +261,51 @@ internal fun PlaceWindow(
                                 // This week sits on the plain page, like Outlook.
                                 .plainPageBackdrop({ nav.visualPosition() }, skyPage = 1, page = page)
                         ) {
-                            CompositionLocalProvider(LocalVisit provides Visit(location, now, pinned)) {
-                                HorizontalPager(
-                                    state = pager,
-                                    beyondViewportPageCount = 1,
-                                    flingBehavior = nav.fling,
-                                    modifier = Modifier.fillMaxSize().pageOvershoot(
-                                        nav.overshoot
-                                    )
-                                ) { index ->
-                                    Box(Modifier.fillMaxSize().pageSwipeBlur({ nav.visualPosition() }, index)) {
-                                        if (index == 0) {
-                                            DaysPage(location, onPage, page, days) {
-                                                abs(nav.visualPosition() - 1f).coerceIn(0f, 1f)
-                                            }
-                                        } else {
-                                            CompositionLocalProvider(
-                                                LocalSkyGlass provides windowSky,
-                                                LocalPageGlass provides windowGlass
-                                            ) {
-                                                ForecastPage(
-                                                    location = location,
-                                                    sky = sky,
-                                                    now = now,
-                                                    refreshing = refreshing,
-                                                    onRefresh = onRefresh,
-                                                    onDetails = onDetails,
-                                                    onOpenPlaces = { onClose() },
-                                                    showLocalTime = false,
-                                                    source = source,
-                                                    scroll = forecastScroll
-                                                )
-                                            }
+                            HorizontalPager(
+                                state = pager,
+                                beyondViewportPageCount = 1,
+                                flingBehavior = nav.fling,
+                                modifier = Modifier.fillMaxSize().pageOvershoot(
+                                    nav.overshoot
+                                )
+                            ) { index ->
+                                Box(Modifier.fillMaxSize().pageSwipeBlur({ nav.visualPosition() }, index)) {
+                                    if (index == 0) {
+                                        DaysPage(location, onPage, page, days) {
+                                            abs(nav.visualPosition() - 1f).coerceIn(0f, 1f)
                                         }
-                                        // The window's header, pinned at the top of each page and sliding with it
-                                        // (agreed 2026-11-21): the visit's line and the close button. On Forecast its
-                                        // glass blurs the window's sky; on This week (a plain page) it's just the tint.
-                                        VisitHeader(
-                                            ink = if (index == 1) sky.palette.text else onPage,
-                                            glass = if (index == 1) windowSky else null,
-                                            onClose = onClose,
-                                            modifier = Modifier.align(Alignment.TopCenter)
-                                        )
+                                    } else {
+                                        CompositionLocalProvider(
+                                            LocalSkyGlass provides windowSky,
+                                            LocalPageGlass provides windowGlass
+                                        ) {
+                                            ForecastPage(
+                                                location = location,
+                                                sky = sky,
+                                                now = now,
+                                                refreshing = refreshing,
+                                                onRefresh = onRefresh,
+                                                onDetails = onDetails,
+                                                onOpenPlaces = { onClose() },
+                                                showLocalTime = false,
+                                                source = source,
+                                                scroll = forecastScroll
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+                    // The window's frame header (agreed 2026-11-21): one line for the whole window, pinned at the
+                    // top while the pages slide and scroll under it, its ink following them (the sky's on
+                    // Forecast, the page's on This week); the close button at the end, on the window's glass.
+                    FrameHeader(
+                        ink = lerp(onPage, sky.palette.text, (1f - abs(nav.visualPosition() - 1f)).coerceIn(0f, 1f)),
+                        glass = windowGlass,
+                        onClose = onClose,
+                        modifier = Modifier.align(Alignment.TopCenter).graphicsLayer { alpha = contentShown() }
+                    ) { ink -> VisitingLine(ink) }
                     // The home toolbar, as is: This week and Forecast, and Pin budding out of Forecast like search
                     // does out of Places (pin keeps the place; otherwise it's gone when you go back).
                     val scope = rememberCoroutineScope()
