@@ -45,7 +45,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.information89.motion.MotionSpring
-import io.github.information89.motion.pageTransition
+import io.github.information89.motion.pageOvershoot
 import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.components.glassSource
 import org.breezyweather.ui.expressive.components.rememberGlassSource
@@ -109,7 +109,7 @@ internal fun ToolbarDemo() {
             HorizontalPager(
                 state = pager,
                 flingBehavior = nav.fling,
-                modifier = Modifier.fillMaxSize().pageTransition(nav.pageChange)
+                modifier = Modifier.fillMaxSize().pageOvershoot(nav.overshoot)
             ) { i ->
                 LabPage(i, Modifier.pageSwipeBlur({ nav.visualPosition() }, i))
             }

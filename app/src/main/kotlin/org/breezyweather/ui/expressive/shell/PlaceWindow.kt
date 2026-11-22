@@ -90,11 +90,12 @@ import androidx.compose.ui.unit.dp
 import breezyweather.domain.location.model.Location
 import io.github.information89.motion.MorphAnchor
 import io.github.information89.motion.MorphMotion
+import io.github.information89.motion.MorphTouches
 import io.github.information89.motion.MotionPhysics
 import io.github.information89.motion.MotionValue
 import io.github.information89.motion.SpringMorph
 import io.github.information89.motion.morphHandle
-import io.github.information89.motion.pageTransition
+import io.github.information89.motion.pageOvershoot
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import org.breezyweather.R
@@ -131,16 +132,16 @@ internal fun postcardKey(id: String) = "postcard-$id"
  * flick folds it home) or tap it. A pull on the page refreshes, like home. Back follows the finger
  * (predictive back). The window only shows the place: it doesn't change the selected or main place.
  *
- * [fromBounds] is where it grows from (the postcard, or the search card it was picked in); [from] the
- * postcard's key, hidden while the window draws it. A visit you didn't keep ([fadeOut]) fades away as
- * it folds back.
+ * [fromBounds] is the search card it was picked in, when it was (null: it grows from and folds back
+ * into its postcard's live position, registered under [from]); [from] is the postcard's key, hidden
+ * while the window draws it. A visit you didn't keep ([fadeOut]) fades away as it folds back.
  */
 @Composable
 internal fun PlaceWindow(
     location: Location,
     motion: MorphMotion,
     from: Any,
-    fromBounds: MorphAnchor,
+    fromBounds: MorphAnchor?,
     now: Long,
     onClose: () -> Unit,
     pinned: Boolean,
@@ -209,6 +210,8 @@ internal fun PlaceWindow(
             // Only the handle pulls the window (morphHandle); a pull on the page refreshes, like home
             // (agreed 2026-11-21).
             canPull = { false },
+            // Opening, the window owns the screen; closing, a sideways swipe is home's (agreed 2026-11-21).
+            touches = MorphTouches.WhileClosing,
             // A tap never closes a window (user 2026-11-21: a tap just after opening a postcard dismissed
             // it): caught while opening, it carries on; caught while closing, it opens again.
             onTap = { motion.open() },
@@ -252,7 +255,9 @@ internal fun PlaceWindow(
                                 state = pager,
                                 beyondViewportPageCount = 1,
                                 flingBehavior = nav.fling,
-                                modifier = Modifier.fillMaxSize().pageTransition(nav.pageChange)
+                                modifier = Modifier.fillMaxSize().pageOvershoot(
+                                    nav.overshoot
+                                )
                             ) { index ->
                                 Box(Modifier.fillMaxSize().pageSwipeBlur({ nav.visualPosition() }, index)) {
                                     if (index == 0) {

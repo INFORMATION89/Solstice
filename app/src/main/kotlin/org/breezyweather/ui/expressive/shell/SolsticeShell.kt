@@ -80,11 +80,9 @@ import breezyweather.domain.location.model.Location
 import io.github.information89.motion.MorphAnchor
 import io.github.information89.motion.Motion
 import io.github.information89.motion.MotionPhysics
-import io.github.information89.motion.pageSettleFling
-import io.github.information89.motion.pageTransition
+import io.github.information89.motion.pageOvershoot
 import io.github.information89.motion.rememberMorphMotion
 import io.github.information89.motion.rememberMotionValue
-import io.github.information89.motion.rememberPageTransition
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.coroutineScope
@@ -270,6 +268,8 @@ fun SolsticeShell(
     // A postcard opened as a window (agreed 2026-11-18): one spring grows it from its card and back.
     var windowId by rememberSaveable { mutableStateOf<String?>(null) }
     var windowOrigin by remember { mutableStateOf<Rect?>(null) }
+    // Opened from search's card (it grows from that rect) rather than from its postcard (live).
+    var windowFromSearch by remember { mutableStateOf(false) }
     // Places being fetched (a postcard window's pull, user 2026-11-21): from the view model.
     val refreshingPlaces by viewModel.refreshingPlaces.collectAsState()
     // The window's motion: SpringMorph's five springs (the user, 2026-11-21: the new morph applies to
@@ -355,6 +355,7 @@ fun SolsticeShell(
             // The search card itself turns into the postcard and opens into the window.
             keyboard?.hide()
             windowOrigin = searchCard ?: searchOrigin
+            windowFromSearch = true
             searchHandoff = true
             windowId = id
         }
@@ -404,7 +405,7 @@ fun SolsticeShell(
                     flingBehavior = nav.fling,
                     modifier = Modifier
                         .fillMaxSize()
-                        .pageTransition(nav.pageChange)
+                        .pageOvershoot(nav.overshoot)
                 ) { index ->
                     Box(
                         Modifier
@@ -445,6 +446,7 @@ fun SolsticeShell(
                                 // Tapping a postcard opens it as a window (no jump, no change of place).
                                 onSelect = { place, bounds ->
                                     windowOrigin = bounds
+                                    windowFromSearch = false
                                     windowId = place.formattedId
                                 },
                                 onStar = {
@@ -563,14 +565,19 @@ fun SolsticeShell(
             val screenH = screen.height.toFloat()
             if (windowPlace != null) {
                 val id = windowPlace.formattedId
-                // Where it grows from: the postcard (or the search card), captured when it opened, since a
-                // visit's postcard leaves the list while its window is open.
-                val fromBounds = remember(windowOrigin) {
+                // Where it grows from: from search, the search card's rect as it was picked; from a postcard,
+                // nothing here: the morph uses the postcard's live position (its registered anchor), so a
+                // closing window lands where the postcard is now, even after the page moved (agreed
+                // 2026-11-21). With neither, a point in the middle of the screen.
+                val fromBounds = remember(windowOrigin, windowFromSearch) {
                     val r = windowOrigin
-                    if (r != null) {
-                        MorphAnchor(r, cornerPx)
-                    } else {
-                        MorphAnchor(Rect(Offset(screenW / 2f - 1f, screenH / 2f - 1f), Size(2f, 2f)), cornerPx)
+                    when {
+                        r == null -> MorphAnchor(
+                            Rect(Offset(screenW / 2f - 1f, screenH / 2f - 1f), Size(2f, 2f)),
+                            cornerPx
+                        )
+                        windowFromSearch -> MorphAnchor(r, cornerPx)
+                        else -> null
                     }
                 }
                 PlaceWindow(

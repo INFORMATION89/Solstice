@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -200,10 +201,25 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
         placed = true
     }
 
+    // The springs of the last move, so a re-aim (the source moved) carries on with the same character.
+    private var lastSprings = MorphSprings.Close
+
+    /**
+     * The source's current bounds (e.g. a postcard on a page that's moving). While it's closing, the
+     * springs re-aim at it from where they are, keeping their velocity, so it lands where the source is
+     * now, even off screen (agreed 2026-11-21: a closing window floated where its postcard had been).
+     */
+    internal fun updateSource(anchor: MorphAnchor) {
+        if (anchor == source) return
+        source = anchor
+        if (!isOpen && isMoving && !caught) animate(anchor, lastSprings)
+    }
+
     /** Springs every property to [to] with [springs], each from its current velocity plus [kick]. */
     private fun animate(to: MorphAnchor, springs: MorphSprings, kick: List<Float> = List(5) { 0f }) {
         val v = values(to)
         caught = false
+        lastSprings = springs
         val props = listOf(
             cx to springs.position,
             cy to springs.position,
@@ -394,6 +410,8 @@ fun SpringMorph(
     // Where it grows from when that isn't a registered [morphSource] (e.g. a card that has just closed
     // into this); [from] is then only the key to hide.
     fromBounds: MorphAnchor? = null,
+    // When touches reach the page below while it moves ([MorphTouches]).
+    touches: MorphTouches = MorphTouches.WhileMoving,
     // Whether a downward drag on the open surface, starting at this point on screen, pulls it (e.g.
     // only from the top of its page, or only from a strip, leaving the page's own pull to refresh).
     canPull: (start: Offset) -> Boolean = { true },
@@ -402,7 +420,9 @@ fun SpringMorph(
 ) {
     val registry = LocalMorphRegistry.current
     val source = fromBounds ?: registry?.get(from) ?: return
-    motion.source = source
+    // The first source is set at once (opening reads it); later ones re-aim the springs after composition.
+    if (motion.source == null) motion.source = source
+    SideEffect { motion.updateSource(source) }
     motion.target = target
     val density = LocalDensity.current
     // How far a finger travels for the whole path: the farthest an edge moves between source and target,
@@ -459,7 +479,7 @@ fun SpringMorph(
     // Moving (opening or closing), a touch reaches what's underneath as well as the surface: the
     // surface takes a tap or a vertical drag, a sideways swipe is left to the page below (user
     // 2026-11-21: a closing window held up swipes). At rest and open, it's the only thing touched.
-    Box(modifier.morphPassThrough(motion).fillMaxSize()) {
+    Box(modifier.morphPassThrough(motion, touches).fillMaxSize()) {
         // The app's material at the surface's bounds (laid out each frame: a material like glass
         // needs a real node where the surface is, to blur what's behind it).
         if (material != null) {
@@ -719,13 +739,32 @@ fun SpringMorph(
 }
 
 /**
- * A morph's touch rule for whatever holds it on screen (agreed 2026-11-21, MOTION.md "animations never
- * block input"): while it moves, a touch reaches the page below as well as the surface (the surface
- * takes a tap or a vertical drag; a sideways swipe is the page's). Resting open, it's the only thing
- * touched. [SpringMorph] applies it to itself; a wrapper around it that sits beside the page needs it
- * too, as touches are only shared between siblings.
+ * When a moving morph lets touches reach the page below as well as its surface (the surface takes a
+ * tap or a vertical drag; a sideways swipe is the page's). Resting open, a morph is always the only
+ * thing touched.
  */
-fun Modifier.morphPassThrough(motion: MorphMotion): Modifier = shareTouchesWhile { !motion.isRestingOpen }
+enum class MorphTouches {
+    /** Opening and closing (MOTION.md "animations never block input"): a card over the page. */
+    WhileMoving,
+
+    /**
+     * Only while closing (agreed 2026-11-21 for a postcard window): opening, the whole screen belongs to
+     * it (a tap catches it); closing, the page below takes a sideways swipe.
+     */
+    WhileClosing,
+}
+
+/**
+ * A morph's touch rule ([touches]) for whatever holds it on screen. [SpringMorph] applies it to itself; a
+ * wrapper around it that sits beside the page needs it too, as touches are only shared between siblings.
+ */
+fun Modifier.morphPassThrough(motion: MorphMotion, touches: MorphTouches = MorphTouches.WhileMoving): Modifier =
+    shareTouchesWhile {
+        when (touches) {
+            MorphTouches.WhileMoving -> !motion.isRestingOpen
+            MorphTouches.WhileClosing -> !motion.isOpen
+        }
+    }
 
 /**
  * Marks a handle that pulls [motion] (agreed 2026-11-21: Material 3's drag handle): a vertical drag that

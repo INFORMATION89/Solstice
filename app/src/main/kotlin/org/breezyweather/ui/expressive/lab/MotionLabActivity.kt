@@ -201,9 +201,9 @@ private fun MotionLab(onBack: () -> Unit) {
             }
             item {
                 Section(
-                    "Swipe settle, A/B",
-                    "The same pages and spring, three ways to finish a swipe. Pick one, swipe and let go " +
-                        "part-way or with a flick; watch the frame counter."
+                    "Swipe settle",
+                    "The app's swipe settle: the pages spring from your finger's speed (momentum). Pick " +
+                        "another spring to compare; let go part-way or with a flick, and at either end."
                 ) { SettleDemo() }
             }
             item {

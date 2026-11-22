@@ -17,7 +17,6 @@
 package org.breezyweather.ui.expressive.shell
 
 import android.os.Build
-import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.gestures.TargetedFlingBehavior
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.pager.PagerState
@@ -26,7 +25,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -37,121 +36,78 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import io.github.information89.motion.Motion
-import io.github.information89.motion.PageTransition
-import io.github.information89.motion.pageSettleFling
-import io.github.information89.motion.rememberPageTransition
+import io.github.information89.motion.PageOvershoot
+import io.github.information89.motion.pageSpringFling
+import io.github.information89.motion.springToPage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
- * How the pages change, shared by home and the postcard window (2026-11-21, tonight's item 3), so both
- * behave the same by construction and only their configuration differs.
- *
- * - Tab taps go through [navigate]: the pager switches at once and `:motion`'s [PageTransition]
- *   draws the slide (taps are never swallowed).
- * - A swipe let go settles the same way ([fling]: the pager jumps, the rest is drawn).
- * - [visualPosition] is where the pages *look* to be, for anything that follows the page position
- *   (the sky's fade, edge blur, swipe blur, the toolbar).
+ * How the pages change, shared by home and the postcard window (2026-11-21), so both behave the same by
+ * construction and only their configuration differs. One page motion for everything (agreed
+ * 2026-11-21: tab taps mirror swipes): the pages themselves spring to their page on `Motion.momentum`,
+ * whether a swipe was let go ([fling]) or a tab was tapped ([navigate]), and bounce past the ends
+ * ([overshoot]). A touch while they move stops the pager first (the accepted trade-off).
  */
 @Stable
 internal class ShellNavigation(
     val pager: PagerState,
-    val pageChange: PageTransition,
     private val scope: CoroutineScope,
 ) {
-    private var jumpFrom by mutableFloatStateOf(0f)
-    private var jumpTo by mutableFloatStateOf(0f)
-
-    /** The toolbar's highlight while a tap glides it across (-1 at rest). */
-    val toolbarGlide = Animatable(-1f)
     private var job: Job? = null
 
-    /** Where the pages look to be: between the page left and the one arrived at while a change is drawn. */
-    fun visualPosition(): Float {
-        val r = pageChange.remaining
-        return if (r > 0f) jumpTo + (jumpFrom - jumpTo) * r else pager.currentPage + pager.currentPageOffsetFraction
-    }
+    // The tabs a tap's change passes over (a jump from This week to Places passes Forecast), while it runs.
+    private var passingFrom by mutableIntStateOf(-1)
+    private var passingTo by mutableIntStateOf(-1)
+
+    /** Where the pages are (fractional), for anything that follows them (sky fade, blurs, backdrop). */
+    fun visualPosition(): Float = pager.currentPage + pager.currentPageOffsetFraction
 
     /**
-     * Whether tab [i] is only passed over by a change in progress (a jump from This week to Places
-     * passes Forecast): its label stays folded. The tabs a change starts and ends on unfold normally
-     * (2026-11-21: with every tab tap gliding, the middle tab's label stayed folded and popped in).
+     * Whether tab [i] is only passed over by a tap's change in progress: its label stays folded. The
+     * tabs a change starts and ends on unfold normally.
      */
-    fun isPassing(i: Int): Boolean {
-        if (toolbarGlide.value < 0f && pageChange.remaining <= 0f) return false
-        val a = jumpFrom.roundToInt()
-        val b = jumpTo.roundToInt()
-        return i > minOf(a, b) && i < maxOf(a, b)
-    }
+    fun isPassing(i: Int): Boolean =
+        passingFrom >= 0 && i > minOf(passingFrom, passingTo) && i < maxOf(passingFrom, passingTo)
 
-    /** Where the toolbar should show the selection, or null to follow the pager. */
-    fun toolbarPosition(): Float? =
-        toolbarGlide.value.takeIf { it >= 0f } ?: visualPosition().takeIf { pageChange.remaining > 0f }
+    /** Where the toolbar shows the selection: null, it follows the pager as for a swipe. */
+    fun toolbarPosition(): Float? = null
 
-    /** The pager's fling: let go, it jumps to the page and the rest of the way is drawn. */
-    val fling: TargetedFlingBehavior = pageSettleFling(pager, pageChange, scope) { from, to ->
-        jumpFrom = from
-        jumpTo = to.toFloat()
-    }
+    /** How far a settle bounces past the first or last page (drawn with `pageOvershoot`). */
+    val overshoot = PageOvershoot()
 
-    /** A finger on the toolbar (its slide) stops any page change in progress. */
+    /** The pager's fling: let go, the pages spring to the page from the finger's speed. */
+    val fling: TargetedFlingBehavior = pageSpringFling(pager, overshoot) { Motion.momentum }
+
+    /** A finger on the toolbar (its slide) stops any tap's change in progress. */
     fun interrupt() {
         job?.cancel()
         job = null
     }
 
-    /**
-     * Goes to page [target]. A new navigation, or a finger, cancels the one in progress and resets
-     * its state first, so nothing is left half-way (a fast second tap used to fight the first).
-     */
+    /** Goes to page [target] the way a swipe settles. A new tap, or a finger, interrupts it where it is. */
     fun navigate(target: Int) {
         job?.cancel()
         job = scope.launch {
+            passingFrom = (pager.currentPage + pager.currentPageOffsetFraction).roundToInt()
+            passingTo = target
             try {
-                rest()
-                val here = (pager.currentPage + pager.currentPageOffsetFraction).roundToInt()
-                if (target != here && abs(pager.currentPageOffsetFraction) < 0.01f) {
-                    // The pager switches at once; the change is drawn on top (agreed 2026-11-21).
-                    val from = here.toFloat()
-                    jumpFrom = from
-                    jumpTo = target.toFloat()
-                    pageChange.go(
-                        forward = target > here,
-                        switch = {
-                            toolbarGlide.snapTo(from)
-                            pager.scrollToPage(target)
-                        },
-                        alongside = {
-                            // About the pace of a neighbouring tab change (user: edge to edge a touch faster).
-                            toolbarGlide.animateTo(target.toFloat(), Motion.settle.spec())
-                        }
-                    )
-                } else {
-                    pager.animateScrollToPage(target)
-                }
+                pager.springToPage(target, overshoot, Motion.momentum)
             } finally {
-                // Finished or interrupted: always back at rest.
-                withContext(NonCancellable) { rest() }
+                passingFrom = -1
+                passingTo = -1
             }
         }
-    }
-
-    private suspend fun rest() {
-        pageChange.rest()
-        toolbarGlide.snapTo(-1f)
     }
 }
 
 @Composable
 internal fun rememberShellNavigation(pager: PagerState): ShellNavigation {
     val scope = rememberCoroutineScope()
-    val pageChange = rememberPageTransition()
-    return remember(pager, pageChange, scope) { ShellNavigation(pager, pageChange, scope) }
+    return remember(pager, scope) { ShellNavigation(pager, scope) }
 }
 
 /**

@@ -47,7 +47,9 @@ curve applies.
 - **Animations never block input** (added by the user 2026-11-21): nothing waits for an animation to
   finish. A tap on anything (a place card while a tab change plays, a button while a sheet settles)
   works at once: the animation is retargeted, finished instantly, or keeps running underneath, but the
-  touch is never swallowed. This applies to every animation, through `:motion`.
+  touch is never swallowed. This applies to every animation, through `:motion`. **Exception, agreed
+  2026-11-21:** page changes (swipes and tab taps) are the pager really scrolling, so a tap while the
+  pages still move first stops them (the user chose one springy page motion over this rule).
 - Pick the target from momentum: project where a fling would come to rest (`SolsticeMotion.project`).
 - Over-dragging rubber-bands, like iOS, and never stops dead (`SolsticeMotion.rubberBand`, coefficient 0.55).
 
@@ -102,8 +104,9 @@ squished while the container first stretches:
 - **Motion lab** (M5, 2026-11-19): Settings → Debug → Motion lab; slow motion is `MotionTime.scale`.
 - **Haptics** (2026-11-21, F1): `:motion` `Haptic` tokens via `haptics().perform(...)`; no direct
   vibrator or `HapticFeedbackType` calls in the app, and no new haptics without agreeing them.
-- **Page changes** (2026-11-21): `:motion` `PageTransition`; the pages switch at once and the
-  change is drawn on top, so taps are never swallowed. Home's tab taps use it.
+- **Page changes** (2026-11-21, revised): `:motion` `PageSpring` (`pageSpringFling`, `springToPage`,
+  `PageOvershoot`): swipes and tab taps spring the pages themselves on `Motion.momentum`, bouncing past
+  the first and last page. `PageTransition` (the drawn picture slide) is gone.
 - **README** (2026-11-19): `motion/README.md` (pieces, tokens, rules, examples).
 - **Next:** refining rounds (CONTINUE.md section 4).
 
