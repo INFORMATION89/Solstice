@@ -3080,3 +3080,20 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
     178). Rain card: `humidity_low` (amount) and `percent_discount` (chance), replacing water_drop and percent.
   - Apple check of the window ✕ fading under its moon card: Apple keeps the screen behind a sheet visible and
     dimmed (its bar buttons included), not hidden; our fade follows the user's wish instead (asked).
+
+### Plan: a sheet over a screen, Apple's way (agreed 2026-11-22: dim + recede, built cheaply)
+
+What Apple does: the screen behind a sheet is dimmed (its buttons stay visible, not tappable) and on iPhone
+recedes slightly into a card, so its top bar slips behind the sheet's edge instead of peeking.
+1. **Motion `recede`**: a modifier for the screen behind a sheet, driven by the sheet's progress: scales it back
+   on its GPU layer and rounds it with the screen's own corner radius. Depth: the 4 % agreed for the page recede
+   on 2026-11-19 (no new value).
+2. **Why it was janky before** (2026-11-20 measurements: search 22 % janky frames with the recede, 8 % without):
+   scaling the page made everything that samples it redraw every frame (the Haze glass, the edge blur). Fix in
+   Motion/app: while a recede moves, glass and edge blur stop re-sampling (glass shows its tint, the blur holds its
+   last frame) and resume at rest. One signal (`LocalRecede`, "the screen is moving under a sheet") that both read.
+3. **App**: the window's ✕ no longer fades; the moon sheet's existing scrim (25 %) dims the screen behind, ✕
+   included; the screen behind recedes with `MoonCards.progress` (home or the window, whichever opened it). A tap
+   on the dimmed area closes the sheet, as now.
+4. **Measure before keeping it**: profile build, `dumpsys gfxinfo`, 6 opens and flick closes, janky % with and
+   without the recede; keep it only if it isn't worse than without. Search can use the same piece afterwards.
