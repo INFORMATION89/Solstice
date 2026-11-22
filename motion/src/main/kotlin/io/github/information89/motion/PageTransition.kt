@@ -371,10 +371,6 @@ fun pageSpringFling(
                     travelled += scrollBy(value - travelled)
                     // What the pager couldn't take (past an end) is drawn as a shift instead.
                     overshoot?.pixels = value - travelled
-                    android.util.Log.println(
-                        android.util.Log.WARN,
-                        "edge value=$value of $distance shift=${value - travelled}"
-                    )
                 }
             } finally {
                 // Settled or caught by a finger: never left shifted.
