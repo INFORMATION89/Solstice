@@ -25,11 +25,6 @@ Where things stand and how to pick the work up anywhere. The plan, decisions and
   launcher icon in test builds) has a demo and live controls for each.
 - **Sky:** one AGSL shader with `SkyEffects` (stars; twinkle built, off until agreed).
 
-**Fix first (found 2026-11-21 night):** CI hasn't run since `c701aab` (Motion as a submodule). The
-second job in `.github/workflows/build.yml` now has **two `with:` keys** on its Checkout step
-(`submodules: true` added above the existing `fetch-depth: 0`), so GitHub rejects the workflow file and
-starts no jobs. Merge them into one `with:` block.
-
 ## Right now (2026-11-21 afternoon, agreed with the user in chat), in this order
 
 1. **Summary texts** (agreed wording; WRITING.md "natural, not generated"). No phone needed to build.

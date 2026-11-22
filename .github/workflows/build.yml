@@ -61,7 +61,6 @@ jobs:
         with:
           # Motion (INFORMATION89/Motion) is a submodule at motion/, built from source.
           submodules: true
-        with:
           fetch-depth: 0
 
       - name: Set up JDK
