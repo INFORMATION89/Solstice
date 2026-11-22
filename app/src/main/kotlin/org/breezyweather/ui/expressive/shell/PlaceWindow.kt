@@ -303,7 +303,7 @@ internal fun PlaceWindow(
                     FrameHeader(
                         ink = lerp(onPage, sky.palette.text, (1f - abs(nav.visualPosition() - 1f)).coerceIn(0f, 1f)),
                         glass = windowGlass,
-                        onClose = onClose,
+                        end = listOf(closeAction(onClose)),
                         modifier = Modifier.align(Alignment.TopCenter).graphicsLayer { alpha = contentShown() }
                     ) { ink -> VisitingLine(ink) }
                     // The home toolbar, as is: This week and Forecast, and Pin budding out of Forecast like search

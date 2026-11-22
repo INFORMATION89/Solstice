@@ -3030,3 +3030,7 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   pages slide and scroll under it (its ink follows the pages); its close button is at the end (user).
   `LocalVisit` is provided window-wide. Motion cfcb505: morphs take all touches while opening and settling by
   default (`MorphTouches.WhileClosing`); a scroll right after opening the moon card no longer moves the page.
+- **2026-11-22: header buttons are part of the page framework (checked on the Pixel).** `FrameAction`
+  (icon, label, action), `FrameButton` (one glass icon button, one touch target) and `FrameHeader(start,
+  end)` lists of actions in `PageFrame.kt`; `closeAction(onClose)` is the window's ✕. Adding a button to a
+  header is one more `FrameAction` in a list.

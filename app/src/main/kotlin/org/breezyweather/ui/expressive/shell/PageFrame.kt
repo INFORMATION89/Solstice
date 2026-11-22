@@ -48,6 +48,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -56,6 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -173,18 +175,48 @@ internal fun pageTopEdge(fadeTo: Color?): EdgeBand = EdgeBlurDefaults.top(
 )
 
 /**
+ * A button a frame header can carry (agreed 2026-11-22: header buttons are part of the framework): an
+ * [icon], its [label] (spoken, and the click's description) and what it does.
+ */
+@Immutable
+internal data class FrameAction(val icon: ImageVector, val label: String, val onClick: () -> Unit)
+
+/** The close action (a window's ✕): back and swipe close too. */
+@Composable
+internal fun closeAction(onClose: () -> Unit): FrameAction =
+    FrameAction(SolsticeIcons.Close, stringResource(R.string.action_close), onClose)
+
+/**
+ * A frame header's button: an icon on the one glass over [glass], one touch target, its icon in the
+ * theme's ink on glass.
+ */
+@Composable
+internal fun FrameButton(action: FrameAction, glass: GlassSource?, modifier: Modifier = Modifier) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .size(Sizes.TouchTarget)
+            .glass(glass, CircleShape)
+            .clickable(onClickLabel = action.label, role = Role.Button, onClick = action.onClick)
+    ) {
+        Icon(action.icon, contentDescription = action.label, tint = MaterialTheme.colorScheme.onSurface)
+    }
+}
+
+/**
  * A frame header (agreed 2026-11-21): text pinned to the frame of a set of pages, not to any page, so it
  * stays put while the pages slide underneath and never scrolls. One touch target tall under the status
- * bar; [content] in the middle, drawn in [ink]; an optional close button at the end ([onClose]) on the
- * one glass over [glass] (what the frame shows behind it), its icon in the theme's ink on glass. Pages
- * under it start below it ([pageTopInset]).
+ * bar; [content] in the middle, drawn in [ink]; buttons ([FrameButton]) at the [start] and the [end], on
+ * the one glass over [glass] (what the frame shows behind them). Pages under it start below it
+ * ([pageTopInset]).
  */
 @Composable
 internal fun FrameHeader(
     ink: Color,
     glass: GlassSource?,
     modifier: Modifier = Modifier,
-    onClose: (() -> Unit)? = null,
+    start: List<FrameAction> = emptyList(),
+    end: List<FrameAction> = emptyList(),
     content: @Composable (ink: Color) -> Unit,
 ) {
     Box(
@@ -195,17 +227,14 @@ internal fun FrameHeader(
             .padding(horizontal = Space.S4)
     ) {
         Box(Modifier.align(Alignment.Center)) { content(ink) }
-        if (onClose != null) {
-            val label = stringResource(R.string.action_close)
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .size(Sizes.TouchTarget)
-                    .glass(glass, CircleShape)
-                    .clickable(onClickLabel = label, role = Role.Button, onClick = onClose)
-            ) {
-                Icon(SolsticeIcons.Close, contentDescription = label, tint = MaterialTheme.colorScheme.onSurface)
+        if (start.isNotEmpty()) {
+            Row(Modifier.align(Alignment.CenterStart), horizontalArrangement = Arrangement.spacedBy(Space.S2)) {
+                start.forEach { FrameButton(it, glass) }
+            }
+        }
+        if (end.isNotEmpty()) {
+            Row(Modifier.align(Alignment.CenterEnd), horizontalArrangement = Arrangement.spacedBy(Space.S2)) {
+                end.forEach { FrameButton(it, glass) }
             }
         }
     }
