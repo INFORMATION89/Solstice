@@ -78,6 +78,9 @@ comparison to Google's libraries, no weather references), and Apple's principles
 - [ ] 💬⭐ **Motion framework** (`:motion` module, reusable in other projects): one motion value per
   interaction, morphs from anchors instead of a seeked `SharedTransitionLayout`, iOS-style springs and
   release rules. Plan in PLAN.md, "Motion framework" (M0 to M5); M0 = agree it.
+- [ ] **Motion in its own repo** (long term, the user 2026-11-21): `:motion` (Apache-2.0) and the
+  Motion Lab move out into their own repository, where Motion work then happens; Solstice depends on
+  it. Until then keep `:motion` free of app code (no Solstice imports) so the split stays a move.
 - [ ] **Design frameworks:** spacing scale, type scale, motion tokens, component rules.
 - [x] 💬⭐ **Icon style:** Material Symbols Rounded, one catalog (`SolsticeIcons`), old Material Icons
   removed (2026-11-19, PR #1). Check on the phone (CONTINUE.md).
