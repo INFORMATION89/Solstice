@@ -126,29 +126,21 @@ internal val LocalVisit = compositionLocalOf<Visit?> { null }
 internal fun pageTopInset(): Dp = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
 /**
- * A visit's line: "[landing plane] Visiting" until it's pinned, and its local time when that differs
- * from yours ("[clock] 2:33 PM, +14 h"). Nothing on home.
+ * A visit's line: "[landing plane] Visiting" in any window (agreed 2026-11-21), and its local time from
+ * the place time system when that differs from yours ("[clock] 2:33 PM, +14 h"). Nothing on home.
  */
 @Composable
 internal fun VisitingLine(ink: Color, modifier: Modifier = Modifier) {
     val visit = LocalVisit.current ?: return
-    val context = LocalContext.current
-    val localTime = timeDifference(visit.location.timeZone, visit.now)?.let { diff ->
-        time(context, java.util.Date(visit.now), visit.location.timeZone) + ", " + diff
-    }
-    if (visit.pinned && localTime == null) return
+    val local = placeTime(LocalContext.current, visit.location.timeZone, visit.now)
     val style = MaterialTheme.typography.labelLarge
     Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
-        if (!visit.pinned) {
-            Icon(SolsticeIcons.Small.FlightLand, null, tint = ink, modifier = Modifier.size(Sizes.IconSmall))
-            Spacer(Modifier.width(Space.S1))
-            Text(stringResource(R.string.shell_visiting), style = style, color = ink)
-            if (localTime != null) Text(" · ", style = style, color = ink)
-        }
-        if (localTime != null) {
-            Icon(SolsticeIcons.Small.Schedule, null, tint = ink, modifier = Modifier.size(Sizes.IconSmall))
-            Spacer(Modifier.width(Space.S1))
-            Text(localTime, style = style, color = ink)
+        Icon(SolsticeIcons.Small.FlightLand, null, tint = ink, modifier = Modifier.size(Sizes.IconSmall))
+        Spacer(Modifier.width(Space.S1))
+        Text(stringResource(R.string.shell_visiting), style = style, color = ink)
+        if (local.label != null) {
+            Text(" · ", style = style, color = ink)
+            PlaceTimeLabel(local, ink, style)
         }
     }
 }

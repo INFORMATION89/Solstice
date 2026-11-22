@@ -178,24 +178,17 @@ internal fun ForecastPage(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            // The place's local time when it's in another time zone from yours, e.g. "[clock] 2:33 PM, +1 h"
-            // (the same clock as a visit's label).
+            // The place's local time when it's in another time zone from yours: the place time system
+            // ("[clock] 2:33 PM, +1 h", the clock's hands at that time).
             if (showLocalTime) {
-                timeDifference(location.timeZone, now)?.let { diff ->
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = Space.Half)) {
-                        Icon(
-                            SolsticeIcons.Small.Schedule,
-                            contentDescription = null,
-                            tint = text.copy(alpha = Emphasis.Medium),
-                            modifier = Modifier.size(Sizes.IconSmall)
-                        )
-                        Spacer(Modifier.width(Space.S1))
-                        Text(
-                            time(context, Date(now), location.timeZone) + ", " + diff,
-                            color = text.copy(alpha = Emphasis.Medium),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
+                val local = placeTime(context, location.timeZone, now)
+                if (local.label != null) {
+                    PlaceTimeLabel(
+                        local,
+                        ink = text.copy(alpha = Emphasis.Medium),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = Space.Half)
+                    )
                 }
             }
             // The big number is the actual temperature, or the feels-like one when that option is on.

@@ -26,6 +26,14 @@
     <string name="shell_use_current_location">Use my current location</string>
     <string name="shell_visiting">Visiting</string>
     <string name="shell_visiting_hint">Visiting %1$s</string>
+    <!-- A place's local time and how far it is from yours: "2:33 PM, +1 h". -->
+    <string name="place_time">%1$s, %2$s</string>
+    <string name="place_offset_ahead">+</string>
+    <string name="place_offset_behind">−</string>
+    <!-- "+6 h": sign, hours. -->
+    <string name="place_offset_hours">%1$s%2$d h</string>
+    <!-- "+5:30 h": sign, hours, minutes. -->
+    <string name="place_offset_hours_minutes">%1$s%2$d:%3$02d h</string>
     <string name="search_top_places">Popular places</string>
     <string name="search_no_results">No places called “%1$s”</string>
     <string name="search_no_results_hint">Check the spelling, or try a bigger city nearby.</string>

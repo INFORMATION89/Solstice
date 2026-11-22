@@ -173,7 +173,8 @@ internal fun PlaceCard(
     // The paper border: one caption line with its margins, the same on every side.
     val bezel = postcardBezel()
     val (title, city) = placeName(context, location)
-    val showTime = !location.isCurrentPosition && timeDifference(location.timeZone, now) != null
+    // The local time when it differs from yours (the place time system; the caption is its stamp style).
+    val localLabel = placeTime(context, location.timeZone, now).label
     val fold by animateFloatAsState(
         if (folded) 1f else 0f,
         Motion.content.spec(),
@@ -328,12 +329,9 @@ internal fun PlaceCard(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
-                if (showTime) {
+                if (localLabel != null) {
                     Text(
-                        listOfNotNull(
-                            time(context, Date(now), location.timeZone),
-                            timeDifference(location.timeZone, now)
-                        ).joinToString(" · ").uppercase(),
+                        localLabel.uppercase(),
                         style = caption,
                         color = ink,
                         maxLines = 1,
@@ -681,43 +679,6 @@ internal fun placeName(context: Context, location: Location): Pair<String, Strin
     } else {
         location.getPlace(context) to null
     }
-}
-
-/**
- * Under the place name: its weather, plus its local time and time difference when it's in another
- * time zone (always for a visit), e.g. "Visiting · Overcast · 14:32, +1 h".
- */
-private fun placeSubtitle(
-    context: Context,
-    location: Location,
-    visiting: Boolean,
-    now: Long,
-    withTime: Boolean = true,
-): String {
-    val diff = timeDifference(location.timeZone, now)
-    val local = if (diff != null || visiting) {
-        listOfNotNull(if (withTime) time(context, Date(now), location.timeZone) else null, diff)
-            .joinToString(", ")
-            .ifEmpty { null }
-    } else {
-        null
-    }
-    return listOfNotNull(
-        if (visiting) context.getString(R.string.shell_visiting) else null,
-        location.weather?.current?.weatherText,
-        local
-    ).joinToString(" · ")
-}
-
-/** A dashed outline marking a place you're only visiting. */
-private fun Modifier.dashedEdge(color: Color, corner: androidx.compose.ui.unit.Dp) = drawWithContent {
-    drawContent()
-    val r = corner.toPx()
-    drawRoundRect(
-        color = color.copy(alpha = 0.55f),
-        cornerRadius = CornerRadius(r, r),
-        style = Stroke(width = 1.5.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 8f)))
-    )
 }
 
 /** The postcard's paper border (top and bottom hold a caption line; the sides are as wide). */

@@ -57,16 +57,6 @@ object Visits {
     private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 }
 
-/** Time difference between [zone] and the phone's zone at [now], e.g. "+1 h", "−6 h", "+5:30 h"; null if none. */
-internal fun timeDifference(zone: TimeZone, now: Long): String? {
-    val minutes = (zone.getOffset(now) - TimeZone.getDefault().getOffset(now)) / 60_000
-    if (minutes == 0) return null
-    val sign = if (minutes > 0) "+" else "−"
-    val h = abs(minutes) / 60
-    val m = abs(minutes) % 60
-    return if (m == 0) "$sign$h h" else "$sign$h:${m.toString().padStart(2, '0')} h"
-}
-
 /** Whole hours of difference, for sorting or quick checks. */
 internal fun hoursApart(zone: TimeZone, now: Long): Int =
     ((zone.getOffset(now) - TimeZone.getDefault().getOffset(now)) / 3_600_000f).roundToInt()

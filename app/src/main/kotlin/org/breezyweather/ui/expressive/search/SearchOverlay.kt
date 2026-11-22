@@ -130,7 +130,8 @@ import org.breezyweather.ui.expressive.components.SheetHandle
 import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.components.SolsticeSheetState
 import org.breezyweather.ui.expressive.components.glass
-import org.breezyweather.ui.expressive.shell.timeDifference
+import org.breezyweather.ui.expressive.shell.PlaceTimeLabel
+import org.breezyweather.ui.expressive.shell.placeTime
 import org.breezyweather.ui.expressive.theme.CornerShapes
 import org.breezyweather.ui.expressive.theme.Corners
 import org.breezyweather.ui.expressive.theme.Sizes
@@ -833,11 +834,8 @@ private fun ResultRow(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    val is24 = android.text.format.DateFormat.is24HourFormat(context)
-    val time = SimpleDateFormat(if (is24) "HH:mm" else "h:mm a", Locale.getDefault())
-        .apply { timeZone = zone }
-        .format(Date(now))
-    val diff = timeDifference(zone, now)
+    // The place time system: the time there (always, to compare results) and how far it is from yours.
+    val local = placeTime(context, zone, now)
     val big = Corners.M
     val small = Corners.XXS
     val colors = MaterialTheme.colorScheme
@@ -896,9 +894,9 @@ private fun ResultRow(
                 }
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text(time, style = MaterialTheme.typography.titleSmall, color = colors.onSurface)
-                if (diff != null) {
-                    Text(diff, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+                PlaceTimeLabel(local, colors.onSurface, MaterialTheme.typography.titleSmall, text = local.time)
+                local.offset?.let {
+                    Text(it, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
                 }
             }
         }

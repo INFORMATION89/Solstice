@@ -2935,3 +2935,12 @@ user picks one before the app changes.
   same spring brings back. Measured on the Pixel with momentum: ~12 px past the last page, ~38 px past
   the first (different flick speeds), same scale as between pages. Next: put B with momentum in the
   app (plan below, to agree).
+- **2026-11-21: place time system (round 4 phase 3), built, not yet seen on the phone** (the Pixel was
+  busy with the other session's testing). `shell/PlaceTime.kt`: one model (`PlaceTime`: time, offset,
+  hands, label), `placeTime()` and `PlaceTimeLabel`; `components/ClockIcon.kt`: a live analog clock drawn
+  to Material Symbols Rounded "schedule" proportions (measured on its 960 grid). Agreed: "2:33 PM, +1 h"
+  everywhere (postcards uppercase it in their stamp style, without the icon); the clock on home Forecast,
+  the window's line and search rows. The offset's "h" and sign are string resources now. The window line
+  says "Visiting" always. Removed two unused helpers (`placeSubtitle`, `dashedEdge`).
+  Note: the other session's commit 684770e also carried my temporary per-frame log in `SpringMorph`
+  (phase 1); it comes out when phase 1 is done.
