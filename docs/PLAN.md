@@ -2944,3 +2944,22 @@ user picks one before the app changes.
   says "Visiting" always. Removed two unused helpers (`placeSubtitle`, `dashedEdge`).
   Note: the other session's commit 684770e also carried my temporary per-frame log in `SpringMorph`
   (phase 1); it comes out when phase 1 is done.
+- **2026-11-21: swipe settle B (momentum) built for home and the window** (handed over by the Motion Lab
+  session; option A, the old settle path `pageSettleFling` / `settle()` and the lab's Now/A removed; the lab
+  keeps B with its spring chips). Not committed: the user found issues on the phone (below).
+
+**Fix plan from the user's recording (agreed 2026-11-21):**
+1. **Tab taps = swipes** (user: the tap animation should mirror the swipe): a tap springs the pager itself
+   to the tab on `Motion.momentum`, the toolbar highlight follows the pager as for swipes. Removed:
+   `PageTransition` (the still-picture slide), `ShellNavigation`'s toolbar glide and jump state. Accepted:
+   a tap while pages move first stops them; a jump across tabs scrolls through the middle page. MOTION.md's
+   "taps never swallowed" rule for page changes is revised accordingly.
+2. **Close into the live postcard:** the window's morph source is the postcard's live anchor (registry,
+   `postcardKey`), not the rect captured at open; `SpringMorph` re-aims its springs (keeping velocity)
+   when the source moves while closing, and follows it off screen (agreed earlier). `fromBounds` stays for
+   the search card only. Fixes the postcard floating over Forecast and the copy drawn over another slot.
+3. **Opening owns the screen:** while a postcard window opens, touches don't reach home (no pass-through);
+   a tap catches it. Once open, its own pages swipe. Closing keeps the agreed pass-through (a sideways
+   swipe moves home; the window follows its postcard). Built as part of the Page kind's touch rule.
+Then: check all of it on the Pixel (taps, swipes, ends, opening and closing with swipes), commit.
+Two of the user's three recordings (200728, 200959) weren't in Downloads; planned from the third.
