@@ -3044,3 +3044,8 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   stars effect is the one star system). The tonight line keeps its space away from today so the dial never
   moves under the finger. Not done: the heading and lines changing with a blur crossfade (needs a Motion
   blur-replace piece); the "tonight" line switches instantly.
+- **2026-11-22: no typed-in sizes in the moon dial (user: don't hard-code).** Motion b22fedb: the dial works out
+  its own height from its look (end caps, a label line, a decoration's size), with `labelGap`,
+  `decorationGap`, `END_CAP` and `MARKER` named; the moon card passes `decorationSize = Sizes.IconSmall` and
+  draws its phase icons at that size (was 60 dp and 7 dp). Left as they were (older, flagged): the moon
+  picture's 200 dp height and its glow's 10 %/60 %, the dial's tick alphas.

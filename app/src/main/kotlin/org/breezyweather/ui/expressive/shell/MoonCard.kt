@@ -660,17 +660,26 @@ private fun MoonCard(
                             labelStyle = MaterialTheme.typography.labelMedium,
                             home = SolsticePalette.Sun
                         ),
-                        modifier = Modifier.fillMaxWidth().height(60.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         label = { d -> if (d == 0f) todayLabel else dayFormat.format(Date(now + (d * DAY).toLong())) },
                         decorate = { d, at, emphasis ->
                             phaseMarks.firstOrNull { (t, _) -> abs((t - now).toFloat() / DAY - d) < 0.5f }
                                 ?.let { (_, phaseAngle) ->
-                                    drawMoonPhaseIcon(phaseIcons, at, 7.dp.toPx(), phaseAngle, ink, emphasis)
+                                    drawMoonPhaseIcon(
+                                        phaseIcons,
+                                        at,
+                                        Sizes.IconSmall.toPx() / 2f,
+                                        phaseAngle,
+                                        ink,
+                                        emphasis
+                                    )
                                 }
                         },
                         describe = { d -> dateFormat.format(Date(now + (d * DAY).toLong())) },
                         onDoubleTap = { it.value.animateTo(0f) },
-                        home = 0f
+                        home = 0f,
+                        // Room for the phase icons, one small icon tall.
+                        decorationSize = Sizes.IconSmall
                     )
                     Spacer(Modifier.height(Space.S4))
                     fun hm(d: Date?) = d?.let { sentenceTime(context, it.time, zone) } ?: "–"
