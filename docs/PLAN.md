@@ -3069,3 +3069,14 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   card catches it without the button-like sink and bounce; buttons opt in later (interactive glass). The
   window's frame header fades out as the window's moon card opens (`1 − MoonCards.progress`). The rain card's
   icons already come from Material Symbols (water drop, percent, rainy); asked the user which they meant.
+- **2026-11-22: "Couldn't update" from the real result; icons heavier and two new; Apple check (built).**
+  - The "last updated" line no longer guesses from timestamps (it lost a race: a refresh stamps its time
+    when it starts, the line noticed it a moment later, so working refreshes read as failed; diagnosed on
+    the Pixel: Mexico City refreshed with no errors). The view model keeps each place's last refresh problem
+    (`refreshFailures`); the line shows "Couldn't update: <short message> · Try again" only then.
+  - Icons: one weight for all, `WEIGHT` in `tools/make_symbols.py` (now 500, one Material step heavier than
+    the default 400; also `SolsticeIcons.WEIGHT`). The generator measures "schedule" at that weight into
+    `ScheduleGeometry`, which the live clock draws with (checked: at 400 it gives the hand-measured 348/72/204/
+    178). Rain card: `humidity_low` (amount) and `percent_discount` (chance), replacing water_drop and percent.
+  - Apple check of the window ✕ fading under its moon card: Apple keeps the screen behind a sheet visible and
+    dimmed (its bar buttons included), not hidden; our fade follows the user's wish instead (asked).

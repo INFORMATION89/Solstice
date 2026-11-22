@@ -310,6 +310,7 @@ class MainActivityViewModel @Inject constructor(
         location: Location,
         errors: List<RefreshError> = emptyList(),
     ) {
+        recordRefresh(location, errors)
         snackbarError.postValue(errors)
 
         updateInnerData(location)
@@ -480,6 +481,23 @@ class MainActivityViewModel @Inject constructor(
         updateInnerData(location, oldLocation)
     }
 
+    /**
+     * Solstice: each place's last refresh problem (its id → the first error), cleared by a refresh without
+     * errors. The "last updated" line shows "Couldn't update" from this, not from a guess (2026-11-22: it
+     * compared timestamps and called working refreshes failed).
+     */
+    private val _refreshFailures = MutableStateFlow<Map<String, RefreshErrorType>>(emptyMap())
+    val refreshFailures: StateFlow<Map<String, RefreshErrorType>> = _refreshFailures.asStateFlow()
+
+    private fun recordRefresh(location: Location, errors: List<RefreshError>) {
+        val first = errors.firstOrNull()?.error
+        _refreshFailures.value = if (first != null) {
+            _refreshFailures.value + (location.formattedId to first)
+        } else {
+            _refreshFailures.value - location.formattedId
+        }
+    }
+
     /** Solstice: the places being fetched by [refreshPlace] (their ids), e.g. a postcard window's pull. */
     private val _refreshingPlaces = MutableStateFlow<Set<String>>(emptySet())
     val refreshingPlaces: StateFlow<Set<String>> = _refreshingPlaces.asStateFlow()
@@ -499,6 +517,7 @@ class MainActivityViewModel @Inject constructor(
                         // Replace exactly the place that was fetched (its id can change once its
                         // address is looked up), never the selected one.
                         viewModelScope.launch(Dispatchers.Main) {
+                            recordRefresh(location, errors)
                             updateInnerData(location, oldLocation = place)
                             // Done, with or without errors (getWeather always completes).
                             _refreshingPlaces.value -= setOf(place.formattedId, location.formattedId)

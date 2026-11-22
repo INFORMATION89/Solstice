@@ -154,6 +154,8 @@ internal fun PlaceWindow(
     source: String? = null,
     // Pull to refresh on its Forecast, like home (user 2026-11-21).
     refreshing: Boolean = false,
+    // The last refresh's problem, as a short message (null: it worked).
+    failure: String? = null,
     onRefresh: () -> Unit = {},
     // The page its postcard is on, which it belongs to (null when it grew from search).
     morphPage: MorphPage? = null,
@@ -286,6 +288,7 @@ internal fun PlaceWindow(
                                                     sky = sky,
                                                     now = now,
                                                     refreshing = refreshing,
+                                                    failure = failure,
                                                     onRefresh = onRefresh,
                                                     onDetails = onDetails,
                                                     onOpenPlaces = { onClose() },

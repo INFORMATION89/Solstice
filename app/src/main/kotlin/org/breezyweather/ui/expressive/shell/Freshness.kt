@@ -39,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.breezyweather.R
 import org.breezyweather.ui.expressive.theme.Emphasis
+import org.breezyweather.ui.expressive.theme.Sizes
 import java.text.DateFormat
 import java.util.Calendar
 import java.util.Date
@@ -100,9 +101,9 @@ internal fun freshnessText(context: Context, freshness: Freshness, zone: TimeZon
 
 /**
  * The quiet "last updated" line (agreed 2026-11-21): "Updated 12 min ago · Open-Meteo", "Updating…"
- * while a refresh runs, or "Couldn't update · Try again" when the last one failed (the only
- * interactive part, a real text button). [now] should tick at least each minute. With no [onRetry]
- * (nothing to refresh, e.g. a postcard window) it only says how fresh the data is.
+ * while a refresh runs, or "Couldn't update: <why> · Try again" when the last refresh reported an error
+ * ([failure], its short message; the only interactive part, a real text button). [now] should tick at
+ * least each minute. With no [onRetry] (nothing to refresh) it only says how fresh the data is.
  */
 @Composable
 internal fun UpdatedLine(
@@ -114,32 +115,26 @@ internal fun UpdatedLine(
     text: Color,
     modifier: Modifier = Modifier,
     onRetry: (() -> Unit)? = null,
+    // The last refresh's problem, as a short message (null: it worked).
+    failure: String? = null,
 ) {
     val context = LocalContext.current
-    // A refresh failed when it ends without moving the update time forward.
-    var startedAt by remember { mutableLongStateOf(0L) }
-    var failed by remember { mutableStateOf(false) }
-    LaunchedEffect(refreshing) {
-        if (refreshing) {
-            startedAt = System.currentTimeMillis()
-            failed = false
-        } else if (startedAt != 0L) {
-            failed = (updated ?: 0L) < startedAt
-        }
-    }
-    LaunchedEffect(updated) { if (updated != null && updated >= startedAt) failed = false }
     val quiet = text.copy(alpha = Emphasis.Medium)
     val style = MaterialTheme.typography.labelMedium
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
-        modifier = modifier.defaultMinSize(minHeight = 48.dp)
+        modifier = modifier.defaultMinSize(minHeight = Sizes.TouchTarget)
     ) {
         when {
             refreshing && onRetry != null -> Text(stringResource(R.string.shell_updating), color = quiet, style = style)
-            failed && onRetry != null -> {
-                Text(stringResource(R.string.shell_update_failed) + SEPARATOR, color = quiet, style = style)
-                TextButton(onClick = onRetry, modifier = Modifier.defaultMinSize(minHeight = 48.dp)) {
+            failure != null && onRetry != null -> {
+                Text(
+                    stringResource(R.string.shell_update_failed_reason, failure) + SEPARATOR,
+                    color = quiet,
+                    style = style
+                )
+                TextButton(onClick = onRetry, modifier = Modifier.defaultMinSize(minHeight = Sizes.TouchTarget)) {
                     Text(stringResource(R.string.shell_try_again), color = text, style = style)
                 }
             }

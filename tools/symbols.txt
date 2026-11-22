@@ -18,6 +18,7 @@ foggy fill
 help mirror
 history
 hourglass_empty
+humidity_low
 info
 keyboard
 map fill
@@ -26,7 +27,7 @@ my_location
 near_me fill
 partly_cloudy_day fill
 partly_cloudy_night fill
-percent
+percent_discount
 public
 push_pin fill
 rainy fill
@@ -38,5 +39,4 @@ star fill
 sunny fill
 thunderstorm fill
 tune
-water_drop
 weather_snowy fill

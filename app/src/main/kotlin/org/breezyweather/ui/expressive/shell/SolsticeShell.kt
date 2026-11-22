@@ -73,6 +73,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -272,6 +273,8 @@ fun SolsticeShell(
     var windowFromSearch by remember { mutableStateOf(false) }
     // Places being fetched (a postcard window's pull, user 2026-11-21): from the view model.
     val refreshingPlaces by viewModel.refreshingPlaces.collectAsState()
+    // Each place's last refresh problem, for the "Couldn't update" line (from the refresh itself).
+    val refreshFailures by viewModel.refreshFailures.collectAsState()
     // The window's motion: SpringMorph's five springs (the user, 2026-11-21: the new morph applies to
     // postcards too). A touch catches it while it moves; a pull, back or a flick folds it home.
     val windowMotion = rememberMorphMotion()
@@ -429,6 +432,8 @@ fun SolsticeShell(
                                         sky = sky,
                                         now = now,
                                         refreshing = loading,
+                                        failure = location?.formattedId?.let { refreshFailures[it] }
+                                            ?.let { stringResource(it.shortMessage) },
                                         onRefresh = {
                                             viewModel.updateWithUpdatingChecking(
                                                 triggeredByUser = true,
@@ -606,6 +611,7 @@ fun SolsticeShell(
                         weather = SkyWeather.of(windowPlace.weather?.current?.weatherCode),
                         source = sourceManager.getWeatherSource(windowPlace.forecastSource)?.name,
                         refreshing = id in refreshingPlaces,
+                        failure = refreshFailures[id]?.let { stringResource(it.shortMessage) },
                         // Asked for by a pull, so no pause.
                         onRefresh = { viewModel.refreshPlace(context, windowPlace, pause = 0) },
                         onPin = {

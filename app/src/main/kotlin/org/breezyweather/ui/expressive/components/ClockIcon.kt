@@ -31,17 +31,17 @@ import kotlin.math.sin
 
 /**
  * A clock icon showing a real time (agreed 2026-11-21): drawn to match Material Symbols Rounded
- * "schedule" (weight 400, optical size 20, as [SolsticeIcons.Small.Schedule]), only its hands point at
- * [hour]:[minute]. Every proportion is measured from that symbol's path on its 960-unit grid, so it
- * sits with the other small symbols.
+ * "schedule" (optical size 20, at the icons' [SolsticeIcons.WEIGHT]), only its hands point at
+ * [hour]:[minute]. Its proportions ([ScheduleGeometry]) are measured from that symbol by the icon
+ * generator, so it follows the icons' weight.
  */
 @Composable
 internal fun ClockIcon(hour: Int, minute: Int, tint: Color, modifier: Modifier = Modifier) {
     Canvas(modifier.size(Sizes.IconSmall)) {
-        val unit = size.minDimension / SymbolGrid.SIZE
-        val stroke = SymbolGrid.STROKE * unit
+        val unit = size.minDimension / ScheduleGeometry.GRID
+        val stroke = ScheduleGeometry.STROKE * unit
         val centre = center
-        drawCircle(tint, radius = SymbolGrid.RING * unit, center = centre, style = Stroke(stroke))
+        drawCircle(tint, radius = ScheduleGeometry.RING * unit, center = centre, style = Stroke(stroke))
         fun hand(turns: Float, length: Float) {
             val angle = turns * 2 * PI - PI / 2
             val end = Offset(
@@ -50,24 +50,7 @@ internal fun ClockIcon(hour: Int, minute: Int, tint: Color, modifier: Modifier =
             )
             drawLine(tint, centre, end, strokeWidth = stroke, cap = StrokeCap.Round)
         }
-        hand(((hour % 12) + minute / 60f) / 12f, SymbolGrid.HOUR_HAND)
-        hand(minute / 60f, SymbolGrid.MINUTE_HAND)
+        hand(((hour % 12) + minute / 60f) / 12f, ScheduleGeometry.HOUR_HAND)
+        hand(minute / 60f, ScheduleGeometry.MINUTE_HAND)
     }
-}
-
-/** Material Symbols' "schedule" (Rounded, weight 400, opsz 20) measured on its 960-unit grid. */
-private object SymbolGrid {
-    const val SIZE = 960f
-
-    /** The ring's centre line: outer radius 384, inner 312. */
-    const val RING = 348f
-
-    /** The ring's and the hands' thickness (384 − 312). */
-    const val STROKE = 72f
-
-    /** The long hand, centre to the middle of its rounded end. */
-    const val MINUTE_HAND = 204f
-
-    /** The short hand, centre to the middle of its rounded end. */
-    const val HOUR_HAND = 178f
 }

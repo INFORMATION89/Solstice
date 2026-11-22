@@ -352,8 +352,8 @@ private fun finer(steps: List<Float>, per: Int): List<Float> {
 @Composable
 private fun RainSwitch(chance: Boolean, text: Color, onChange: (Boolean) -> Unit) {
     val options = listOf(
-        Triple(false, SolsticeIcons.WaterDrop, R.string.shell_rain_amount),
-        Triple(true, SolsticeIcons.Percent, R.string.shell_rain_probability)
+        Triple(false, SolsticeIcons.HumidityLow, R.string.shell_rain_amount),
+        Triple(true, SolsticeIcons.PercentDiscount, R.string.shell_rain_probability)
     )
     val colors = ToggleButtonDefaults.colors(
         containerColor = text.copy(alpha = 0.10f),

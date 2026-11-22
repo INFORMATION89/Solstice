@@ -94,7 +94,8 @@
     <string name="shell_updated_yesterday">Updated yesterday at %1$s</string>
     <string name="shell_updated_on">Updated %1$s</string>
     <string name="shell_updating">Updating…</string>
-    <string name="shell_update_failed">Couldn’t update</string>
+    <!-- The last refresh failed, with why: "Couldn’t update: Network unavailable". -->
+    <string name="shell_update_failed_reason">Couldn’t update: %1$s</string>
     <string name="shell_try_again">Try again</string>
     <string name="moon_title">Moon</string>
     <string name="moon_lit_growing">Tonight the moon will be %1$s lit and still growing.</string>

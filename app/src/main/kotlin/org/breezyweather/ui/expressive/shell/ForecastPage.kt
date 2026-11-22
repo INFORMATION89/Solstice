@@ -106,6 +106,8 @@ internal fun ForecastPage(
     pullToRefresh: Boolean = true,
     // The forecast source's name, for the "last updated" line.
     source: String? = null,
+    // The last refresh's problem, as a short message (null: it worked).
+    failure: String? = null,
     // Its scroll (hoisted by a window that needs to know when it's at the top).
     scroll: androidx.compose.foundation.ScrollState? = null,
 ) {
@@ -243,7 +245,8 @@ internal fun ForecastPage(
                 zone = TimeZone.getDefault(),
                 refreshing = refreshing,
                 text = text,
-                onRetry = if (pullToRefresh) onRefresh else null
+                onRetry = if (pullToRefresh) onRefresh else null,
+                failure = failure
             )
         }
     }
