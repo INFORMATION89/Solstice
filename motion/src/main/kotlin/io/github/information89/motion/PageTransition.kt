@@ -18,6 +18,7 @@ package io.github.information89.motion
 
 import android.os.Build
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.TargetedFlingBehavior
 import androidx.compose.foundation.pager.PagerState
@@ -31,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.TileMode
@@ -290,13 +292,8 @@ fun pageSettleFling(
         val pageSize = (pager.layoutInfo.pageSize + pager.layoutInfo.pageSpacing).toFloat()
         if (pageSize <= 0f) return initialVelocity
         val position = pager.currentPage + pager.currentPageOffsetFraction
-        // Pages per second; a flick past a third of a page a second picks the next page that way.
         val velocity = initialVelocity / pageSize
-        val target = when {
-            velocity > 0.35f -> floor(position).toInt() + 1
-            velocity < -0.35f -> ceil(position).toInt() - 1
-            else -> position.roundToInt()
-        }.coerceIn(0, (pager.pageCount - 1).coerceAtLeast(0))
+        val target = settleTarget(position, velocity, pager.pageCount)
         val distance = (target - position) * pageSize
         if (abs(distance) < 0.5f) return 0f
         onSettle(position, target)
@@ -310,3 +307,45 @@ fun pageSettleFling(
         return 0f
     }
 }
+
+/**
+ * The page a swipe let go at [position] (fractional) with [velocity] (pages per second, + forward)
+ * settles on: a flick past a third of a page a second picks the next page that way, otherwise the
+ * nearest page. Shared by [pageSettleFling] and [pageSpringFling].
+ */
+internal fun settleTarget(position: Float, velocity: Float, pageCount: Int): Int = when {
+    velocity > 0.35f -> floor(position).toInt() + 1
+    velocity < -0.35f -> ceil(position).toInt() - 1
+    else -> position.roundToInt()
+}.coerceIn(0, (pageCount - 1).coerceAtLeast(0))
+
+/**
+ * A pager fling that's one spring the whole way (Motion Lab option B, 2026-11-21; the user: no linear
+ * animations): it picks the page as [pageSettleFling] does, then springs the pages there with [spring],
+ * starting at the finger's speed, so a flick carries into the spring and can overshoot and settle.
+ * Unlike Compose's default pager fling there's no decay phase first. A touch while it moves stops the
+ * pager first (it's really scrolling).
+ */
+fun pageSpringFling(pager: PagerState, spring: () -> MotionSpring): TargetedFlingBehavior =
+    object : TargetedFlingBehavior {
+        override suspend fun ScrollScope.performFling(
+            initialVelocity: Float,
+            onRemainingDistanceUpdated: (Float) -> Unit,
+        ): Float {
+            val pageSize = (pager.layoutInfo.pageSize + pager.layoutInfo.pageSpacing).toFloat()
+            if (pageSize <= 0f) return initialVelocity
+            val position = pager.currentPage + pager.currentPageOffsetFraction
+            val target = settleTarget(position, initialVelocity / pageSize, pager.pageCount)
+            val distance = (target - position) * pageSize
+            var travelled = 0f
+            Animatable(0f).animateTo(
+                distance,
+                spring().spec(Offset.VisibilityThreshold.x),
+                initialVelocity = initialVelocity
+            ) {
+                travelled += scrollBy(value - travelled)
+            }
+            onRemainingDistanceUpdated(0f)
+            return 0f
+        }
+    }

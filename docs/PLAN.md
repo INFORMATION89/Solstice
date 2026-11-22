@@ -2919,3 +2919,12 @@ frame (phase 4, the ✕ lives in its pinned header); built alongside the morph k
 **Also done meanwhile (fork session, b7b9706):** the swipe-settle A/B comparison is in the Motion Lab
 (Now / A / B); on the phone A cuts the pause after letting go from ~29 ms to ~9 ms, B has none. The
 user picks one before the app changes.
+- **2026-11-21: settle round 2.** The user: A feels the same as Now; B doesn't have the issue but needs
+  a springy settle ("no linear animations"). Cause found: Compose's pager fling coasts on a decay curve
+  first and only the end is a spring. Built `pageSpringFling` (`:motion`): picks the page by the shared
+  rule (`settleTarget`, also used by `pageSettleFling`) and is one spring the whole way from the
+  finger's speed. The lab's B has chips for the existing springy tokens. Measured on the Pixel (flick
+  from page 0 to the middle page, ~5000 px/s; overshoot past the page as a share of a page): content
+  ~0.4 %, container ~1.3 %, brisk ~1.5 %, momentum ~1.2 %, playful ~10 %. At the first and last page
+  the pager can't overshoot (it stops at the edge). Waiting on the user to pick a spring; the app still
+  uses Now.
