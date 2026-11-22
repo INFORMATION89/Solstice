@@ -81,4 +81,17 @@ class SummaryTest {
         assertEquals(Precipitation.MIXED, Precipitation.combine(listOf(Precipitation.RAIN, Precipitation.SNOW)))
         assertEquals(Precipitation.NONE, Precipitation.combine(listOf(Precipitation.NONE)))
     }
+
+    @Test
+    fun `a week warms or cools by its trend line, at 3 degrees or more`() {
+        assertEquals(WeekTrend.WARMER, WeekTrend.of(listOf(10.0, 11.0, 11.5, 12.0, 12.5, 13.0, 13.5)))
+        assertEquals(WeekTrend.COLDER, WeekTrend.of(listOf(15.0, 14.0, 13.0, 12.5, 12.0, 11.0, 10.0)))
+        assertEquals(WeekTrend.STEADY, WeekTrend.of(listOf(10.0, 11.0, 10.0, 11.0, 10.0, 11.0, 11.0)))
+    }
+
+    @Test
+    fun `unknown days are skipped`() {
+        assertEquals(WeekTrend.WARMER, WeekTrend.of(listOf(10.0, null, 12.0, null, 14.0, null, 16.0)))
+        assertEquals(WeekTrend.STEADY, WeekTrend.of(listOf(null, 10.0, null)))
+    }
 }

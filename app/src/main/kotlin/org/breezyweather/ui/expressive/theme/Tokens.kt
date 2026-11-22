@@ -59,9 +59,33 @@ object Sizes {
     val IconXLarge = 28.dp
     val IconHero = 32.dp
 
-    /** A sheet's grab bar (search, moon card). */
-    val HandleWidth = 36.dp
+    /** A sheet's drag handle (search, moon card, postcard window): Material 3's 32 × 4 dp. */
+    val HandleWidth = 32.dp
     val HandleThickness = 4.dp
+
+    /** The room a sheet leaves at its top for the handle, the bar centred in it (its touch target reaches below). */
+    val HandleStrip = Space.S6
+}
+
+/**
+ * How strongly ink (text and icons) shows over its background (agreed 2026-11-21): Material's
+ * documented text emphasis levels, applied to whatever ink the page uses (the sky's text, the page's).
+ */
+object Emphasis {
+    /** Main text. */
+    val High = 0.87f
+
+    /** Secondary text: labels, captions, supporting lines. */
+    val Medium = 0.60f
+
+    /** Disabled or placeholder. */
+    val Disabled = 0.38f
+}
+
+/** Opacities set by Material 3 for specific parts. */
+object Opacity {
+    /** Material 3's drag handle: the ink at 40 %. */
+    val Handle = 0.4f
 }
 
 /** Line widths. */

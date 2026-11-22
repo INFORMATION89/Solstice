@@ -77,6 +77,7 @@ import org.breezyweather.ui.expressive.components.SolsticeCard
 import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.sky.SkyState
 import org.breezyweather.ui.expressive.sky.SkyWeather
+import org.breezyweather.ui.expressive.theme.Emphasis
 import org.breezyweather.ui.expressive.theme.HeroType
 import org.breezyweather.ui.expressive.theme.Sizes
 import org.breezyweather.ui.expressive.theme.SolsticePalette
@@ -145,7 +146,7 @@ internal fun ForecastPage(
                 .padding(top = Space.S10, bottom = 120.dp)
         ) {
             // A visit's line above the title, scrolling with the page (postcard windows only).
-            VisitingLine(text.copy(alpha = 0.85f), Modifier.padding(bottom = Space.S2))
+            VisitingLine(text.copy(alpha = Emphasis.High), Modifier.padding(bottom = Space.S2))
             // Only the location's title at the top (plus an icon for the current position).
             val (title, city) = placeName(context, location)
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -171,7 +172,7 @@ internal fun ForecastPage(
             city?.let {
                 Text(
                     it,
-                    color = text.copy(alpha = 0.72f),
+                    color = text.copy(alpha = Emphasis.Medium),
                     style = MaterialTheme.typography.bodyLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -185,13 +186,13 @@ internal fun ForecastPage(
                         Icon(
                             SolsticeIcons.Small.Schedule,
                             contentDescription = null,
-                            tint = text.copy(alpha = 0.72f),
+                            tint = text.copy(alpha = Emphasis.Medium),
                             modifier = Modifier.size(Sizes.IconSmall)
                         )
                         Spacer(Modifier.width(Space.S1))
                         Text(
                             time(context, Date(now), location.timeZone) + ", " + diff,
-                            color = text.copy(alpha = 0.72f),
+                            color = text.copy(alpha = Emphasis.Medium),
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
@@ -213,7 +214,7 @@ internal fun ForecastPage(
                 Text(it, color = text, style = MaterialTheme.typography.headlineSmallEmphasized)
             }
             feelsLikeLine(context, location)?.let {
-                Text(it, color = text.copy(alpha = 0.72f), style = MaterialTheme.typography.bodyLarge)
+                Text(it, color = text.copy(alpha = Emphasis.Medium), style = MaterialTheme.typography.bodyLarge)
             }
             Spacer(Modifier.height(Space.S7))
             SunPath(location, now, text, sky.palette)
@@ -434,7 +435,7 @@ private fun SunPath(
             } else if (middle != null) {
                 Text(
                     middle,
-                    color = text.copy(alpha = 0.85f),
+                    color = text.copy(alpha = Emphasis.High),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )
@@ -469,7 +470,7 @@ private fun sunStrength(context: Context, uv: Double?): String? {
 private fun TimeLabel(time: String, label: String, text: Color, align: Alignment.Horizontal) {
     Column(horizontalAlignment = align) {
         Text(time, color = text, style = MaterialTheme.typography.titleLargeEmphasized)
-        Text(label, color = text.copy(alpha = 0.65f), style = MaterialTheme.typography.bodyMedium)
+        Text(label, color = text.copy(alpha = Emphasis.Medium), style = MaterialTheme.typography.bodyMedium)
     }
 }
 
@@ -498,7 +499,7 @@ private fun TodayCard(location: Location, now: Long, text: Color) {
                     Icon(
                         hourIcon(SkyWeather.of(hour.weatherCode), !hour.isDaylight),
                         contentDescription = hour.weatherText,
-                        tint = text.copy(alpha = 0.85f),
+                        tint = text.copy(alpha = Emphasis.High),
                         modifier = Modifier.padding(vertical = Space.S2).size(Sizes.Icon)
                     )
                     Text(
@@ -507,7 +508,7 @@ private fun TodayCard(location: Location, now: Long, text: Color) {
                         } else {
                             time(context, hour.date, location.timeZone, hourOnly = true)
                         },
-                        color = text.copy(alpha = 0.65f),
+                        color = text.copy(alpha = Emphasis.Medium),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }

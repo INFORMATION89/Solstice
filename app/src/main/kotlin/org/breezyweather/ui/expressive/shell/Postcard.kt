@@ -126,7 +126,8 @@ internal fun PlaceCard(
     folded: Boolean,
     now: Long,
     context: Context,
-    onClick: () -> Unit,
+    // Null: drawn only, takes no touches (e.g. the copy a window morphs from).
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     val sky = skyFor(location, now)
@@ -200,7 +201,13 @@ internal fun PlaceCard(
                 alpha = if (visiting) 0.92f else 1f
             }
             // Taps are taken on the whole card (outside the deckled clip, which can swallow them).
-            .clickable(interactionSource = press, indication = null, onClick = onClick)
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable(interactionSource = press, indication = null, onClick = onClick)
+                } else {
+                    Modifier
+                }
+            )
             // A soft, low shadow, like card lying on paper.
             .shadow(
                 elevation = if (selected) Elevation.CardSelected else Elevation.Card,

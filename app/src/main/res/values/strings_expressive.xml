@@ -67,9 +67,9 @@
     <string name="settings_feels_like_main">Show feels-like as the main temperature</string>
     <string name="shell_actual_temperature">Actual %1$s</string>
     <string name="shell_now_main_place">This is now your main place</string>
-    <string name="week_warming">Warming up through the week</string>
-    <string name="week_cooling">Getting colder through the week</string>
-    <string name="week_steady">Steady temperatures all week</string>
+    <string name="week_warming">It will get warmer through the week</string>
+    <string name="week_cooling">It will get colder through the week</string>
+    <string name="week_steady">Temperatures will stay steady all week</string>
     <string name="week_one_wet">You’ll need an umbrella on %1$s</string>
     <string name="week_one_wet_today">You’ll need an umbrella today</string>
     <string name="week_some_wet">It will rain on %1$s days this week</string>

@@ -2793,3 +2793,47 @@ Steps:
   from (1); (5) Motion Lab: settle A (freeze during the swipe, no pause at release) vs B (the pager
   springs from the finger's velocity, no image); (6) check each on the phone before handing over.
   Open: a fallback radius for Android 10–11 (no `RoundedCorner` API).
+- **2026-11-21: audit of my last three rounds (the user asked: hand-picked values, hard-coding, things
+  that belong in a system).** Causes found on the phone with temporary logs (removed): (a) the window's
+  handle and reopening a closing postcard failed because the morph's `sourceContent` (a copy of the
+  postcard, invisible but clickable, drawn on top) ate the touches; (b) swipes were held up because the
+  closing window caught any touch as a grab. Built (not yet felt on the phone; not committed): the copy
+  is draw-only; while a morph moves, touches also reach the page below (`shareTouchesWhile`) and a
+  sideways swipe is the page's; full-screen window with the screen's corner radius; M3 handle (drag or
+  tap); the moon card's bottom corners go to the screen's radius.
+  Audit findings, to fix after agreeing:
+  1. `SETTLED_PX = 0.5f` (`SpringMorph`): Compose's own pixel visibility threshold is 0.5 px
+     (`Offset.VisibilityThreshold`); use that constant instead of a literal.
+  2. `ARRIVED = 0.98f` (`SpringMorph`): invented. "Arrived" should mean the springs are within the
+     settle threshold, no extra number.
+  3. `weekTrend` (`WeekPage.kt`): 3 °C threshold and "first three vs last three days" were never agreed,
+     and the rule lives in the page instead of the shared summary engine (`Summary.kt`); its three
+     strings weren't checked against WRITING.md.
+  4. Text emphasis: `VisitingLine` uses alpha 0.85 (copied); the app has no emphasis tokens at all
+     (0.85, 0.8, 0.72, 0.7, 0.65… scattered). Needs a token set or M3 colour roles.
+  5. Handles: three hand-drawn copies (search, moon card, window), alpha 0.4 and a 0.25–0.75 fade
+     copied around; the moon card's and search's handles don't do anything. One `SheetHandle`
+     component (M3 drag handle: role colour, 48 dp target, drag + tap), and a `:motion` hook so any
+     morph can be pulled from its handle (instead of `onGloballyPositioned` bounds in the window).
+  6. `SheetShape` lives in `MoonCard.kt` but serves the window too: move to components.
+  7. "Share touches while moving" is written twice (SpringMorph and the moon sheet's wrapper): one
+     `:motion` API.
+  8. Window refresh: `windowRefreshing` in the shell plus an `onDone` callback, outside the view model's
+     loading state; a failed fetch may leave the spinner on. Needs a per-place refreshing state in the
+     view model.
+- **2026-11-21: audit fixed and the third round checked on the Pixel (adb).** Values: the morph's
+  settle threshold is Compose's `Offset.VisibilityThreshold`; the made-up 98 % "arrived" is gone (the
+  catcher only exists while moving); `Emphasis` tokens (Material's 87 / 60 / 38 %) replace the scattered
+  text and icon alphas (postcard art left local, as agreed before); `Opacity.Handle` (M3's 40 %);
+  `Sizes.HandleWidth` 32 dp (M3) and `Sizes.HandleStrip` (the 24 dp strip search, the moon card and the
+  window already shared). Systems: one `SheetHandle` (search, moon card, window; tap closes, drag is the
+  sheet's); `:motion` `morphHandle` (a handle's bounds; the pull itself is SpringMorph's, measured on
+  screen) and `morphPassThrough` (one rule for touches while a morph moves); `SheetShape` and
+  `rememberScreenCorners` in components; `WeekTrend` in the summary engine (7-day trend line, 3 °C,
+  tests in `SummaryTest`); per-place `refreshingPlaces` in the view model. Week strings in future tense.
+  Checked on the phone: handle drag folds the window home, handle tap closes, a tap on a closing
+  postcard reopens it, a sideways swipe on a closing window changes the page, pull refreshes with its
+  indicator, the window is full screen. Not checked: corners mid-morph (too fast for screenshots), the
+  moon card's handle and bottom corners, search's handle tap. Left as they were (pre-existing, to
+  decide): the window fades its content over 25–75 % of the growth while the moon card uses
+  `CONTENT_FROM`/`CONTENT_TO` (35–70 %); search's field height is a hard-coded 64 dp in its layout.

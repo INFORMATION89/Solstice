@@ -52,6 +52,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.breezyweather.ui.expressive.theme.Corners
+import org.breezyweather.ui.expressive.theme.Emphasis
 import org.breezyweather.ui.expressive.theme.Space
 
 /** Check / close icon shown inside a Switch thumb. */
@@ -228,7 +229,7 @@ fun ChoiceSheet(
                                     color = if (itemEnabled) {
                                         MaterialTheme.colorScheme.onSurface
                                     } else {
-                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                                        MaterialTheme.colorScheme.onSurface.copy(alpha = Emphasis.Disabled)
                                     },
                                     modifier = Modifier.weight(1f)
                                 )

@@ -60,6 +60,7 @@ import io.github.information89.motion.Motion
 import io.github.information89.motion.edgeBlur
 import org.breezyweather.R
 import org.breezyweather.ui.expressive.components.SolsticeIcons
+import org.breezyweather.ui.expressive.theme.Emphasis
 import org.breezyweather.ui.expressive.theme.Sizes
 import org.breezyweather.ui.expressive.theme.Space
 import kotlin.math.abs
@@ -113,17 +114,16 @@ internal fun ToolbarDock(alpha: () -> Float = { 1f }, content: @Composable Colum
 
 /**
  * A place being visited in a postcard window (null on home): every page frame shows its "Visiting"
- * line at the top of the page, scrolling with it, and starts at the sheet's top instead of under the
- * status bar (user 2026-11-21: the line stayed fixed on top while the page scrolled).
+ * line at the top of the page, scrolling with it (user 2026-11-21: the line stayed fixed on top while
+ * the page scrolled).
  */
 internal data class Visit(val location: Location, val now: Long, val pinned: Boolean)
 
 internal val LocalVisit = compositionLocalOf<Visit?> { null }
 
-/** Where a page's content starts: under the status bar, or at the top of a postcard window's sheet. */
+/** Where a page's content starts: under the status bar (home and the full-screen postcard window). */
 @Composable
-internal fun pageTopInset(): Dp =
-    if (LocalVisit.current != null) 0.dp else WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+internal fun pageTopInset(): Dp = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
 /**
  * A visit's line: "[landing plane] Visiting" until it's pinned, and its local time when that differs
@@ -195,7 +195,7 @@ internal fun PageScaffold(
         )
     ) {
         if (visiting) {
-            item(key = "visit") { VisitingLine(onPage.copy(alpha = 0.85f), Modifier.padding(start = Space.S1)) }
+            item(key = "visit") { VisitingLine(onPage.copy(alpha = Emphasis.High), Modifier.padding(start = Space.S1)) }
         }
         item(key = "header") {
             // As tall as an icon button, with or without one, so the title sits at the same height.

@@ -85,6 +85,7 @@ import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.theme.CornerShapes
 import org.breezyweather.ui.expressive.theme.Corners
 import org.breezyweather.ui.expressive.theme.Elevation
+import org.breezyweather.ui.expressive.theme.Emphasis
 import org.breezyweather.ui.expressive.theme.Sizes
 import org.breezyweather.ui.expressive.theme.Space
 import kotlin.math.PI
@@ -186,7 +187,7 @@ internal fun PlacesPage(
                 Icon(
                     SolsticeIcons.Settings,
                     contentDescription = stringResource(R.string.action_settings),
-                    tint = onPage.copy(alpha = 0.7f)
+                    tint = onPage.copy(alpha = Emphasis.Medium)
                 )
             }
         }

@@ -136,6 +136,8 @@ import io.github.information89.motion.MotionValue
 import io.github.information89.motion.SpringMorph
 import io.github.information89.motion.haptics
 import io.github.information89.motion.morphAnchor
+import io.github.information89.motion.morphHandle
+import io.github.information89.motion.morphPassThrough
 import io.github.information89.motion.morphSource
 import io.github.information89.motion.rememberMorphMotion
 import kotlinx.coroutines.CoroutineStart
@@ -144,12 +146,15 @@ import kotlinx.coroutines.launch
 import org.breezyweather.R
 import org.breezyweather.domain.weather.model.getDescription
 import org.breezyweather.ui.expressive.components.GlassSource
+import org.breezyweather.ui.expressive.components.SheetHandle
+import org.breezyweather.ui.expressive.components.SheetShape
 import org.breezyweather.ui.expressive.components.SolsticeMotion
 import org.breezyweather.ui.expressive.components.glass
 import org.breezyweather.ui.expressive.sky.SkyVisibility
 import org.breezyweather.ui.expressive.sky.Tonight
 import org.breezyweather.ui.expressive.theme.CornerShapes
 import org.breezyweather.ui.expressive.theme.Corners
+import org.breezyweather.ui.expressive.theme.Emphasis
 import org.breezyweather.ui.expressive.theme.Sizes
 import org.breezyweather.ui.expressive.theme.SolsticePalette
 import org.breezyweather.ui.expressive.theme.Space
@@ -339,30 +344,6 @@ internal object MoonCardState {
 }
 
 /**
- * The sheet's shape: round on top (as the button), and the bottom corners square off as it docks.
- * Reads the morph's value when the outline is built (every size change, i.e. every frame of the
- * morph).
- */
-internal class MoonSheetShape(private val radius: Float, private val progress: Float) : Shape {
-    override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
-        val top = minOf(radius, size.minDimension / 2)
-        val bottom = top * (1f - progress.coerceIn(0f, 1f))
-        return Outline.Rounded(
-            RoundRect(
-                0f,
-                0f,
-                size.width,
-                size.height,
-                topLeftCornerRadius = CornerRadius(top),
-                topRightCornerRadius = CornerRadius(top),
-                bottomRightCornerRadius = CornerRadius(bottom),
-                bottomLeftCornerRadius = CornerRadius(bottom)
-            )
-        )
-    }
-}
-
-/**
  * The moon card as a sheet, like the search card (agreed 2026-11-19): the same glass, docked at the
  * bottom at full screen height, a handle on top. It's the button grown: one morph value (M3,
  * `:motion`) drives the shape, the glass, the heading flying from the button's label and the
@@ -419,8 +400,9 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
     val target = remember(window, top, radius) {
         MorphAnchor(Rect(0f, top, window.width.toFloat(), window.height.toFloat()), radius)
     }
-    // Round on top like the button; the bottom corners square off as it docks.
-    val sheetShape = remember { { r: Float, p: Float -> MoonSheetShape(r, p) } }
+    // Round on top like the button; the bottom corners become the screen's as it docks.
+    val screenCorners = org.breezyweather.ui.expressive.components.rememberScreenCorners()
+    val sheetShape = remember(screenCorners) { { r: Float, p: Float -> SheetShape(r, p, screenCorners.bottom) } }
     fun shown() = motion.progress.coerceIn(0f, 1f)
 
     // While open, a tap above the sheet closes it. Closing, nothing here takes touches: the page
@@ -428,6 +410,8 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
     Box(
         Modifier
             .fillMaxSize()
+            // Beside the page: moving, a touch also reaches the page below (SpringMorph's rule).
+            .morphPassThrough(motion)
             .then(
                 if (motion.isOpen) {
                     Modifier.pointerInput(Unit) {
@@ -461,7 +445,7 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
         ) {
             Box(Modifier.fillMaxSize()) {
                 Column {
-                    Spacer(Modifier.height(Space.S6)) // room for the handle, drawn on top
+                    Spacer(Modifier.height(Sizes.HandleStrip)) // room for the handle, drawn on top
                     MoonCard(
                         location,
                         now,
@@ -490,9 +474,11 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
                         }
                     )
                 }
-                // The handle, like search's: it comes and goes with the content.
-                Box(
-                    Modifier
+                // The shared handle: it comes and goes with the content; drag it down or tap it to close.
+                SheetHandle(
+                    ink = ink,
+                    onClose = { close() },
+                    modifier = Modifier
                         .align(Alignment.TopCenter)
                         .graphicsLayer {
                             alpha = MotionValue.window(
@@ -501,10 +487,7 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
                                 SolsticeMotion.CONTENT_TO
                             )
                         }
-                        .padding(top = Space.S3)
-                        .width(Sizes.HandleWidth)
-                        .height(Sizes.HandleThickness)
-                        .background(ink.copy(alpha = 0.4f), CircleShape)
+                        .morphHandle(motion)
                 )
             }
         }
@@ -645,7 +628,7 @@ private fun MoonCard(
                 Column(restModifier) {
                     Text(
                         SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()).apply { timeZone = zone }.format(at),
-                        color = ink.copy(alpha = 0.7f),
+                        color = ink.copy(alpha = Emphasis.Medium),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = dateModifier
                     )
@@ -840,7 +823,7 @@ private fun MoonCard(
                                     zone
                             }.format(at)
                         },
-                        color = ink.copy(alpha = 0.8f),
+                        color = ink.copy(alpha = Emphasis.High),
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )

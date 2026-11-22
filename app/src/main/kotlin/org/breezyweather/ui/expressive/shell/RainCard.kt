@@ -69,6 +69,7 @@ import org.breezyweather.ui.expressive.components.CardMaterial
 import org.breezyweather.ui.expressive.components.SolsticeCard
 import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.sky.SkyWeather
+import org.breezyweather.ui.expressive.theme.Emphasis
 import org.breezyweather.ui.expressive.theme.Sizes
 import org.breezyweather.ui.expressive.theme.SolsticePalette
 import org.breezyweather.ui.expressive.theme.Space
@@ -212,7 +213,7 @@ internal fun RainCard(rain: RainOutlook.Coming, location: Location, text: Color)
             }
             Text(
                 caption,
-                color = text.copy(alpha = 0.72f),
+                color = text.copy(alpha = Emphasis.Medium),
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -237,7 +238,7 @@ internal fun RainCard(rain: RainOutlook.Coming, location: Location, text: Color)
             labels.forEach {
                 Text(
                     it,
-                    color = text.copy(alpha = 0.65f),
+                    color = text.copy(alpha = Emphasis.Medium),
                     style = MaterialTheme.typography.labelSmall,
                     textAlign = if (showChance && chances != null) TextAlign.Center else TextAlign.Start,
                     maxLines = 1,
@@ -299,7 +300,7 @@ private fun BoxScope.ChanceBars(chances: List<Float>, text: Color) {
             ) {
                 Text(
                     "${(c * 100).roundToInt()}%",
-                    color = text.copy(alpha = 0.8f),
+                    color = text.copy(alpha = Emphasis.High),
                     style = MaterialTheme.typography.labelSmall,
                     maxLines = 1
                 )
@@ -357,7 +358,7 @@ private fun RainSwitch(chance: Boolean, text: Color, onChange: (Boolean) -> Unit
     )
     val colors = ToggleButtonDefaults.colors(
         containerColor = text.copy(alpha = 0.10f),
-        contentColor = text.copy(alpha = 0.6f),
+        contentColor = text.copy(alpha = Emphasis.Medium),
         checkedContainerColor = text.copy(alpha = 0.22f),
         checkedContentColor = text
     )
@@ -398,13 +399,13 @@ internal fun NoRainLine(hours: Int, text: Color) {
         Icon(
             SolsticeIcons.Small.Rainy,
             contentDescription = null,
-            tint = text.copy(alpha = 0.7f),
+            tint = text.copy(alpha = Emphasis.Medium),
             modifier = Modifier.size(Sizes.IconSmall)
         )
         Spacer(Modifier.width(Space.S2))
         Text(
             stringResource(R.string.shell_no_rain, hours),
-            color = text.copy(alpha = 0.8f),
+            color = text.copy(alpha = Emphasis.High),
             style = MaterialTheme.typography.bodyMedium
         )
     }

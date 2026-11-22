@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.breezyweather.R
+import org.breezyweather.ui.expressive.theme.Emphasis
 import java.text.DateFormat
 import java.util.Calendar
 import java.util.Date
@@ -127,7 +128,7 @@ internal fun UpdatedLine(
         }
     }
     LaunchedEffect(updated) { if (updated != null && updated >= startedAt) failed = false }
-    val quiet = text.copy(alpha = 0.6f)
+    val quiet = text.copy(alpha = Emphasis.Medium)
     val style = MaterialTheme.typography.labelMedium
     Row(
         verticalAlignment = Alignment.CenterVertically,

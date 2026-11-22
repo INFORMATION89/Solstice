@@ -18,6 +18,7 @@ package io.github.information89.motion
 
 import android.os.Build
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
@@ -50,14 +51,21 @@ import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.node.PointerInputModifierNode
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
@@ -205,9 +213,10 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
         )
         props.forEachIndexed { i, (a, spring) ->
             val velocity = a.velocity + kick[i]
-            // Settled within half a pixel (the default 0.01 kept a resting surface "moving" for a long
-            // tail of invisible motion, so a touch on an open card was caught as a tap that closed it).
-            scope.launch { a.animateTo(v[i], spring.spec(SETTLED_PX), initialVelocity = velocity) }
+            // Settled within Compose's own pixel threshold (the default 0.01 for a bare Float kept a resting
+            // surface "moving" for a long tail of invisible motion, so a touch on an open card was caught as
+            // a tap that closed it).
+            scope.launch { a.animateTo(v[i], spring.spec(PIXEL_THRESHOLD), initialVelocity = velocity) }
         }
     }
 
@@ -303,8 +312,8 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
         /** The fastest the springs are thrown, in path per second (~1/4 s for the whole way). */
         const val MAX_VELOCITY = 4f
 
-        /** How close (px) a spring must be to count as settled. */
-        const val SETTLED_PX = 0.5f
+        /** How close (px) a spring must be to count as settled: Compose's pixel visibility threshold. */
+        val PIXEL_THRESHOLD = Offset.VisibilityThreshold.x
     }
 
     /** The finger lifted: the surface springs back up with a little bounce. */
@@ -315,6 +324,12 @@ class MorphMotion internal constructor(private val scope: CoroutineScope) {
     /** Whether any of the springs is moving. */
     val isMoving: Boolean
         get() = cx.isRunning || cy.isRunning || w.isRunning || h.isRunning || r.isRunning
+
+    /** Open and still: its content owns the touches. Otherwise it's moving and catches them itself. */
+    val isRestingOpen: Boolean get() = isOpen && !isMoving
+
+    /** Where its handle is on screen, if it has one ([morphHandle]); a pull starting there is the surface's. */
+    internal var handle: Rect = Rect.Zero
 
     /**
      * A finger came down on it: every spring stops where it is (iOS: caught mid-flight, never
@@ -418,14 +433,17 @@ fun SpringMorph(
     // A finger on the catcher keeps it there until it lifts (2026-11-21: caught, the springs stopped,
     // the catcher went away under the finger and the surface stayed pressed in).
     var held by remember { mutableStateOf(false) }
-    val restingOpen by remember(motion) { derivedStateOf { motion.isOpen && !motion.isMoving && !held } }
+    val restingOpen by remember(motion) { derivedStateOf { motion.isRestingOpen && !held } }
 
     fun hand(): Float = MotionValue.window(motion.progress, handOff.start, handOff.endInclusive).let {
         it * it *
             (3f - 2f * it)
     }
 
-    Box(modifier.fillMaxSize()) {
+    // Moving (opening or closing), a touch reaches what's underneath as well as the surface: the
+    // surface takes a tap or a vertical drag, a sideways swipe is left to the page below (user
+    // 2026-11-21: a closing window held up swipes). At rest and open, it's the only thing touched.
+    Box(modifier.morphPassThrough(motion).fillMaxSize()) {
         // The app's material at the surface's bounds (laid out each frame: a material like glass
         // needs a real node where the surface is, to blur what's behind it).
         if (material != null) {
@@ -532,7 +550,11 @@ fun SpringMorph(
                             if (!dragging) {
                                 dx += abs(step.x)
                                 dy += step.y
-                                if (dy > viewConfiguration.touchSlop && dy > dx && canPull(start)) dragging = true
+                                if (dy > viewConfiguration.touchSlop && dy > dx &&
+                                    (motion.handle.contains(start) || canPull(start))
+                                ) {
+                                    dragging = true
+                                }
                             }
                             if (dragging) {
                                 motion.drag(-step.y / dragRange)
@@ -573,22 +595,20 @@ fun SpringMorph(
                         catcherDrawn[3] = b.top
                     }
                     // One gesture, the iOS way (user 2026-11-21: it couldn't be reopened while closing). A
-                    // touch catches it where it is; moving past the touch slop makes it a drag that follows
-                    // the finger and is thrown on release; lifting without moving is a tap that turns it back.
+                    // touch catches it where it is; moving vertically past the touch slop makes it a drag that
+                    // follows the finger and is thrown on release; sideways, it lets go for the page below;
+                    // lifting without moving is a tap that turns it back.
                     .pointerInput(motion, draggable, dragRange) {
                         awaitEachGesture {
                             val down = awaitFirstDown(requireUnconsumed = false)
                             down.consume()
                             held = true
-                            // Caught at (or within a hair of) where it was heading: lifting just lets it
-                            // carry on, it isn't a tap that turns it back.
-                            val arrived = motion.isOpen && motion.progress > ARRIVED
                             motion.catch()
                             val tracker = VelocityTracker()
                             var last = onScreen(down.position, catcherDrawn)
                             tracker.addPosition(down.uptimeMillis, last)
                             var dragging = false
-                            var travelled = 0f
+                            var moved = Offset.Zero
                             var released = false
                             try {
                                 while (true) {
@@ -603,7 +623,7 @@ fun SpringMorph(
                                         when {
                                             dragging -> motion.release(-tracker.calculateVelocity().y / dragRange)
                                             // A hold isn't a tap (user 2026-11-21: holding the card closed it).
-                                            long || arrived -> motion.resume()
+                                            long -> motion.resume()
                                             else -> onTap?.invoke() ?: motion.toggle()
                                         }
                                         change.consume()
@@ -611,15 +631,28 @@ fun SpringMorph(
                                     }
                                     val step = now - last
                                     last = now
-                                    travelled += abs(step.x) + abs(step.y)
+                                    moved += step
                                     tracker.addPosition(change.uptimeMillis, now)
-                                    if (!dragging && draggable && travelled > viewConfiguration.touchSlop) {
-                                        dragging = true
-                                        // Dragging, it follows the finger at full size.
-                                        motion.unpress()
+                                    if (!dragging && moved.getDistance() > viewConfiguration.touchSlop) {
+                                        if (draggable && abs(moved.y) >= abs(moved.x)) {
+                                            dragging = true
+                                            // Dragging, it follows the finger at full size.
+                                            motion.unpress()
+                                        } else {
+                                            // A sideways swipe isn't for the surface: it carries on where it
+                                            // was heading and the page underneath takes the swipe.
+                                            released = true
+                                            motion.unpress()
+                                            motion.resume()
+                                            break
+                                        }
                                     }
-                                    if (dragging) motion.drag(-step.y / dragRange)
-                                    change.consume()
+                                    // Moves are only taken once it's a drag, so a sideways swipe stays
+                                    // whole for the page underneath.
+                                    if (dragging) {
+                                        motion.drag(-step.y / dragRange)
+                                        change.consume()
+                                    }
                                 }
                             } finally {
                                 held = false
@@ -638,9 +671,13 @@ fun SpringMorph(
         if (sourceContent != null) {
             // Centred in the source's size, as a button centres its label (2026-11-21: pinned to the
             // corner, the moon pill's label sat up and to the left during the hand-off).
+            // Drawn only: never in the accessibility tree. It must not take touches either (no click
+            // handlers in it): above everything here, an invisible clickable copy ate the touches meant
+            // for the surface and its content (2026-11-21: the window's handle and reopening).
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
+                    .clearAndSetSemantics { }
                     .layout { measurable, constraints ->
                         val sw = source.bounds.width.roundToInt().coerceAtLeast(0)
                         val sh = source.bounds.height.roundToInt().coerceAtLeast(0)
@@ -665,8 +702,50 @@ fun SpringMorph(
     }
 }
 
-/** Progress past which a caught surface counts as having arrived open. */
-private const val ARRIVED = 0.98f
+/**
+ * A morph's touch rule for whatever holds it on screen (agreed 2026-11-21, MOTION.md "animations never
+ * block input"): while it moves, a touch reaches the page below as well as the surface (the surface
+ * takes a tap or a vertical drag; a sideways swipe is the page's). Resting open, it's the only thing
+ * touched. [SpringMorph] applies it to itself; a wrapper around it that sits beside the page needs it
+ * too, as touches are only shared between siblings.
+ */
+fun Modifier.morphPassThrough(motion: MorphMotion): Modifier = shareTouchesWhile { !motion.isRestingOpen }
+
+/**
+ * Marks a handle that pulls [motion] (agreed 2026-11-21: Material 3's drag handle): a vertical drag that
+ * starts on it drags the surface 1:1 and a release throws it (open or home, by the projected fling),
+ * whatever [SpringMorph]'s `canPull` says. The drag itself is [SpringMorph]'s, measured on screen, so it
+ * follows the finger as the surface scales. Put it on the handle's touch target inside the morph's
+ * content; taps are left to the handle (e.g. a click that closes).
+ */
+fun Modifier.morphHandle(motion: MorphMotion): Modifier = onGloballyPositioned {
+    motion.handle = it.boundsInRoot()
+}
+
+/**
+ * While [share] is true, a touch that lands here also reaches the siblings underneath (Compose's
+ * `sharePointerInputWithSiblings`), so something on top doesn't hide the page below from it. Put it on
+ * the node that is the sibling of what's underneath.
+ */
+fun Modifier.shareTouchesWhile(share: () -> Boolean): Modifier = this then ShareTouchesElement(share)
+
+private data class ShareTouchesElement(val share: () -> Boolean) : ModifierNodeElement<ShareTouchesNode>() {
+    override fun create() = ShareTouchesNode(share)
+
+    override fun update(node: ShareTouchesNode) {
+        node.share = share
+    }
+}
+
+private class ShareTouchesNode(var share: () -> Boolean) :
+    Modifier.Node(),
+    PointerInputModifierNode {
+    override fun onPointerEvent(pointerEvent: PointerEvent, pass: PointerEventPass, bounds: IntSize) = Unit
+
+    override fun onCancelPointerInput() = Unit
+
+    override fun sharePointerInputWithSiblings(): Boolean = share()
+}
 
 /** Defaults for [SpringMorph]'s hand-over from the source's content to the target's. */
 object MorphHandOff {

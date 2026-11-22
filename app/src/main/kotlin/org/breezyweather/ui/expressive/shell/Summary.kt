@@ -114,3 +114,37 @@ internal enum class Precipitation {
         }
     }
 }
+
+/**
+ * How a week's temperatures go (agreed 2026-11-21): the headline of a dry week on This week. A straight
+ * line through the daily highs (least squares: every day counts, steadier than comparing two days); if it
+ * rises or falls by at least [THRESHOLD_CELSIUS] from the first day to the last, the week is getting
+ * warmer or colder, otherwise steady.
+ */
+internal enum class WeekTrend {
+    WARMER,
+    COLDER,
+    STEADY,
+    ;
+
+    companion object {
+        /** How much the line must change across the week (agreed: 3 °C, 5 °F). */
+        const val THRESHOLD_CELSIUS = 3.0
+
+        /** The trend of [highs] (°C, one per day in order; unknown days are skipped). */
+        fun of(highs: List<Double?>): WeekTrend {
+            val points = highs.mapIndexedNotNull { day, high -> high?.let { day.toDouble() to it } }
+            if (points.size < 2) return STEADY
+            val meanX = points.map { it.first }.average()
+            val meanY = points.map { it.second }.average()
+            val spread = points.sumOf { (x, _) -> (x - meanX) * (x - meanX) }
+            val slope = points.sumOf { (x, y) -> (x - meanX) * (y - meanY) } / spread
+            val change = slope * (points.last().first - points.first().first)
+            return when {
+                change >= THRESHOLD_CELSIUS -> WARMER
+                change <= -THRESHOLD_CELSIUS -> COLDER
+                else -> STEADY
+            }
+        }
+    }
+}

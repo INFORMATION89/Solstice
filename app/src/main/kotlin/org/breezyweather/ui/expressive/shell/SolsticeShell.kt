@@ -270,8 +270,8 @@ fun SolsticeShell(
     // A postcard opened as a window (agreed 2026-11-18): one spring grows it from its card and back.
     var windowId by rememberSaveable { mutableStateOf<String?>(null) }
     var windowOrigin by remember { mutableStateOf<Rect?>(null) }
-    // The window's place is being refreshed by its pull (user 2026-11-21).
-    var windowRefreshing by remember { mutableStateOf(false) }
+    // Places being fetched (a postcard window's pull, user 2026-11-21): from the view model.
+    val refreshingPlaces by viewModel.refreshingPlaces.collectAsState()
     // The window's motion: SpringMorph's five springs (the user, 2026-11-21: the new morph applies to
     // postcards too). A touch catches it while it moves; a pull, back or a flick folds it home.
     val windowMotion = rememberMorphMotion()
@@ -584,11 +584,9 @@ fun SolsticeShell(
                     fadeOut = id in visiting && id !in starred,
                     weather = SkyWeather.of(windowPlace.weather?.current?.weatherCode),
                     source = sourceManager.getWeatherSource(windowPlace.forecastSource)?.name,
-                    refreshing = windowRefreshing,
-                    onRefresh = {
-                        windowRefreshing = true
-                        viewModel.refreshPlace(context, windowPlace, pause = 0) { windowRefreshing = false }
-                    },
+                    refreshing = id in refreshingPlaces,
+                    // Asked for by a pull, so no pause.
+                    onRefresh = { viewModel.refreshPlace(context, windowPlace, pause = 0) },
                     onPin = {
                         if (id in visiting) Visits.unmark(context, id) else Visits.mark(context, id)
                         controller.visitsChanged++

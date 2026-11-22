@@ -62,6 +62,7 @@ import org.breezyweather.ui.expressive.sky.SkyState
 import org.breezyweather.ui.expressive.sky.SkyWeather
 import org.breezyweather.ui.expressive.sky.paletteAt
 import org.breezyweather.ui.expressive.theme.CornerShapes
+import org.breezyweather.ui.expressive.theme.Emphasis
 import org.breezyweather.ui.expressive.theme.Sizes
 import org.breezyweather.ui.expressive.theme.SolsticePalette
 import org.breezyweather.ui.expressive.theme.Space
@@ -106,24 +107,6 @@ internal fun DaysPage(
 private fun isWet(w: SkyWeather) = w == SkyWeather.RAIN || w == SkyWeather.THUNDERSTORM || w == SkyWeather.SNOW
 
 /**
- * A dry week's headline (agreed 2026-11-21): the trend of the highs, the first three days against the
- * last three; a change of [TREND_DEGREES] °C or more is warming up or getting colder, otherwise steady.
- */
-internal fun weekTrend(highs: List<Double?>): Int {
-    val known = highs.filterNotNull()
-    if (known.size < 4) return R.string.week_steady
-    val n = minOf(3, known.size / 2)
-    val change = known.takeLast(n).average() - known.take(n).average()
-    return when {
-        change >= TREND_DEGREES -> R.string.week_warming
-        change <= -TREND_DEGREES -> R.string.week_cooling
-        else -> R.string.week_steady
-    }
-}
-
-private const val TREND_DEGREES = 3.0
-
-/**
  * The week in words (agreed 2026-11-18, design B): a headline and a sentence. A condition named in
  * the text has its small icon inline ("Expect [rain] on Saturday"); temperatures are bold and
  * underlined, ready to become links to that day's card.
@@ -144,7 +127,13 @@ private fun WeekSummary(
     fun name(i: Int) = if (i == 0) context.getString(R.string.shell_today) else dayLong(days[i].date, location.timeZone)
     val headline = when {
         // A dry week says how it feels instead (user 2026-11-21: "no rain expected" isn't useful).
-        wetDays.isEmpty() -> context.getString(weekTrend(highs.map { it?.inCelsius }))
+        wetDays.isEmpty() -> context.getString(
+            when (WeekTrend.of(highs.map { it?.inCelsius })) {
+                WeekTrend.WARMER -> R.string.week_warming
+                WeekTrend.COLDER -> R.string.week_cooling
+                WeekTrend.STEADY -> R.string.week_steady
+            }
+        )
         wetDays.size == 1 && wetDays.first() == 0 -> context.getString(R.string.week_one_wet_today)
         wetDays.size == 1 -> context.getString(R.string.week_one_wet, name(wetDays.first()))
         wetDays.size >= days.size - 1 -> context.getString(R.string.week_mostly_wet)
@@ -184,7 +173,7 @@ private fun WeekSummary(
             Icon(
                 hourIcon(wetIcon ?: SkyWeather.RAIN, false),
                 contentDescription = null,
-                tint = onPage.copy(alpha = 0.85f)
+                tint = onPage.copy(alpha = Emphasis.High)
             )
         }
     )
@@ -194,7 +183,7 @@ private fun WeekSummary(
         Text(
             body,
             inlineContent = inline,
-            color = onPage.copy(alpha = 0.8f),
+            color = onPage.copy(alpha = Emphasis.High),
             style = MaterialTheme.typography.bodyLarge
         )
     }
@@ -253,19 +242,19 @@ private fun WeekPills(
                         }
                         Text(
                             day.night?.temperature?.temperature?.let { degrees(context, it) } ?: "",
-                            color = onPage.copy(alpha = 0.6f),
+                            color = onPage.copy(alpha = Emphasis.Medium),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(top = Space.S2)
                         )
                         Icon(
                             hourIcon(weather, false),
                             contentDescription = day.day?.weatherText,
-                            tint = if (wet) SolsticePalette.Wet else onPage.copy(alpha = 0.75f),
+                            tint = if (wet) SolsticePalette.Wet else onPage.copy(alpha = Emphasis.High),
                             modifier = Modifier.padding(top = Space.S2, bottom = Space.Half).size(Sizes.IconMedium)
                         )
                         Text(
                             if (i == 0) stringResource(R.string.shell_today) else dayShort(day.date, location.timeZone),
-                            color = if (wet) SolsticePalette.Wet else onPage.copy(alpha = 0.8f),
+                            color = if (wet) SolsticePalette.Wet else onPage.copy(alpha = Emphasis.High),
                             style = MaterialTheme.typography.labelMedium
                         )
                     }

@@ -32,6 +32,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -479,8 +480,13 @@ class MainActivityViewModel @Inject constructor(
         updateInnerData(location, oldLocation)
     }
 
+    /** Solstice: the places being fetched by [refreshPlace] (their ids), e.g. a postcard window's pull. */
+    private val _refreshingPlaces = MutableStateFlow<Set<String>>(emptySet())
+    val refreshingPlaces: StateFlow<Set<String>> = _refreshingPlaces.asStateFlow()
+
     /** Solstice: fetch one place's weather without selecting it (a postcard window from search). */
-    fun refreshPlace(context: Context, place: Location, pause: Long = 500, onDone: () -> Unit = {}) {
+    fun refreshPlace(context: Context, place: Location, pause: Long = 500) {
+        _refreshingPlaces.value += place.formattedId
         // Off the main thread (address lookup and fetching can block), and after a short pause so
         // the postcard window can open smoothly first.
         viewModelScope.launch(Dispatchers.IO) {
@@ -494,7 +500,8 @@ class MainActivityViewModel @Inject constructor(
                         // address is looked up), never the selected one.
                         viewModelScope.launch(Dispatchers.Main) {
                             updateInnerData(location, oldLocation = place)
-                            onDone()
+                            // Done, with or without errors (getWeather always completes).
+                            _refreshingPlaces.value -= setOf(place.formattedId, location.formattedId)
                         }
                     }
                 }

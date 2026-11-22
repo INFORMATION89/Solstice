@@ -126,6 +126,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.breezyweather.R
 import org.breezyweather.ui.expressive.components.GlassSource
+import org.breezyweather.ui.expressive.components.SheetHandle
 import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.components.SolsticeSheetState
 import org.breezyweather.ui.expressive.components.glass
@@ -383,7 +384,7 @@ fun SearchOverlay(
                     val top = status.getTop(this) + Space.S3.toPx()
                     // Full width, sitting right on the keyboard (no gaps).
                     val margin = 0f
-                    val chrome = (24.dp + 64.dp).toPx() // handle + field
+                    val chrome = (Sizes.HandleStrip + 64.dp).toPx() // handle + field
                     val compact = 280.dp.toPx()
                     val tall = (height - bottomInset - top - chrome).coerceAtLeast(compact)
                     sheet.measure(room = tall - compact, dismissDistance = 220.dp.toPx())
@@ -416,7 +417,7 @@ fun SearchOverlay(
                 modifier = Modifier.align(Alignment.Center).graphicsLayer { alpha = 1f - inside() }
             )
             Column(Modifier.fillMaxSize().graphicsLayer { alpha = inside() }.nestedScroll(listDrag)) {
-                Spacer(Modifier.height(Space.S6)) // room for the handle, drawn on top
+                Spacer(Modifier.height(Sizes.HandleStrip)) // room for the handle, drawn on top
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     // Built once the card is a third of the way open (it's invisible before that), so the
                     // first frame of the animation only has the card and field to build.
@@ -452,6 +453,7 @@ fun SearchOverlay(
             // The handle's touch area is taller than it looks (it overlaps the top of the results).
             Handle(
                 modifier = Modifier.align(Alignment.TopCenter).graphicsLayer { alpha = inside() },
+                onClose = onClose,
                 moving = { sheet.presence.isRunning || sheet.detent.isRunning },
                 onStart = { sheet.catch() },
                 onDelta = { drag(it) },
@@ -491,17 +493,17 @@ fun SearchOverlay(
 @Composable
 private fun Handle(
     modifier: Modifier,
+    onClose: () -> Unit,
     moving: () -> Boolean,
     onStart: () -> Unit,
     onDelta: (Float) -> Unit,
     onRelease: (Float) -> Unit,
 ) {
-    // Looks like a 24 dp strip with the bar in the middle, but grabs 40 dp.
+    // The shared handle (looks like the handle strip, grabs a 48 dp touch target), across the width.
     Box(
         contentAlignment = Alignment.TopCenter,
         modifier = modifier
             .fillMaxWidth()
-            .height(40.dp)
             .draggable(
                 orientation = Orientation.Vertical,
                 state = rememberDraggableState(onDelta),
@@ -511,13 +513,7 @@ private fun Handle(
                 onDragStopped = { velocity -> onRelease(velocity) }
             )
     ) {
-        Box(
-            Modifier
-                .padding(top = Space.S3)
-                .width(Sizes.HandleWidth)
-                .height(Sizes.HandleThickness)
-                .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f), CircleShape)
-        )
+        SheetHandle(MaterialTheme.colorScheme.onSurfaceVariant, onClose)
     }
 }
 

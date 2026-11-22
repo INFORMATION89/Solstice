@@ -78,6 +78,8 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -91,12 +93,15 @@ import io.github.information89.motion.MorphMotion
 import io.github.information89.motion.MotionPhysics
 import io.github.information89.motion.MotionValue
 import io.github.information89.motion.SpringMorph
+import io.github.information89.motion.morphHandle
 import io.github.information89.motion.pageTransition
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import org.breezyweather.R
 import org.breezyweather.ui.expressive.components.LocalPageGlass
 import org.breezyweather.ui.expressive.components.LocalSkyGlass
+import org.breezyweather.ui.expressive.components.SheetHandle
+import org.breezyweather.ui.expressive.components.SheetShape
 import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.components.glassSource
 import org.breezyweather.ui.expressive.components.rememberGlassSource
@@ -111,9 +116,6 @@ import org.breezyweather.ui.expressive.theme.Space
 import org.breezyweather.ui.theme.compose.BreezyWeatherTheme
 import kotlin.math.abs
 
-/** How far below the sheet's top a pull closes the window (the handle and the "Visiting" line). */
-private val CLOSE_STRIP = 64.dp
-
 /** The morph key of a place's postcard (its window grows out of it). */
 internal fun postcardKey(id: String) = "postcard-$id"
 
@@ -123,11 +125,11 @@ internal fun postcardKey(id: String) = "postcard-$id"
  *
  * On `SpringMorph` (the user, 2026-11-21: the new morph applies to postcards too): five springs grow it
  * from the postcard; the postcard blurs out as the window sharpens in, and the window is carried at
- * its full layout, growing uniformly. A touch catches it while it moves (a tap turns it back, a drag
- * takes it over). Open, a pull down from its top strip (status bar and "Visiting" line) drags it back
- * towards its postcard and a release past halfway (or a flick) folds it home; a pull on the page
- * refreshes, like home. Back follows the finger (predictive back). The window only shows the place:
- * it doesn't change the selected or main place.
+ * its full layout, growing uniformly. A touch catches it while it moves (a tap opens it, a vertical drag
+ * takes it over, a sideways swipe is the page's below). Open, it's full screen with its corners on the
+ * screen's own (agreed 2026-11-21); its handle closes it: drag it down (a release past halfway or a
+ * flick folds it home) or tap it. A pull on the page refreshes, like home. Back follows the finger
+ * (predictive back). The window only shows the place: it doesn't change the selected or main place.
  *
  * [fromBounds] is where it grows from (the postcard, or the search card it was picked in); [from] the
  * postcard's key, hidden while the window draws it. A visit you didn't keep ([fadeOut]) fades away as
@@ -162,17 +164,17 @@ internal fun PlaceWindow(
         }
     }
     fun progress() = motion.progress
+
+    // The window's content, toolbar and handle fade in over the middle half of the growth (as before).
+    fun contentShown() = ((progress() - 0.25f) / 0.5f).coerceIn(0f, 1f)
     val window = androidx.compose.ui.platform.LocalWindowInfo.current.containerSize
-    // A sheet like the moon card's (agreed 2026-11-21): docked at the bottom, its top just below the
-    // status bar, rounded on top with a handle; the bottom corners square off as it docks.
-    val density = LocalDensity.current
-    val statusTop = WindowInsets.statusBars.getTop(density)
-    val sheetTop = statusTop + with(density) { Space.S3.toPx() }
-    val radius = with(density) { Corners.XL.toPx() }
-    val target = remember(window, sheetTop, radius) {
-        MorphAnchor(Rect(0f, sheetTop, window.width.toFloat(), window.height.toFloat()), radius)
+    // Full screen, keeping its handle (agreed 2026-11-21): its corners grow from the postcard's into
+    // the screen's own, top and bottom, so they line up with the glass the whole way.
+    val screenCorners = org.breezyweather.ui.expressive.components.rememberScreenCorners()
+    val target = remember(window, screenCorners) {
+        MorphAnchor(Rect(0f, 0f, window.width.toFloat(), window.height.toFloat()), screenCorners.top)
     }
-    val sheetShape = remember { { r: Float, p: Float -> MoonSheetShape(r, p) } }
+    val windowShape = remember(screenCorners) { { r: Float, p: Float -> SheetShape(r, p, screenCorners.bottom) } }
     val sky = skyFor(location, now)
     // Night there: the window's own interface is dark (the main screen keeps your setting).
     val night = sky.sunHeight < 0f
@@ -194,21 +196,6 @@ internal fun PlaceWindow(
             SkySystemBars(if (pager.currentPage == 1) sky.palette else plainPalette(page, onPage))
         }
         val context = LocalContext.current
-        val closeStrip = sheetTop + with(density) { CLOSE_STRIP.toPx() }
-        // While open, the page behind dims a little, and a tap above the sheet closes it.
-        Box(
-            Modifier
-                .fillMaxSize()
-                .graphicsLayer { alpha = progress().coerceIn(0f, 1f) }
-                .background(Color.Black.copy(alpha = 0.25f))
-        )
-        if (motion.isOpen) {
-            Box(
-                Modifier.fillMaxWidth().height(with(density) { sheetTop.toDp() }).pointerInput(Unit) {
-                    detectTapGestures { onClose() }
-                }
-            )
-        }
         SpringMorph(
             from = from,
             target = target,
@@ -218,10 +205,10 @@ internal fun PlaceWindow(
             modifier = Modifier.graphicsLayer {
                 alpha = if (fadeOut && !motion.isOpen) progress().coerceIn(0f, 1f) else 1f
             },
-            shape = sheetShape,
-            // A pull on the page refreshes, like home (user 2026-11-21); a pull from the sheet's top (its
-            // handle and the "Visiting" line) folds it back into its postcard.
-            canPull = { start -> start.y < closeStrip },
+            shape = windowShape,
+            // Only the handle pulls the window (morphHandle); a pull on the page refreshes, like home
+            // (agreed 2026-11-21).
+            canPull = { false },
             // A tap never closes a window (user 2026-11-21: a tap just after opening a postcard dismissed
             // it): caught while opening, it carries on; caught while closing, it opens again.
             onTap = { motion.open() },
@@ -235,7 +222,8 @@ internal fun PlaceWindow(
                     folded = false,
                     now = now,
                     context = context,
-                    onClick = {}
+                    // Drawn only (no click): an invisible clickable copy above the window ate its touches.
+                    onClick = null
                 )
             }
         ) {
@@ -255,7 +243,7 @@ internal fun PlaceWindow(
                     Box(
                         Modifier
                             .fillMaxSize()
-                            .graphicsLayer { alpha = ((progress() - 0.25f) / 0.5f).coerceIn(0f, 1f) }
+                            .graphicsLayer { alpha = contentShown() }
                             // This week sits on the plain page, like Outlook.
                             .plainPageBackdrop({ nav.visualPosition() }, skyPage = 1, page = page)
                     ) {
@@ -295,20 +283,20 @@ internal fun PlaceWindow(
                         }
                     }
                 }
-                // The handle, like the moon card's.
-                Box(
-                    Modifier
+                // The shared handle under the status bar: drag it down to fold the window home, or tap it.
+                SheetHandle(
+                    ink = sky.palette.text,
+                    onClose = onClose,
+                    modifier = Modifier
                         .align(Alignment.TopCenter)
-                        .graphicsLayer { alpha = ((progress() - 0.25f) / 0.5f).coerceIn(0f, 1f) }
-                        .padding(top = Space.S3)
-                        .width(Sizes.HandleWidth)
-                        .height(Sizes.HandleThickness)
-                        .background(sky.palette.text.copy(alpha = 0.4f), CircleShape)
+                        .statusBarsPadding()
+                        .graphicsLayer { alpha = contentShown() }
+                        .morphHandle(motion)
                 )
                 // The home toolbar, as is: This week and Forecast, and Pin budding out of Forecast like search
                 // does out of Places (pin keeps the place; otherwise it's gone when you go back).
                 val scope = rememberCoroutineScope()
-                ToolbarDock(alpha = { ((progress() - 0.25f) / 0.5f).coerceIn(0f, 1f) }) {
+                ToolbarDock(alpha = { contentShown() }) {
                     ShellToolbar(
                         pager = pager,
                         sky = sky,
