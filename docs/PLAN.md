@@ -2982,3 +2982,14 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   theme's ink (`onSurface`). Stars are a card/surface effect (`Modifier.skyEffects`, the sky's own star
   drawing); only the moon sheet uses it, at night at the place. Cards now pad `Space.S4` (Paper was S5).
   Not done: the moon card opened from a postcard window follows home's theme, not the window's.
+- **2026-11-21: Motion phase 1 done (docs/MOTION_REPO_PLAN.md, now in the Motion repo).**
+  `:motion` and the lab's files moved to [INFORMATION89/Motion](https://github.com/INFORMATION89/Motion)
+  with their history (39 commits split at 8162bff with git-filter-repo; no upstream history), plus a
+  standalone Gradle build (Solstice's versions), CI and README. In Solstice `motion/` is a submodule
+  built with `includeBuild` (dependency `io.github.information89:motion`), CI checks out submodules,
+  Motion's tests run as `:motion:motion:testDebugUnitTest`. Checked: a fresh `--recurse-submodules`
+  clone builds; lint and Motion's 28 tests pass; the APK's code is identical to before the switch
+  (only the commit hash in the version text differs). Motion's root project is `MotionFramework`: a
+  root named "Motion" clashed with its `:motion` project in Solstice's type-safe accessors. The other
+  session's temporary SpringMorph log was removed in Motion (043a703) and Solstice bumped to it.
+  Workflow: CONTINUE.md "Motion (submodule)". Next: phase 2 (Motion Lab as its own app).

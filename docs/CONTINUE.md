@@ -226,6 +226,22 @@ Reference for iOS behaviour: `docs/MORPH_STUDY.md`, and `NEORUAA/Glasmio` (Apach
 - **Windows:** `.gitattributes` keeps LF so Spotless passes. In Git Bash, set
   `JAVA_HOME="C:/Program Files/Android/Android Studio/jbr"` (Android Studio's JDK 25 works).
 
+## Motion (submodule)
+
+Since 2026-11-21 `motion/` is a git submodule: [INFORMATION89/Motion](https://github.com/INFORMATION89/Motion)
+(Apache-2.0), built from source with `includeBuild` (`settings.gradle.kts`); the app depends on
+`io.github.information89:motion`. Plan and phases: Motion's `docs/MOTION_REPO_PLAN.md`.
+
+- **A Motion change lands in Motion first.** Edit in `motion/` (a real Motion checkout) or in a
+  separate clone (`~/Developer/Motion`), commit and push to Motion, then in Solstice commit the new
+  pointer: `git -C motion pull` (or `git submodule update --remote motion`), build and check, then
+  `git add motion` and commit "Bump Motion to abc1234: what changed". Never commit `motion/` files
+  in Solstice's own history.
+- **After pulling Solstice**, run `git submodule update --init` so `motion/` matches the pointer.
+- **Gradle paths:** Motion's tasks run as `:motion:motion:<task>` from Solstice (e.g.
+  `./gradlew :motion:motion:testDebugUnitTest`), or as `:motion:<task>` inside `motion/`.
+- The Motion Lab still lives in Solstice (`ui/expressive/lab/`) until phase 2 moves it to Motion.
+
 ## Set up a new computer
 
 1. Install **Android Studio** (it bundles a JDK; the build needs **Java 21**), or install JDK 21 and
@@ -233,7 +249,7 @@ Reference for iOS behaviour: `docs/MORPH_STUDY.md`, and `NEORUAA/Glasmio` (Apach
 2. In the SDK manager, install **Android SDK Platform 37** and **Build-Tools 37**.
 3. Clone and build:
    ```bash
-   git clone https://github.com/INFORMATION89/Solstice.git
+   git clone --recurse-submodules https://github.com/INFORMATION89/Solstice.git
    cd Solstice
    ./gradlew assembleBasicDebug
    ```
