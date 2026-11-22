@@ -269,28 +269,31 @@ internal fun PlaceWindow(
                                     nav.overshoot
                                 )
                             ) { index ->
-                                Box(Modifier.fillMaxSize().pageSwipeBlur({ nav.visualPosition() }, index)) {
-                                    if (index == 0) {
-                                        DaysPage(location, onPage, page, days) {
-                                            abs(nav.visualPosition() - 1f).coerceIn(0f, 1f)
-                                        }
-                                    } else {
-                                        CompositionLocalProvider(
-                                            LocalSkyGlass provides windowSky,
-                                            LocalPageGlass provides windowGlass
-                                        ) {
-                                            ForecastPage(
-                                                location = location,
-                                                sky = sky,
-                                                now = now,
-                                                refreshing = refreshing,
-                                                onRefresh = onRefresh,
-                                                onDetails = onDetails,
-                                                onOpenPlaces = { onClose() },
-                                                showLocalTime = false,
-                                                source = source,
-                                                scroll = forecastScroll
-                                            )
+                                // Each page knows which page it is, so what grows out of it belongs to it (FramePage).
+                                FramePage(nav, index) {
+                                    Box(Modifier.fillMaxSize().pageSwipeBlur({ nav.visualPosition() }, index)) {
+                                        if (index == 0) {
+                                            DaysPage(location, onPage, page, days) {
+                                                abs(nav.visualPosition() - 1f).coerceIn(0f, 1f)
+                                            }
+                                        } else {
+                                            CompositionLocalProvider(
+                                                LocalSkyGlass provides windowSky,
+                                                LocalPageGlass provides windowGlass
+                                            ) {
+                                                ForecastPage(
+                                                    location = location,
+                                                    sky = sky,
+                                                    now = now,
+                                                    refreshing = refreshing,
+                                                    onRefresh = onRefresh,
+                                                    onDetails = onDetails,
+                                                    onOpenPlaces = { onClose() },
+                                                    showLocalTime = false,
+                                                    source = source,
+                                                    scroll = forecastScroll
+                                                )
+                                            }
                                         }
                                     }
                                 }

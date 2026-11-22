@@ -51,6 +51,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +70,7 @@ import androidx.compose.ui.unit.dp
 import breezyweather.domain.location.model.Location
 import io.github.information89.motion.EdgeBand
 import io.github.information89.motion.EdgeBlurDefaults
+import io.github.information89.motion.MorphPage
 import io.github.information89.motion.Motion
 import io.github.information89.motion.scrollEdgeBlur
 import org.breezyweather.R
@@ -332,4 +334,18 @@ internal fun PageScaffold(
             content()
         }
     }
+}
+
+/** The page this is on (null outside a pager page), for morphs that grow out of it ([MorphSettings.page]). */
+internal val LocalMorphPage = compositionLocalOf<MorphPage?> { null }
+
+/**
+ * One page of a set of pages (agreed 2026-11-22: anything that grows out of a page belongs to it): tells
+ * what's on it which page it is ([LocalMorphPage]), so a card opened from a button here moves with this
+ * page and is clipped to it while it closes, never showing on another page.
+ */
+@Composable
+internal fun FramePage(nav: ShellNavigation, index: Int, content: @Composable () -> Unit) {
+    val page = remember(nav, index) { MorphPage(nav.pager, index, nav.overshoot) }
+    CompositionLocalProvider(LocalMorphPage provides page, content = content)
 }

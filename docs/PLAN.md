@@ -3059,3 +3059,8 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   **Bug found, not fixed:** in a postcard window the moon card's dial doesn't respond (on home it does).
   Logs (removed): the touch reaches the moon sheet and its morph content at the right place, but never the
   dial; next step: log the dial's bounds in the window (the phone locked before that ran).
+- **2026-11-22: everything that grows out of a page belongs to it (built, NOT checked on the phone: the
+  user was using it).** `FramePage(nav, index)` in `PageFrame.kt` wraps every page of home's and the
+  windows' pagers and provides `LocalMorphPage`; the moon card takes its pill's page (`MoonCards.page`) and
+  passes it as `MorphSettings(page = …)`, so closing while you swipe keeps it inside its page, clipped, as the
+  postcard window already did. Search grows from the toolbar (not a page) and is unaffected.

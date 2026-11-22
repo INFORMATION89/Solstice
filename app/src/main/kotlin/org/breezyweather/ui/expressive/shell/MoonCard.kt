@@ -135,6 +135,8 @@ import io.github.information89.motion.Haptic
 import io.github.information89.motion.Morph
 import io.github.information89.motion.MorphAnchor
 import io.github.information89.motion.MorphHost
+import io.github.information89.motion.MorphPage
+import io.github.information89.motion.MorphSettings
 import io.github.information89.motion.MorphStyle
 import io.github.information89.motion.Motion
 import io.github.information89.motion.MotionValue
@@ -256,6 +258,7 @@ internal fun MoonSharedLayout(content: @Composable () -> Unit) {
 internal fun MoonButton(location: Location, now: Long) {
     val context = LocalContext.current
     val moonCards = LocalMoonCards.current
+    val morphPage = LocalMorphPage.current
     val (angle, lit) = moonAt(Date(now))
     val phase = breezyweather.domain.weather.model.MoonPhase(angle).getDescription(context) ?: ""
     val suffix = " · ${(lit * 100).roundToInt()} %"
@@ -282,6 +285,7 @@ internal fun MoonButton(location: Location, now: Long) {
             .clip(pill)
             .clickable(role = androidx.compose.ui.semantics.Role.Button) {
                 moonCards.glass = pageGlass
+                moonCards.page = morphPage
                 moonCards.buttonInk = glassInk
                 moonCards.show(location, now, phase + suffix)
             }
@@ -317,6 +321,9 @@ internal class MoonCards {
 
     /** The glass of the screen the card was opened from. */
     var glass: GlassSource? = null
+
+    /** The page the button was on: the card belongs to it (moves with it, clipped to it, while closing). */
+    var page: MorphPage? = null
 
     /** 0 closed … 1 open. */
     var progress by mutableFloatStateOf(0f)
@@ -420,6 +427,8 @@ private fun MoonSheet(cards: MoonCards, location: Location, now: Long, glass: Gl
             // One material the whole way (MOTION.md): the pill's own glass grows into the sheet's.
             material = { shape -> glass(cards.glass ?: glass, shape) },
             shape = sheetShape,
+            // It belongs to its button's page: closing while you swipe, it stays inside that page.
+            settings = MorphSettings(page = cards.page),
             // The pill's label blurs out as the sheet's content sharpens in (and back on the way home).
             sourceContent = {
                 val label = cards.label

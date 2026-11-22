@@ -405,109 +405,113 @@ fun SolsticeShell(
                         // All three pages stay built: going Places -> Forecast would otherwise build Outlook (ten
                         // sky cards) in the middle of the swipe.
                         beyondViewportPageCount = 2,
-                        // Letting go of a swipe: the pager jumps to the page at once and the rest of the way is
-                        // drawn (2026-11-21), so a tap during it lands (MOTION.md: never block input).
+                        // Letting go of a swipe, the pages spring to their page on Motion.momentum (ShellNavigation).
                         flingBehavior = nav.fling,
                         modifier = Modifier
                             .fillMaxSize()
                             .pageOvershoot(nav.overshoot)
                     ) { index ->
-                        Box(
-                            Modifier
-                                .fillMaxSize()
-                                .pageSwipeBlur({ visualPosition() }, index)
-                        ) {
-                            when (index) {
-                                PAGE_DAYS -> DaysPage(location, onPage, page, daysList) {
-                                    // The edge blur only comes in once the plain page is mostly there (it showed
-                                    // over the sky as soon as a swipe started).
-                                    edgeFade(visualPosition())
-                                }
-                                PAGE_FORECAST -> ForecastPage(
-                                    location = location,
-                                    sky = sky,
-                                    now = now,
-                                    refreshing = loading,
-                                    onRefresh = {
-                                        viewModel.updateWithUpdatingChecking(
-                                            triggeredByUser = true,
-                                            checkPermissions = true
-                                        )
-                                    },
-                                    onDetails = actions::openDetails,
-                                    onOpenPlaces = { navigate(PAGE_PLACES) },
-                                    source = location?.let { sourceManager.getWeatherSource(it.forecastSource)?.name }
-                                )
-                                else -> PlacesPage(
-                                    // The visit open in a window isn't listed until you pin it.
-                                    locations = locations.filterNot {
-                                        it.formattedId == windowId && it.formattedId in visiting
-                                    },
-                                    currentId = location?.formattedId,
-                                    starred = starred,
-                                    visiting = visiting,
-                                    now = now,
-                                    onPage = onPage,
-                                    // Tapping a postcard opens it as a window (no jump, no change of place).
-                                    onSelect = { place, bounds ->
-                                        windowOrigin = bounds
-                                        windowFromSearch = false
-                                        windowId = place.formattedId
-                                    },
-                                    onStar = {
-                                        val id = it.formattedId
-                                        // One star: starring moves it here; the starred place stays starred.
-                                        if (id in starred) return@PlacesPage
-                                        starred = setOf(id)
-                                        saveStarred(context, starred)
-                                        messages.show(
-                                            ShellMessage(
-                                                SolsticeIcons.StarFill,
-                                                context.getString(R.string.shell_now_main_place)
+                        // Each page knows which page it is, so what grows out of it belongs to it (FramePage).
+                        FramePage(nav, index) {
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .pageSwipeBlur({ visualPosition() }, index)
+                            ) {
+                                when (index) {
+                                    PAGE_DAYS -> DaysPage(location, onPage, page, daysList) {
+                                        // The edge blur only comes in once the plain page is mostly there (it showed
+                                        // over the sky as soon as a swipe started).
+                                        edgeFade(visualPosition())
+                                    }
+                                    PAGE_FORECAST -> ForecastPage(
+                                        location = location,
+                                        sky = sky,
+                                        now = now,
+                                        refreshing = loading,
+                                        onRefresh = {
+                                            viewModel.updateWithUpdatingChecking(
+                                                triggeredByUser = true,
+                                                checkPermissions = true
                                             )
-                                        )
-                                        // The main place is kept, never a visit.
-                                        if (id in starred) Visits.unmark(context, id)
-                                        controller.visitsChanged++
-                                    },
-                                    onDelete = { place ->
-                                        val index = locations.indexOfFirst { it.formattedId == place.formattedId }
-                                        if (index >= 0) {
-                                            viewModel.deleteLocation(index)
+                                        },
+                                        onDetails = actions::openDetails,
+                                        onOpenPlaces = { navigate(PAGE_PLACES) },
+                                        source = location?.let {
+                                            sourceManager.getWeatherSource(it.forecastSource)?.name
+                                        }
+                                    )
+                                    else -> PlacesPage(
+                                        // The visit open in a window isn't listed until you pin it.
+                                        locations = locations.filterNot {
+                                            it.formattedId == windowId && it.formattedId in visiting
+                                        },
+                                        currentId = location?.formattedId,
+                                        starred = starred,
+                                        visiting = visiting,
+                                        now = now,
+                                        onPage = onPage,
+                                        // Tapping a postcard opens it as a window (no jump, no change of place).
+                                        onSelect = { place, bounds ->
+                                            windowOrigin = bounds
+                                            windowFromSearch = false
+                                            windowId = place.formattedId
+                                        },
+                                        onStar = {
+                                            val id = it.formattedId
+                                            // One star: starring moves it here; the starred place stays starred.
+                                            if (id in starred) return@PlacesPage
+                                            starred = setOf(id)
+                                            saveStarred(context, starred)
                                             messages.show(
                                                 ShellMessage(
-                                                    icon = SolsticeIcons.Delete,
-                                                    text = context.getString(
-                                                        R.string.shell_place_removed,
-                                                        place.getPlace(context)
-                                                    ),
-                                                    action = context.getString(R.string.shell_undo),
-                                                    onAction = { viewModel.addLocation(place, index, context) }
+                                                    SolsticeIcons.StarFill,
+                                                    context.getString(R.string.shell_now_main_place)
                                                 )
                                             )
-                                        }
-                                    },
-                                    onAddCurrent = {
-                                        viewModel.openChooseWeatherSourcesDialog(
-                                            Location(isCurrentPosition = true).applyDefaultPreset(sourceManager)
-                                        )
-                                    },
-                                    onEdit = {
-                                        viewModel.setLocation(it.formattedId)
-                                        actions.openLocationSettings()
-                                    },
-                                    onMove = { id, beforeId ->
-                                        // Same move in the saved list (where the current position may sit anywhere).
-                                        val from = locations.indexOfFirst { it.formattedId == id }
-                                        val rest = locations.filter { it.formattedId != id }
-                                        val to = beforeId?.let { b -> rest.indexOfFirst { it.formattedId == b } }
-                                            ?.takeIf { it >= 0 } ?: rest.size
-                                        if (from >= 0) viewModel.swapLocations(from, to)
-                                    },
-                                    onSettings = actions::openSettings,
-                                    listState = placesList,
-                                    pageFade = { edgeFade(visualPosition()) }
-                                )
+                                            // The main place is kept, never a visit.
+                                            if (id in starred) Visits.unmark(context, id)
+                                            controller.visitsChanged++
+                                        },
+                                        onDelete = { place ->
+                                            val index = locations.indexOfFirst { it.formattedId == place.formattedId }
+                                            if (index >= 0) {
+                                                viewModel.deleteLocation(index)
+                                                messages.show(
+                                                    ShellMessage(
+                                                        icon = SolsticeIcons.Delete,
+                                                        text = context.getString(
+                                                            R.string.shell_place_removed,
+                                                            place.getPlace(context)
+                                                        ),
+                                                        action = context.getString(R.string.shell_undo),
+                                                        onAction = { viewModel.addLocation(place, index, context) }
+                                                    )
+                                                )
+                                            }
+                                        },
+                                        onAddCurrent = {
+                                            viewModel.openChooseWeatherSourcesDialog(
+                                                Location(isCurrentPosition = true).applyDefaultPreset(sourceManager)
+                                            )
+                                        },
+                                        onEdit = {
+                                            viewModel.setLocation(it.formattedId)
+                                            actions.openLocationSettings()
+                                        },
+                                        onMove = { id, beforeId ->
+                                            // Same move in the saved list (where the current position may sit anywhere).
+                                            val from = locations.indexOfFirst { it.formattedId == id }
+                                            val rest = locations.filter { it.formattedId != id }
+                                            val to = beforeId?.let { b -> rest.indexOfFirst { it.formattedId == b } }
+                                                ?.takeIf { it >= 0 } ?: rest.size
+                                            if (from >= 0) viewModel.swapLocations(from, to)
+                                        },
+                                        onSettings = actions::openSettings,
+                                        listState = placesList,
+                                        pageFade = { edgeFade(visualPosition()) }
+                                    )
+                                }
                             }
                         }
                     }
