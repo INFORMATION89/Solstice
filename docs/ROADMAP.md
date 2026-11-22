@@ -49,6 +49,18 @@ See CONTINUE.md "6 AM session": reopen while it's still closing, a stronger text
 animation research, a velocity cap, a bit more opening bounce, the Motion Lab redesign plan (with a
 comparison to Google's libraries, no weather references), and Apple's principles for the toolbar.
 
+## 🗓 Next week: interactive glass (backlog, added 2026-11-22)
+
+Liquid-Glass-style touch response for every glass button (`FrameButton`, toolbar, pills), as one
+`interactiveGlass` piece in Motion, Motion Lab first with a switch per behaviour, then the app. Ideas
+(chat, 2026-11-22; none agreed yet): press swell and springy release; a touch light that spreads from the
+finger and follows it; hold (brighter, a little more swell, a haptic tick, optionally growing into a small
+glass menu via the morph kinds, e.g. ✕ → "Close" / "Pin and close"); elastic stretch when the finger slides
+off, cancelling past the edge; a release ripple as a bend in the glass; appear and disappear through blur;
+neighbouring glass buttons merging into one shape (most ambitious); haptics from the existing tokens.
+Rules: never blocks input, values from Motion tokens only, Reduce Motion keeps light and haptics but drops
+stretch and scale.
+
 ## ⭐ Next session priorities
 
 1. Rework what needs redoing and make everything consistent (spacing, materials, components).
