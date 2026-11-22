@@ -186,6 +186,11 @@ internal data class FrameAction(val icon: ImageVector, val label: String, val on
 internal fun closeAction(onClose: () -> Unit): FrameAction =
     FrameAction(SolsticeIcons.Close, stringResource(R.string.action_close), onClose)
 
+/** The settings action (e.g. on Places' title). */
+@Composable
+internal fun settingsAction(onSettings: () -> Unit): FrameAction =
+    FrameAction(SolsticeIcons.Settings, stringResource(R.string.action_settings), onSettings)
+
 /**
  * A frame header's button: an icon on the one glass over [glass], one touch target, its icon in the
  * theme's ink on glass.
@@ -268,7 +273,7 @@ private val ToolbarClearance = 160.dp
 
 /**
  * A plain page (This week, Places): a list edge to edge under a transparent status bar and the
- * toolbar, the page's large title (with an optional [action], e.g. Settings) at the same height on
+ * toolbar, the page's large title (with its [actions], framework buttons, e.g. Settings) at the same height on
  * every page, the standard side margins, room for the toolbar at the end, and the progressive edge
  * blur at the top. One place to change them all (component catalog, M4).
  */
@@ -280,7 +285,7 @@ internal fun PageScaffold(
     listState: LazyListState,
     pageFade: () -> Float,
     spacing: Dp,
-    action: (@Composable () -> Unit)? = null,
+    actions: List<FrameAction> = emptyList(),
     content: LazyListScope.() -> Unit,
 ) {
     val top = pageTopInset()
@@ -316,7 +321,12 @@ internal fun PageScaffold(
                         style = MaterialTheme.typography.displaySmallEmphasized.copy(fontWeight = FontWeight.SemiBold),
                         modifier = Modifier.weight(1f).padding(start = Space.S1)
                     )
-                    action?.invoke()
+                    // The page's buttons: the framework's (agreed 2026-11-22), on the plain page's glass tint.
+                    if (actions.isNotEmpty()) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(Space.S2)) {
+                            actions.forEach { FrameButton(it, glass = null) }
+                        }
+                    }
                 }
             }
             content()

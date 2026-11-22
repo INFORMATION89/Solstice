@@ -3049,3 +3049,6 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   `decorationGap`, `END_CAP` and `MARKER` named; the moon card passes `decorationSize = Sizes.IconSmall` and
   draws its phase icons at that size (was 60 dp and 7 dp). Left as they were (older, flagged): the moon
   picture's 200 dp height and its glow's 10 %/60 %, the dial's tick alphas.
+- **2026-11-22: Places' settings button is a framework button (checked on the Pixel).** `PageScaffold`
+  takes `actions: List<FrameAction>` (drawn with `FrameButton` on the plain page's glass tint) instead of a
+  free composable slot; `settingsAction(onSettings)` sits next to `closeAction`. Tapping it opens Settings.

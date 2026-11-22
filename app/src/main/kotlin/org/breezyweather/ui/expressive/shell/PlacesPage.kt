@@ -182,15 +182,7 @@ internal fun PlacesPage(
         listState = listState,
         pageFade = pageFade,
         spacing = Space.S4,
-        action = {
-            IconButton(onClick = onSettings) {
-                Icon(
-                    SolsticeIcons.Settings,
-                    contentDescription = stringResource(R.string.action_settings),
-                    tint = onPage.copy(alpha = Emphasis.Medium)
-                )
-            }
-        }
+        actions = listOf(settingsAction(onSettings))
     ) {
         items(shown, key = { it }) { id ->
             val location = byId[id] ?: return@items
