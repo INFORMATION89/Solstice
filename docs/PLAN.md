@@ -2993,3 +2993,11 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   root named "Motion" clashed with its `:motion` project in Solstice's type-safe accessors. The other
   session's temporary SpringMorph log was removed in Motion (043a703) and Solstice bumped to it.
   Workflow: CONTINUE.md "Motion (submodule)". Next: phase 2 (Motion Lab as its own app).
+- **2026-11-21: a closing window stays in its tab; the moon card belongs to its screen** (user's
+  recording). Motion 4cc4f03: `MorphSettings` (one setting for a morph: `touches`, `page`) and `MorphPage`
+  (a page of a pager; its movement comes from the pager: size, spacing, orientation, reversed, RTL,
+  overshoot). A window opened from a postcard belongs to the Places page: swiping home while it closes
+  carries it 1:1 with that page, clipped to it, instead of the springs chasing the postcard. The moon card
+  is per screen (`MoonCards`, `LocalMoonCards`, no default): home and each postcard window draw their own,
+  so one opened in a window closes and goes with the window (and takes its theme). Built; not checked on
+  the Pixel.

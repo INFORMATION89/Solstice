@@ -65,7 +65,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -90,6 +89,8 @@ import androidx.compose.ui.unit.dp
 import breezyweather.domain.location.model.Location
 import io.github.information89.motion.MorphAnchor
 import io.github.information89.motion.MorphMotion
+import io.github.information89.motion.MorphPage
+import io.github.information89.motion.MorphSettings
 import io.github.information89.motion.MorphTouches
 import io.github.information89.motion.MotionPhysics
 import io.github.information89.motion.MotionValue
@@ -154,6 +155,8 @@ internal fun PlaceWindow(
     // Pull to refresh on its Forecast, like home (user 2026-11-21).
     refreshing: Boolean = false,
     onRefresh: () -> Unit = {},
+    // The page its postcard is on, which it belongs to (null when it grew from search).
+    morphPage: MorphPage? = null,
 ) {
     PredictiveBackHandler(enabled = motion.isOpen) { events ->
         try {
@@ -210,8 +213,9 @@ internal fun PlaceWindow(
             // Only the handle pulls the window (morphHandle); a pull on the page refreshes, like home
             // (agreed 2026-11-21).
             canPull = { false },
-            // Opening, the window owns the screen; closing, a sideways swipe is home's (agreed 2026-11-21).
-            touches = MorphTouches.WhileClosing,
+            // Opening, the window owns the screen; closing, a sideways swipe is home's, and it folds home
+            // inside its postcard's page (agreed 2026-11-21).
+            settings = MorphSettings(touches = MorphTouches.WhileClosing, page = morphPage),
             // A tap never closes a window (user 2026-11-21: a tap just after opening a postcard dismissed
             // it): caught while opening, it carries on; caught while closing, it opens again.
             onTap = { motion.open() },
@@ -230,97 +234,103 @@ internal fun PlaceWindow(
                 )
             }
         ) {
+            // The window's own moon card (agreed 2026-11-21): opened here, it lives and closes with it.
+            val windowMoonCards = remember { MoonCards() }
             Box(Modifier.fillMaxSize()) {
-                // The window's own glass: its toolbar blurs the window's sky and pages, like the home toolbar.
-                val windowGlass = rememberGlassSource()
-                // The window's sky alone, for its Forecast cards' blur.
-                val windowSky = rememberGlassSource()
-                Box(Modifier.fillMaxSize().glassSource(windowGlass)) {
-                    // The postcard's sky is what grows: laid out full screen and scaled down onto the card.
-                    SkyBackground(
-                        state = sky,
-                        // Stars on a clear night (F4), baked into the window's sky.
-                        effects = SkyEffects.of(sky, SkyWeather.of(location.weather?.current?.weatherCode)),
-                        modifier = Modifier.fillMaxSize().glassSource(windowSky)
-                    ) {}
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .graphicsLayer { alpha = contentShown() }
-                            // This week sits on the plain page, like Outlook.
-                            .plainPageBackdrop({ nav.visualPosition() }, skyPage = 1, page = page)
-                    ) {
-                        CompositionLocalProvider(LocalVisit provides Visit(location, now, pinned)) {
-                            HorizontalPager(
-                                state = pager,
-                                beyondViewportPageCount = 1,
-                                flingBehavior = nav.fling,
-                                modifier = Modifier.fillMaxSize().pageOvershoot(
-                                    nav.overshoot
-                                )
-                            ) { index ->
-                                Box(Modifier.fillMaxSize().pageSwipeBlur({ nav.visualPosition() }, index)) {
-                                    if (index == 0) {
-                                        DaysPage(location, onPage, page, days) {
-                                            abs(nav.visualPosition() - 1f).coerceIn(0f, 1f)
-                                        }
-                                    } else {
-                                        CompositionLocalProvider(
-                                            LocalSkyGlass provides windowSky,
-                                            LocalPageGlass provides windowGlass
-                                        ) {
-                                            ForecastPage(
-                                                location = location,
-                                                sky = sky,
-                                                now = now,
-                                                refreshing = refreshing,
-                                                onRefresh = onRefresh,
-                                                onDetails = onDetails,
-                                                onOpenPlaces = { onClose() },
-                                                showLocalTime = false,
-                                                source = source,
-                                                scroll = forecastScroll
-                                            )
+                CompositionLocalProvider(LocalMoonCards provides windowMoonCards) {
+                    // The window's own glass: its toolbar blurs the window's sky and pages, like the home toolbar.
+                    val windowGlass = rememberGlassSource()
+                    // The window's sky alone, for its Forecast cards' blur.
+                    val windowSky = rememberGlassSource()
+                    Box(Modifier.fillMaxSize().glassSource(windowGlass)) {
+                        // The postcard's sky is what grows: laid out full screen and scaled down onto the card.
+                        SkyBackground(
+                            state = sky,
+                            // Stars on a clear night (F4), baked into the window's sky.
+                            effects = SkyEffects.of(sky, SkyWeather.of(location.weather?.current?.weatherCode)),
+                            modifier = Modifier.fillMaxSize().glassSource(windowSky)
+                        ) {}
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .graphicsLayer { alpha = contentShown() }
+                                // This week sits on the plain page, like Outlook.
+                                .plainPageBackdrop({ nav.visualPosition() }, skyPage = 1, page = page)
+                        ) {
+                            CompositionLocalProvider(LocalVisit provides Visit(location, now, pinned)) {
+                                HorizontalPager(
+                                    state = pager,
+                                    beyondViewportPageCount = 1,
+                                    flingBehavior = nav.fling,
+                                    modifier = Modifier.fillMaxSize().pageOvershoot(
+                                        nav.overshoot
+                                    )
+                                ) { index ->
+                                    Box(Modifier.fillMaxSize().pageSwipeBlur({ nav.visualPosition() }, index)) {
+                                        if (index == 0) {
+                                            DaysPage(location, onPage, page, days) {
+                                                abs(nav.visualPosition() - 1f).coerceIn(0f, 1f)
+                                            }
+                                        } else {
+                                            CompositionLocalProvider(
+                                                LocalSkyGlass provides windowSky,
+                                                LocalPageGlass provides windowGlass
+                                            ) {
+                                                ForecastPage(
+                                                    location = location,
+                                                    sky = sky,
+                                                    now = now,
+                                                    refreshing = refreshing,
+                                                    onRefresh = onRefresh,
+                                                    onDetails = onDetails,
+                                                    onOpenPlaces = { onClose() },
+                                                    showLocalTime = false,
+                                                    source = source,
+                                                    scroll = forecastScroll
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                // The shared handle under the status bar: drag it down to fold the window home, or tap it.
-                SheetHandle(
-                    ink = sky.palette.text,
-                    onClose = onClose,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .statusBarsPadding()
-                        .graphicsLayer { alpha = contentShown() }
-                        .morphHandle(motion)
-                )
-                // The home toolbar, as is: This week and Forecast, and Pin budding out of Forecast like search
-                // does out of Places (pin keeps the place; otherwise it's gone when you go back).
-                val scope = rememberCoroutineScope()
-                ToolbarDock(alpha = { contentShown() }) {
-                    ShellToolbar(
-                        pager = pager,
-                        sky = sky,
-                        weather = weather,
-                        glass = windowGlass,
-                        labelShown = labelShown,
-                        onTab = { nav.navigate(it) },
-                        onInterrupt = { nav.interrupt() },
-                        position = { nav.toolbarPosition() },
-                        passing = { nav.isPassing(it) },
-                        searchEnabled = true,
-                        onSearch = onPin,
-                        onSearchBounds = {},
-                        withPlaces = false,
-                        // Outline when it's a visit; filled once pinned.
-                        budIcon = if (pinned) SolsticeIcons.PushPinFill else SolsticeIcons.PushPin,
-                        budDescription = stringResource(if (pinned) R.string.shell_pinned else R.string.shell_pin),
-                        budChecked = pinned
+                    // The shared handle under the status bar: drag it down to fold the window home, or tap it.
+                    SheetHandle(
+                        ink = sky.palette.text,
+                        onClose = onClose,
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .statusBarsPadding()
+                            .graphicsLayer { alpha = contentShown() }
+                            .morphHandle(motion)
                     )
+                    // The home toolbar, as is: This week and Forecast, and Pin budding out of Forecast like search
+                    // does out of Places (pin keeps the place; otherwise it's gone when you go back).
+                    val scope = rememberCoroutineScope()
+                    ToolbarDock(alpha = { contentShown() }) {
+                        ShellToolbar(
+                            pager = pager,
+                            sky = sky,
+                            weather = weather,
+                            glass = windowGlass,
+                            labelShown = labelShown,
+                            onTab = { nav.navigate(it) },
+                            onInterrupt = { nav.interrupt() },
+                            position = { nav.toolbarPosition() },
+                            passing = { nav.isPassing(it) },
+                            searchEnabled = true,
+                            onSearch = onPin,
+                            onSearchBounds = {},
+                            withPlaces = false,
+                            // Outline when it's a visit; filled once pinned.
+                            budIcon = if (pinned) SolsticeIcons.PushPinFill else SolsticeIcons.PushPin,
+                            budDescription = stringResource(if (pinned) R.string.shell_pinned else R.string.shell_pin),
+                            budChecked = pinned
+                        )
+                    }
+                    // Its moon card, over the window's pages and toolbar, on the window's glass.
+                    MoonCardOverlay(windowMoonCards, windowGlass)
                 }
             }
         }

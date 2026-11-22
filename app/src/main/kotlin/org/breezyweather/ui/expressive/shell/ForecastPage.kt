@@ -422,7 +422,7 @@ private fun SunPath(
             }
             if (night) {
                 // At night: the moon's phase, outlined so it reads as a button (opens the moon card).
-                MoonButton(location, now, text, palette, night)
+                MoonButton(location, now)
                 Spacer(Modifier.weight(1f))
             } else if (middle != null) {
                 Text(

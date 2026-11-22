@@ -80,6 +80,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -249,14 +250,9 @@ internal fun MoonSharedLayout(content: @Composable () -> Unit) {
 
 /** The moon phase button under the sun path: always visible, outlined so it reads as a button. */
 @Composable
-internal fun MoonButton(
-    location: Location,
-    now: Long,
-    text: Color,
-    palette: org.breezyweather.ui.expressive.sky.SkyPalette,
-    night: Boolean,
-) {
+internal fun MoonButton(location: Location, now: Long) {
     val context = LocalContext.current
+    val moonCards = LocalMoonCards.current
     val (angle, lit) = moonAt(Date(now))
     val phase = breezyweather.domain.weather.model.MoonPhase(angle).getDescription(context) ?: ""
     val suffix = " · ${(lit * 100).roundToInt()} %"
@@ -282,9 +278,9 @@ internal fun MoonButton(
             .glass(skyGlass, pill)
             .clip(pill)
             .clickable(role = androidx.compose.ui.semantics.Role.Button) {
-                MoonCardState.glass = pageGlass
-                MoonCardState.buttonInk = glassInk
-                MoonCardState.show(location, now, null, phase + suffix, palette, night)
+                moonCards.glass = pageGlass
+                moonCards.buttonInk = glassInk
+                moonCards.show(location, now, phase + suffix)
             }
             .padding(horizontal = Space.S3, vertical = Space.S2)
     ) {
@@ -301,39 +297,36 @@ private fun MoonPillContent(phase: String, suffix: String, text: Color, labelMod
     }
 }
 
-/** Which place's moon card is open (the shell draws it over everything, on its glass). */
-internal object MoonCardState {
+/**
+ * The moon card of one screen (agreed 2026-11-21: a moon card belongs to the screen it opened from, so
+ * it closes and goes with that screen): home and each postcard window have their own, provided as
+ * [LocalMoonCards] and drawn by that screen's [MoonCardOverlay].
+ */
+@Stable
+internal class MoonCards {
     var request by androidx.compose.runtime.mutableStateOf<Pair<Location, Long>?>(null)
 
     /** The button's label. */
     var label: String = ""
 
-    /** The forecast's sky the card is tinted with, and whether it's night at the place (dark card). */
-    var palette: org.breezyweather.ui.expressive.sky.SkyPalette? = null
-    var night: Boolean = true
-
     /** The button's text colour. */
     var buttonInk: Color = Color.White
 
-    /** The glass of the screen the card was opened from (null: the shell's). */
+    /** The glass of the screen the card was opened from. */
     var glass: GlassSource? = null
 
-    /** 0 closed … 1 open; the shell reads it to recede the page, like search. */
+    /** 0 closed … 1 open. */
     var progress by mutableFloatStateOf(0f)
 
-    fun show(
-        location: Location,
-        now: Long,
-        @Suppress("UNUSED_PARAMETER") from: Rect?,
-        text: String,
-        sky: org.breezyweather.ui.expressive.sky.SkyPalette,
-        isNight: Boolean,
-    ) {
+    fun show(location: Location, now: Long, text: String) {
         label = text
-        palette = sky
-        night = isNight
         request = location to now
     }
+}
+
+/** The moon cards of the screen this is on (each screen must provide its own). */
+internal val LocalMoonCards = androidx.compose.runtime.staticCompositionLocalOf<MoonCards> {
+    error("No MoonCards here: each screen (home, a postcard window) provides its own")
 }
 
 /**
@@ -344,14 +337,14 @@ internal object MoonCardState {
  * open or closed (agreed 2026-11-19); pulling up past open rubber-bands like iOS.
  */
 @Composable
-internal fun MoonCardOverlay(glass: GlassSource) {
-    val request = MoonCardState.request ?: return
+internal fun MoonCardOverlay(cards: MoonCards, glass: GlassSource) {
+    val request = cards.request ?: return
     // A fresh morph value per opening.
-    androidx.compose.runtime.key(request) { MoonSheet(request.first, request.second, glass) }
+    androidx.compose.runtime.key(request) { MoonSheet(cards, request.first, request.second, glass) }
 }
 
 @Composable
-private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
+private fun MoonSheet(cards: MoonCards, location: Location, now: Long, glass: GlassSource) {
     val density = LocalDensity.current
     // The new morph (SpringMorph, agreed in the lab 2026-11-21, applied to the moon card at the user's
     // request): five springs grow the pill into the sheet; a touch catches it mid-flight, a tap turns it
@@ -363,11 +356,11 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
         var opened = false
         androidx.compose.runtime.snapshotFlow { Triple(motion.progress, motion.isOpen, motion.isVisible) }
             .collect { (p, open, visible) ->
-                MoonCardState.progress = p.coerceIn(0f, 1f)
+                cards.progress = p.coerceIn(0f, 1f)
                 if (open) opened = true
                 if (opened && !open && !visible) {
-                    MoonCardState.progress = 0f
-                    MoonCardState.request = null
+                    cards.progress = 0f
+                    cards.request = null
                 }
             }
     }
@@ -422,13 +415,13 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
             target = target,
             motion = motion,
             // One material the whole way (MOTION.md): the pill's own glass grows into the sheet's.
-            material = { shape -> glass(MoonCardState.glass ?: glass, shape) },
+            material = { shape -> glass(cards.glass ?: glass, shape) },
             shape = sheetShape,
             // The pill's label blurs out as the sheet's content sharpens in (and back on the way home).
             sourceContent = {
-                val label = MoonCardState.label
+                val label = cards.label
                 val phase = label.substringBefore(" · ")
-                MoonPillContent(phase, label.removePrefix(phase), MoonCardState.buttonInk)
+                MoonPillContent(phase, label.removePrefix(phase), cards.buttonInk)
             }
         ) {
             Box(Modifier.fillMaxSize().skyEffects(placeSky, stars)) {

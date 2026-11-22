@@ -35,6 +35,7 @@ import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
@@ -78,6 +79,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import breezyweather.domain.location.model.Location
 import io.github.information89.motion.MorphAnchor
+import io.github.information89.motion.MorphPage
 import io.github.information89.motion.Motion
 import io.github.information89.motion.MotionPhysics
 import io.github.information89.motion.pageOvershoot
@@ -378,234 +380,243 @@ fun SolsticeShell(
     val placesList = rememberLazyListState()
     val labelShown by rememberTitleHandOff(listOf(daysList, null, placesList))
     // The moon button and sheet share one transition (Compose's container transform).
+    // The home screen's moon card (a window has its own, agreed 2026-11-21).
+    val homeMoonCards = remember { MoonCards() }
     MoonSharedLayout {
-        Box(Modifier.fillMaxSize()) {
-            // Everything the toolbar's glass shows, blurred, behind it.
-            AnimatedSkyBackground(
-                sky,
-                Modifier.fillMaxSize().glassSource(glass),
-                skyGlass = skyGlass,
-                pageGlass = glass,
-                // Only while the Forecast page shows some of it and no postcard window covers it.
-                visible = {
-                    abs(visualPosition() - PAGE_FORECAST) < 0.999f &&
-                        windowMotion.progress < 0.999f
-                },
-                // Stars on a clear night (F4).
-                effects = SkyEffects.of(sky, SkyWeather.of(location?.weather?.current?.weatherCode))
-            ) {
-                Box(Modifier.fillMaxSize().plainPageBackdrop({ visualPosition() }, PAGE_FORECAST, page))
-                HorizontalPager(
-                    state = pager,
-                    // All three pages stay built: going Places -> Forecast would otherwise build Outlook (ten
-                    // sky cards) in the middle of the swipe.
-                    beyondViewportPageCount = 2,
-                    // Letting go of a swipe: the pager jumps to the page at once and the rest of the way is
-                    // drawn (2026-11-21), so a tap during it lands (MOTION.md: never block input).
-                    flingBehavior = nav.fling,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .pageOvershoot(nav.overshoot)
-                ) { index ->
-                    Box(
-                        Modifier
+        CompositionLocalProvider(LocalMoonCards provides homeMoonCards) {
+            Box(Modifier.fillMaxSize()) {
+                // Everything the toolbar's glass shows, blurred, behind it.
+                AnimatedSkyBackground(
+                    sky,
+                    Modifier.fillMaxSize().glassSource(glass),
+                    skyGlass = skyGlass,
+                    pageGlass = glass,
+                    // Only while the Forecast page shows some of it and no postcard window covers it.
+                    visible = {
+                        abs(visualPosition() - PAGE_FORECAST) < 0.999f &&
+                            windowMotion.progress < 0.999f
+                    },
+                    // Stars on a clear night (F4).
+                    effects = SkyEffects.of(sky, SkyWeather.of(location?.weather?.current?.weatherCode))
+                ) {
+                    Box(Modifier.fillMaxSize().plainPageBackdrop({ visualPosition() }, PAGE_FORECAST, page))
+                    HorizontalPager(
+                        state = pager,
+                        // All three pages stay built: going Places -> Forecast would otherwise build Outlook (ten
+                        // sky cards) in the middle of the swipe.
+                        beyondViewportPageCount = 2,
+                        // Letting go of a swipe: the pager jumps to the page at once and the rest of the way is
+                        // drawn (2026-11-21), so a tap during it lands (MOTION.md: never block input).
+                        flingBehavior = nav.fling,
+                        modifier = Modifier
                             .fillMaxSize()
-                            .pageSwipeBlur({ visualPosition() }, index)
-                    ) {
-                        when (index) {
-                            PAGE_DAYS -> DaysPage(location, onPage, page, daysList) {
-                                // The edge blur only comes in once the plain page is mostly there (it showed
-                                // over the sky as soon as a swipe started).
-                                edgeFade(visualPosition())
-                            }
-                            PAGE_FORECAST -> ForecastPage(
-                                location = location,
-                                sky = sky,
-                                now = now,
-                                refreshing = loading,
-                                onRefresh = {
-                                    viewModel.updateWithUpdatingChecking(
-                                        triggeredByUser = true,
-                                        checkPermissions = true
-                                    )
-                                },
-                                onDetails = actions::openDetails,
-                                onOpenPlaces = { navigate(PAGE_PLACES) },
-                                source = location?.let { sourceManager.getWeatherSource(it.forecastSource)?.name }
-                            )
-                            else -> PlacesPage(
-                                // The visit open in a window isn't listed until you pin it.
-                                locations = locations.filterNot {
-                                    it.formattedId == windowId && it.formattedId in visiting
-                                },
-                                currentId = location?.formattedId,
-                                starred = starred,
-                                visiting = visiting,
-                                now = now,
-                                onPage = onPage,
-                                // Tapping a postcard opens it as a window (no jump, no change of place).
-                                onSelect = { place, bounds ->
-                                    windowOrigin = bounds
-                                    windowFromSearch = false
-                                    windowId = place.formattedId
-                                },
-                                onStar = {
-                                    val id = it.formattedId
-                                    // One star: starring moves it here; the starred place stays starred.
-                                    if (id in starred) return@PlacesPage
-                                    starred = setOf(id)
-                                    saveStarred(context, starred)
-                                    messages.show(
-                                        ShellMessage(
-                                            SolsticeIcons.StarFill,
-                                            context.getString(R.string.shell_now_main_place)
+                            .pageOvershoot(nav.overshoot)
+                    ) { index ->
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .pageSwipeBlur({ visualPosition() }, index)
+                        ) {
+                            when (index) {
+                                PAGE_DAYS -> DaysPage(location, onPage, page, daysList) {
+                                    // The edge blur only comes in once the plain page is mostly there (it showed
+                                    // over the sky as soon as a swipe started).
+                                    edgeFade(visualPosition())
+                                }
+                                PAGE_FORECAST -> ForecastPage(
+                                    location = location,
+                                    sky = sky,
+                                    now = now,
+                                    refreshing = loading,
+                                    onRefresh = {
+                                        viewModel.updateWithUpdatingChecking(
+                                            triggeredByUser = true,
+                                            checkPermissions = true
                                         )
-                                    )
-                                    // The main place is kept, never a visit.
-                                    if (id in starred) Visits.unmark(context, id)
-                                    controller.visitsChanged++
-                                },
-                                onDelete = { place ->
-                                    val index = locations.indexOfFirst { it.formattedId == place.formattedId }
-                                    if (index >= 0) {
-                                        viewModel.deleteLocation(index)
+                                    },
+                                    onDetails = actions::openDetails,
+                                    onOpenPlaces = { navigate(PAGE_PLACES) },
+                                    source = location?.let { sourceManager.getWeatherSource(it.forecastSource)?.name }
+                                )
+                                else -> PlacesPage(
+                                    // The visit open in a window isn't listed until you pin it.
+                                    locations = locations.filterNot {
+                                        it.formattedId == windowId && it.formattedId in visiting
+                                    },
+                                    currentId = location?.formattedId,
+                                    starred = starred,
+                                    visiting = visiting,
+                                    now = now,
+                                    onPage = onPage,
+                                    // Tapping a postcard opens it as a window (no jump, no change of place).
+                                    onSelect = { place, bounds ->
+                                        windowOrigin = bounds
+                                        windowFromSearch = false
+                                        windowId = place.formattedId
+                                    },
+                                    onStar = {
+                                        val id = it.formattedId
+                                        // One star: starring moves it here; the starred place stays starred.
+                                        if (id in starred) return@PlacesPage
+                                        starred = setOf(id)
+                                        saveStarred(context, starred)
                                         messages.show(
                                             ShellMessage(
-                                                icon = SolsticeIcons.Delete,
-                                                text = context.getString(
-                                                    R.string.shell_place_removed,
-                                                    place.getPlace(context)
-                                                ),
-                                                action = context.getString(R.string.shell_undo),
-                                                onAction = { viewModel.addLocation(place, index, context) }
+                                                SolsticeIcons.StarFill,
+                                                context.getString(R.string.shell_now_main_place)
                                             )
                                         )
-                                    }
-                                },
-                                onAddCurrent = {
-                                    viewModel.openChooseWeatherSourcesDialog(
-                                        Location(isCurrentPosition = true).applyDefaultPreset(sourceManager)
-                                    )
-                                },
-                                onEdit = {
-                                    viewModel.setLocation(it.formattedId)
-                                    actions.openLocationSettings()
-                                },
-                                onMove = { id, beforeId ->
-                                    // Same move in the saved list (where the current position may sit anywhere).
-                                    val from = locations.indexOfFirst { it.formattedId == id }
-                                    val rest = locations.filter { it.formattedId != id }
-                                    val to = beforeId?.let { b -> rest.indexOfFirst { it.formattedId == b } }
-                                        ?.takeIf { it >= 0 } ?: rest.size
-                                    if (from >= 0) viewModel.swapLocations(from, to)
-                                },
-                                onSettings = actions::openSettings,
-                                listState = placesList,
-                                pageFade = { edgeFade(visualPosition()) }
-                            )
+                                        // The main place is kept, never a visit.
+                                        if (id in starred) Visits.unmark(context, id)
+                                        controller.visitsChanged++
+                                    },
+                                    onDelete = { place ->
+                                        val index = locations.indexOfFirst { it.formattedId == place.formattedId }
+                                        if (index >= 0) {
+                                            viewModel.deleteLocation(index)
+                                            messages.show(
+                                                ShellMessage(
+                                                    icon = SolsticeIcons.Delete,
+                                                    text = context.getString(
+                                                        R.string.shell_place_removed,
+                                                        place.getPlace(context)
+                                                    ),
+                                                    action = context.getString(R.string.shell_undo),
+                                                    onAction = { viewModel.addLocation(place, index, context) }
+                                                )
+                                            )
+                                        }
+                                    },
+                                    onAddCurrent = {
+                                        viewModel.openChooseWeatherSourcesDialog(
+                                            Location(isCurrentPosition = true).applyDefaultPreset(sourceManager)
+                                        )
+                                    },
+                                    onEdit = {
+                                        viewModel.setLocation(it.formattedId)
+                                        actions.openLocationSettings()
+                                    },
+                                    onMove = { id, beforeId ->
+                                        // Same move in the saved list (where the current position may sit anywhere).
+                                        val from = locations.indexOfFirst { it.formattedId == id }
+                                        val rest = locations.filter { it.formattedId != id }
+                                        val to = beforeId?.let { b -> rest.indexOfFirst { it.formattedId == b } }
+                                            ?.takeIf { it >= 0 } ?: rest.size
+                                        if (from >= 0) viewModel.swapLocations(from, to)
+                                    },
+                                    onSettings = actions::openSettings,
+                                    listState = placesList,
+                                    pageFade = { edgeFade(visualPosition()) }
+                                )
+                            }
                         }
                     }
                 }
-            }
-            // The toolbar steps aside while search or a place window is open.
-            ToolbarDock(alpha = {
-                1f -
-                    maxOf(searchSheet.presence.value.coerceIn(0f, 1f), windowMotion.progress.coerceIn(0f, 1f))
-            }) {
-                ShellMessageHost(messages, glass)
-                ShellToolbar(
-                    pager = pager,
-                    sky = sky,
-                    weather = SkyWeather.of(location?.weather?.current?.weatherCode),
-                    glass = glass,
-                    labelShown = labelShown,
-                    onTab = { navigate(it) },
-                    onInterrupt = { nav.interrupt() },
-                    position = { nav.toolbarPosition() },
-                    passing = { nav.isPassing(it) },
-                    searchEnabled = !searchOpen,
-                    onSearch = {
-                        searchHandoff = false
-                        searchOpen = true
-                    },
-                    onSearchBounds = { searchOrigin = it },
-                    // The search card is the button while it's out: it carries the icon there and back,
-                    // and the real one shows again in the frame the card has folded away (one swap).
-                    budIconShown = {
-                        if (searchSheet.presence.value > 0f || searchSheet.presence.isRunning) 0f else 1f
-                    }
-                )
-            }
-            ChooseSourcesDialog(viewModel, sourceManager)
-            val nearPoint = (
-                locations.firstOrNull {
-                    it.isCurrentPosition
-                } ?: location
-                )?.let { it.latitude to it.longitude }
-            SearchOverlay(
-                open = searchOpen,
-                sheet = searchSheet,
-                origin = searchOrigin,
-                searchViewModel = searchViewModel,
-                near = nearPoint,
-                countryCode = (locations.firstOrNull { it.isCurrentPosition } ?: location)?.countryCode,
-                onPickLocation = { pick(it) },
-                onPickCity = { pick(it.toLocation()) },
-                onClose = { searchOpen = false },
-                onReopen = { searchOpen = true },
-                onCardBounds = { searchCard = it },
-                glass = glass,
-                handedOff = searchHandoff && windowReady
-            )
-            // Above search: a city picked there grows into its window right where the search card was.
-            val windowPlace = locations.firstOrNull { it.formattedId == windowId }
-            val cornerPx = with(LocalDensity.current) { org.breezyweather.ui.expressive.theme.Corners.L.toPx() }
-            val screen = androidx.compose.ui.platform.LocalWindowInfo.current.containerSize
-            val screenW = screen.width.toFloat()
-            val screenH = screen.height.toFloat()
-            if (windowPlace != null) {
-                val id = windowPlace.formattedId
-                // Where it grows from: from search, the search card's rect as it was picked; from a postcard,
-                // nothing here: the morph uses the postcard's live position (its registered anchor), so a
-                // closing window lands where the postcard is now, even after the page moved (agreed
-                // 2026-11-21). With neither, a point in the middle of the screen.
-                val fromBounds = remember(windowOrigin, windowFromSearch) {
-                    val r = windowOrigin
-                    when {
-                        r == null -> MorphAnchor(
-                            Rect(Offset(screenW / 2f - 1f, screenH / 2f - 1f), Size(2f, 2f)),
-                            cornerPx
-                        )
-                        windowFromSearch -> MorphAnchor(r, cornerPx)
-                        else -> null
-                    }
+                // The toolbar steps aside while search or a place window is open.
+                ToolbarDock(alpha = {
+                    1f -
+                        maxOf(searchSheet.presence.value.coerceIn(0f, 1f), windowMotion.progress.coerceIn(0f, 1f))
+                }) {
+                    ShellMessageHost(messages, glass)
+                    ShellToolbar(
+                        pager = pager,
+                        sky = sky,
+                        weather = SkyWeather.of(location?.weather?.current?.weatherCode),
+                        glass = glass,
+                        labelShown = labelShown,
+                        onTab = { navigate(it) },
+                        onInterrupt = { nav.interrupt() },
+                        position = { nav.toolbarPosition() },
+                        passing = { nav.isPassing(it) },
+                        searchEnabled = !searchOpen,
+                        onSearch = {
+                            searchHandoff = false
+                            searchOpen = true
+                        },
+                        onSearchBounds = { searchOrigin = it },
+                        // The search card is the button while it's out: it carries the icon there and back,
+                        // and the real one shows again in the frame the card has folded away (one swap).
+                        budIconShown = {
+                            if (searchSheet.presence.value > 0f || searchSheet.presence.isRunning) 0f else 1f
+                        }
+                    )
                 }
-                PlaceWindow(
-                    location = windowPlace,
-                    motion = windowMotion,
-                    from = postcardKey(id),
-                    fromBounds = fromBounds,
-                    now = now,
-                    onClose = { closeWindow() },
-                    pinned = id !in visiting,
-                    fadeOut = id in visiting && id !in starred,
-                    weather = SkyWeather.of(windowPlace.weather?.current?.weatherCode),
-                    source = sourceManager.getWeatherSource(windowPlace.forecastSource)?.name,
-                    refreshing = id in refreshingPlaces,
-                    // Asked for by a pull, so no pause.
-                    onRefresh = { viewModel.refreshPlace(context, windowPlace, pause = 0) },
-                    onPin = {
-                        if (id in visiting) Visits.unmark(context, id) else Visits.mark(context, id)
-                        controller.visitsChanged++
-                    },
-                    onDetails = {
-                        viewModel.setLocation(windowPlace.formattedId)
-                        actions.openDetails()
-                    }
+                ChooseSourcesDialog(viewModel, sourceManager)
+                val nearPoint = (
+                    locations.firstOrNull {
+                        it.isCurrentPosition
+                    } ?: location
+                    )?.let { it.latitude to it.longitude }
+                SearchOverlay(
+                    open = searchOpen,
+                    sheet = searchSheet,
+                    origin = searchOrigin,
+                    searchViewModel = searchViewModel,
+                    near = nearPoint,
+                    countryCode = (locations.firstOrNull { it.isCurrentPosition } ?: location)?.countryCode,
+                    onPickLocation = { pick(it) },
+                    onPickCity = { pick(it.toLocation()) },
+                    onClose = { searchOpen = false },
+                    onReopen = { searchOpen = true },
+                    onCardBounds = { searchCard = it },
+                    glass = glass,
+                    handedOff = searchHandoff && windowReady
                 )
+                // Above search: a city picked there grows into its window right where the search card was.
+                val windowPlace = locations.firstOrNull { it.formattedId == windowId }
+                val cornerPx = with(LocalDensity.current) { org.breezyweather.ui.expressive.theme.Corners.L.toPx() }
+                val screen = androidx.compose.ui.platform.LocalWindowInfo.current.containerSize
+                val screenW = screen.width.toFloat()
+                val screenH = screen.height.toFloat()
+                // The Places page, as the morph sees it (its movement comes from the pager itself).
+                val placesPage = remember(pager, nav) { MorphPage(pager, PAGE_PLACES, nav.overshoot) }
+                if (windowPlace != null) {
+                    val id = windowPlace.formattedId
+                    // Where it grows from: from search, the search card's rect as it was picked; from a postcard,
+                    // nothing here: the morph uses the postcard's live position (its registered anchor), so a
+                    // closing window lands where the postcard is now, even after the page moved (agreed
+                    // 2026-11-21). With neither, a point in the middle of the screen.
+                    val fromBounds = remember(windowOrigin, windowFromSearch) {
+                        val r = windowOrigin
+                        when {
+                            r == null -> MorphAnchor(
+                                Rect(Offset(screenW / 2f - 1f, screenH / 2f - 1f), Size(2f, 2f)),
+                                cornerPx
+                            )
+                            windowFromSearch -> MorphAnchor(r, cornerPx)
+                            else -> null
+                        }
+                    }
+                    PlaceWindow(
+                        location = windowPlace,
+                        motion = windowMotion,
+                        from = postcardKey(id),
+                        fromBounds = fromBounds,
+                        // Opened from its postcard, the window belongs to the Places page (agreed 2026-11-21):
+                        // swiping home while it closes carries it with that page, clipped to it.
+                        morphPage = if (fromBounds == null) placesPage else null,
+                        now = now,
+                        onClose = { closeWindow() },
+                        pinned = id !in visiting,
+                        fadeOut = id in visiting && id !in starred,
+                        weather = SkyWeather.of(windowPlace.weather?.current?.weatherCode),
+                        source = sourceManager.getWeatherSource(windowPlace.forecastSource)?.name,
+                        refreshing = id in refreshingPlaces,
+                        // Asked for by a pull, so no pause.
+                        onRefresh = { viewModel.refreshPlace(context, windowPlace, pause = 0) },
+                        onPin = {
+                            if (id in visiting) Visits.unmark(context, id) else Visits.mark(context, id)
+                            controller.visitsChanged++
+                        },
+                        onDetails = {
+                            viewModel.setLocation(windowPlace.formattedId)
+                            actions.openDetails()
+                        }
+                    )
+                }
+                // The moon card, over everything (also over a postcard window), on the search card's glass.
+                MoonCardOverlay(homeMoonCards, glass)
             }
-            // The moon card, over everything (also over a postcard window), on the search card's glass.
-            MoonCardOverlay(glass)
         }
     }
 }
