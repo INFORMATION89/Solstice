@@ -3034,3 +3034,13 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   (icon, label, action), `FrameButton` (one glass icon button, one touch target) and `FrameHeader(start,
   end)` lists of actions in `PageFrame.kt`; `closeAction(onClose)` is the window's ✕. Adding a button to a
   header is one more `FrameAction` in a list.
+- **2026-11-22: F5, the moon card refined (checked on the Pixel).** Decisions (user): a "tonight" line
+  under the date, then three tiles (lit and growing/shrinking; rises and sets; full moon and distance),
+  each the one glass card; a close button from the framework (`FrameButton` + `closeAction`) instead of
+  the handle (a one-size sheet; pull down and back still close); dial labels: day names, "Today", and the
+  phase icon on days a principal phase begins. The hand-made dial (its own drag, decay 1.6, settle, drawing)
+  is replaced by Motion's `Dial` (a95a252 adds a home point: today's tick in `DialLook.home`, an arrow at the
+  edge when it's out of view; icons above labels). The card's own 70 random stars are gone (the sheet's
+  stars effect is the one star system). The tonight line keeps its space away from today so the dial never
+  moves under the finger. Not done: the heading and lines changing with a blur crossfade (needs a Motion
+  blur-replace piece); the "tonight" line switches instantly.

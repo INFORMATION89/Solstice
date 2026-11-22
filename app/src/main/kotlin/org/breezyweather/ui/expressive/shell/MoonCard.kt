@@ -127,6 +127,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import breezyweather.domain.location.model.Location
+import io.github.information89.motion.Dial
+import io.github.information89.motion.DialLook
+import io.github.information89.motion.DialScale
 import io.github.information89.motion.Haptic
 import io.github.information89.motion.Morph
 import io.github.information89.motion.MorphAnchor
@@ -137,9 +140,9 @@ import io.github.information89.motion.MotionValue
 import io.github.information89.motion.SpringMorph
 import io.github.information89.motion.haptics
 import io.github.information89.motion.morphAnchor
-import io.github.information89.motion.morphHandle
 import io.github.information89.motion.morphPassThrough
 import io.github.information89.motion.morphSource
+import io.github.information89.motion.rememberDialState
 import io.github.information89.motion.rememberMorphMotion
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.first
@@ -147,7 +150,6 @@ import kotlinx.coroutines.launch
 import org.breezyweather.R
 import org.breezyweather.domain.weather.model.getDescription
 import org.breezyweather.ui.expressive.components.GlassSource
-import org.breezyweather.ui.expressive.components.SheetHandle
 import org.breezyweather.ui.expressive.components.SheetShape
 import org.breezyweather.ui.expressive.components.SolsticeCard
 import org.breezyweather.ui.expressive.components.SolsticeMotion
@@ -227,11 +229,11 @@ internal fun DrawScope.drawMoon(center: Offset, r: Float, angle: Int, lit: Float
     }
 }
 
-/** The dial's fling, slowing down. */
-private val dialDecay = FloatExponentialDecaySpec(frictionMultiplier = 1.6f)
-
-/** The dial's settle spring. */
-private val moonSettle = Motion.settle.spec<Float>()
+/**
+ * The moon card's dial (F5, agreed 2026-11-21): ±14 days, a tick every 6 hours, a labelled major tick
+ * per day, four days across.
+ */
+private val MoonDialScale = DialScale(min = -14f, max = 14f, step = 0.25f, majorEvery = 4, visibleSpan = 4f)
 
 /** Morph keys for a place's moon button and its label. */
 private fun pillKey(location: Location) = "moon-pill-${location.formattedId}"
@@ -426,7 +428,7 @@ private fun MoonSheet(cards: MoonCards, location: Location, now: Long, glass: Gl
         ) {
             Box(Modifier.fillMaxSize().skyEffects(placeSky, stars)) {
                 Column {
-                    Spacer(Modifier.height(Sizes.HandleStrip)) // room for the handle, drawn on top
+                    Spacer(Modifier.height(Space.S4)) // the same top margin as the close button
                     MoonCard(
                         location,
                         now,
@@ -455,11 +457,14 @@ private fun MoonSheet(cards: MoonCards, location: Location, now: Long, glass: Gl
                         }
                     )
                 }
-                // The shared handle: it comes and goes with the content; drag it down to close.
-                SheetHandle(
-                    ink = ink,
+                // The framework's close button (agreed 2026-11-22: a one-size sheet has a close button, not a
+                // handle, like the postcard window); pulling the card down and back still close it.
+                FrameButton(
+                    closeAction { close() },
+                    glass = null,
                     modifier = Modifier
-                        .align(Alignment.TopCenter)
+                        .align(Alignment.TopEnd)
+                        .padding(Space.S4)
                         .graphicsLayer {
                             alpha = MotionValue.window(
                                 motion.progress,
@@ -467,7 +472,6 @@ private fun MoonSheet(cards: MoonCards, location: Location, now: Long, glass: Gl
                                 SolsticeMotion.CONTENT_TO
                             )
                         }
-                        .morphHandle(motion)
                 )
             }
         }
@@ -501,9 +505,9 @@ private fun MoonCard(
         }
     }
     val context = LocalContext.current
-    // Scrubbing offset in days (fractional while dragging).
-    var offset by remember { mutableFloatStateOf(0f) }
-    val haptics = haptics()
+    // The dial (Motion's): where it is, in days from now (fractional while it moves).
+    val dial = rememberDialState(MoonDialScale, initial = 0f)
+    val offset = dial.value.value
     val phaseIcons = rememberMoonPhaseIcons()
     // The principal phases within the dial's range, and their angles. Worked out in the background
     // (2026-11-19): on the main thread they held up the first frame of the card's opening, and the
@@ -541,19 +545,7 @@ private fun MoonCard(
             )
         }
     }
-    var fling by remember { androidx.compose.runtime.mutableStateOf<kotlinx.coroutines.Job?>(null) }
-
-    // Haptics: a firm tick per day, a lighter one per 6-hour step.
-    fun tick(before: Float, after: Float) {
-        when {
-            kotlin.math.floor(before + 0.5f) != kotlin.math.floor(after + 0.5f) ->
-                haptics.perform(Haptic.detent)
-            kotlin.math.floor(before * 4f + 0.5f) != kotlin.math.floor(after * 4f + 0.5f) ->
-                haptics.perform(Haptic.tick)
-        }
-    }
     val moon = MoonRenderer.remember()
-    val scope = rememberCoroutineScope()
     val at = Date(now + (offset * DAY).toLong())
     val (angle, lit) = moonAt(at)
     val zone = location.timeZone
@@ -612,19 +604,23 @@ private fun MoonCard(
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = dateModifier
                     )
-                    // The moon (on a starry night when the glass is dark).
-                    val dark = ink.luminance() > 0.5f
-                    Canvas(Modifier.fillMaxWidth().height(200.dp)) {
-                        if (dark) {
-                            val rnd = Random(11)
-                            repeat(70) {
-                                drawCircle(
-                                    Color.White.copy(alpha = 0.2f + rnd.nextFloat() * 0.5f),
-                                    radius = 0.6f + rnd.nextFloat() * 1.4f,
-                                    center = Offset(rnd.nextFloat() * size.width, rnd.nextFloat() * size.height)
-                                )
-                            }
+                    // "Will I see it tonight?" as a line under the date (agreed 2026-11-22), only on today. Away
+                    // from today it keeps its space and just fades, so nothing moves under a finger on the dial.
+                    tonight?.let { t ->
+                        val (res, args) = SkyVisibility.sentence(t, MoonVisibility.texts) {
+                            sentenceTime(context, it, zone)
                         }
+                        Text(
+                            sentences(listOf(stringResource(res) to args)),
+                            color = ink.copy(alpha = Emphasis.High),
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier
+                                .padding(top = Space.S2)
+                                .graphicsLayer { alpha = if (abs(offset) < 0.5f) 1f else 0f }
+                        )
+                    }
+                    // The moon (the sheet's stars, from the sky's star system, are behind it).
+                    Canvas(Modifier.fillMaxWidth().height(200.dp)) {
                         // A soft glow, then the real moon.
                         drawCircle(
                             Brush.radialGradient(
@@ -646,166 +642,35 @@ private fun MoonCard(
                         )
                     }
                     Spacer(Modifier.height(Space.S1))
-                    // The dial: ticks every 6 hours, a longer one per day; drag to move through the days.
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(60.dp)
-                            // Only while the card is open: closing, it lets every touch through to the page (MOTION.md).
-                            .then(
-                                if (interactive) {
-                                    Modifier.pointerInput(Unit) {
-                                        val perDay = size.width / 4f
-                                        val tracker = VelocityTracker()
-                                        detectHorizontalDragGestures(
-                                            onDragStart = {
-                                                fling?.cancel()
-                                                tracker.resetTracking()
-                                            },
-                                            onDragEnd = {
-                                                // Inertia: a flick keeps the dial turning, slowing down, then it
-                                                // settles on the nearest 6-hour tick.
-                                                val v = -tracker.calculateVelocity().x / perDay
-                                                fling = scope.launch {
-                                                    var last = offset
-                                                    animateDecay(offset, v, dialDecay) {
-                                                            value,
-                                                            _,
-                                                        ->
-                                                        offset = value.coerceIn(-14f, 14f)
-                                                        tick(last, offset)
-                                                        last = offset
-                                                    }
-                                                    val snapped = (
-                                                        kotlin.math.round(
-                                                            offset * 4f
-                                                        ) / 4f
-                                                        ).coerceIn(-14f, 14f)
-                                                    animate(
-                                                        offset,
-                                                        snapped,
-                                                        animationSpec = moonSettle
-                                                    ) {
-                                                            value,
-                                                            _,
-                                                        ->
-                                                        offset = value
-                                                    }
-                                                }
-                                            }
-                                        ) { change, dx ->
-                                            change.consume()
-                                            tracker.addPosition(change.uptimeMillis, change.position)
-                                            val before = offset
-                                            // Drag left to go forward in time (the ticks follow the finger).
-                                            offset = (offset - dx / perDay).coerceIn(-14f, 14f)
-                                            tick(before, offset)
-                                        }
-                                    }
-                                        // Double-tap: back to today.
-                                        .pointerInput(Unit) {
-                                            detectTapGestures(onDoubleTap = {
-                                                scope.launch {
-                                                    animate(
-                                                        offset,
-                                                        0f,
-                                                        animationSpec = moonSettle
-                                                    ) {
-                                                            v,
-                                                            _,
-                                                        ->
-                                                        offset = v
-                                                    }
-                                                    haptics.perform(Haptic.snap)
-                                                }
-                                            })
-                                        }
-                                } else {
-                                    Modifier
-                                }
-                            )
-                    ) {
-                        Canvas(Modifier.fillMaxWidth().padding(top = Space.S4).height(28.dp)) {
-                            val perDay = size.width / 4f
-                            val mid = size.width / 2
-                            for (q in -40..40) {
-                                val d = q / 4f - (offset - offset.toInt())
-                                val x = mid + d * perDay
-                                if (x < 0 || x > size.width) continue
-                                val major = (q + (offset.toInt() * 4)) % 4 == 0
-                                val fade = 1f - (abs(x - mid) / mid).coerceIn(0f, 1f) * 0.8f
-                                drawLine(
-                                    ink.copy(alpha = (if (major) 0.9f else 0.35f) * fade),
-                                    Offset(x, if (major) 2f else 8f),
-                                    Offset(x, size.height - 2f),
-                                    strokeWidth = if (major) 2f else 1.2f
-                                )
-                            }
-                            // Where a new phase begins (new, first quarter, full, last quarter): its little moon
-                            // icon above the tick.
-                            for ((t, a) in phaseMarks) {
-                                val x = mid + ((t - now).toFloat() / DAY - offset) * perDay
-                                if (x < 0f || x > size.width) continue
-                                val markFade = 1f - (abs(x - mid) / mid).coerceIn(0f, 1f) * 0.8f
-                                drawMoonPhaseIcon(
-                                    phaseIcons,
-                                    Offset(x, -9f * density),
-                                    7f * density,
-                                    a,
-                                    ink,
-                                    markFade
-                                )
-                            }
-                            // Today: a small dot under its tick (moves with the dial); out of view, an arrow
-                            // at that edge points the way back.
-                            val todayX = mid - offset * perDay
-                            if (todayX !in 0f..size.width) {
-                                val left = todayX < 0f
-                                val ax = if (left) 6f * density else size.width - 6f * density
-                                val ay = size.height + 6f * density
-                                val dir = if (left) 1f else -1f
-                                drawPath(
-                                    Path().apply {
-                                        moveTo(ax - dir * 4f * density, ay)
-                                        lineTo(ax + dir * 3f * density, ay - 4f * density)
-                                        lineTo(ax + dir * 3f * density, ay + 4f * density)
-                                        close()
-                                    },
-                                    SolsticePalette.Sun
-                                )
-                            }
-                            if (todayX in 0f..size.width) {
-                                drawCircle(
-                                    SolsticePalette.Sun,
-                                    radius = 3.5f * density,
-                                    center = Offset(
-                                        todayX,
-                                        size.height + 6f * density
-                                    )
-                                )
-                            }
-                            drawLine(
-                                SolsticePalette.TideLine,
-                                Offset(mid, 0f),
-                                Offset(mid, size.height),
-                                strokeWidth = 3f
-                            )
-                        }
+                    // The dial (Motion's Dial, F5): days labelled, today as home (its arrow points back when
+                    // it's out of view), the moon-phase icon above the days a principal phase begins; drag or
+                    // fling through ±14 days, double-tap to come back to today. Haptics are the dial's own.
+                    val todayLabel = stringResource(R.string.shell_today)
+                    val dayFormat = remember(zone) {
+                        SimpleDateFormat("EEE", Locale.getDefault()).apply { timeZone = zone }
                     }
-                    Text(
-                        if (abs(offset) <
-                            0.5f
-                        ) {
-                            stringResource(R.string.shell_today)
-                        } else {
-                            SimpleDateFormat("EEE", Locale.getDefault()).apply {
-                                timeZone =
-                                    zone
-                            }.format(at)
+                    val dateFormat = remember(zone) {
+                        SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()).apply { timeZone = zone }
+                    }
+                    Dial(
+                        state = dial,
+                        look = DialLook(
+                            ink = ink,
+                            marker = SolsticePalette.TideLine,
+                            labelStyle = MaterialTheme.typography.labelMedium,
+                            home = SolsticePalette.Sun
+                        ),
+                        modifier = Modifier.fillMaxWidth().height(60.dp),
+                        label = { d -> if (d == 0f) todayLabel else dayFormat.format(Date(now + (d * DAY).toLong())) },
+                        decorate = { d, at, emphasis ->
+                            phaseMarks.firstOrNull { (t, _) -> abs((t - now).toFloat() / DAY - d) < 0.5f }
+                                ?.let { (_, phaseAngle) ->
+                                    drawMoonPhaseIcon(phaseIcons, at, 7.dp.toPx(), phaseAngle, ink, emphasis)
+                                }
                         },
-                        color = ink.copy(alpha = Emphasis.High),
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                        describe = { d -> dateFormat.format(Date(now + (d * DAY).toLong())) },
+                        onDoubleTap = { it.value.animateTo(0f) },
+                        home = 0f
                     )
                     Spacer(Modifier.height(Space.S4))
                     fun hm(d: Date?) = d?.let { sentenceTime(context, it.time, zone) } ?: "–"
@@ -813,15 +678,10 @@ private fun MoonCard(
                     val days = ((full.time - at.time) / DAY.toDouble()).roundToInt().coerceAtLeast(0)
                     val km = "%,d km".format(distance.roundToInt())
                     val growing = angle < 180
-                    // Tonight's visibility leads, only while the dial is on today.
-                    val tonightSentence = tonight?.takeIf { abs(offset) < 0.5f }?.let { t ->
-                        val (res, args) = SkyVisibility.sentence(t, MoonVisibility.texts) {
-                            sentenceTime(context, it, zone)
-                        }
-                        stringResource(res) to args
-                    }
-                    val sentences = listOfNotNull(
-                        tonightSentence,
+                    // The details as tiles (design A, agreed 2026-11-22): how lit and growing or shrinking; rises
+                    // and sets; the next full moon and the distance. Each is the one card (inside the sheet
+                    // there's nothing to blur: just the glass tint).
+                    val tiles = listOf(
                         stringResource(
                             if (growing) R.string.moon_lit_growing else R.string.moon_lit_shrinking
                         ) to listOf("${(lit * 100).roundToInt()} %"),
@@ -837,11 +697,17 @@ private fun MoonCard(
                                 listOf(context.getString(R.string.moon_days, days), km)
                         }
                     )
-                    val body = sentences(sentences)
-                    // The one card (inside the sheet there's nothing to blur: just the glass tint).
                     CompositionLocalProvider(org.breezyweather.ui.expressive.components.LocalSkyGlass provides null) {
-                        SolsticeCard { cardInk ->
-                            Text(body, color = cardInk, style = MaterialTheme.typography.bodyLarge)
+                        Column(verticalArrangement = Arrangement.spacedBy(Space.S3)) {
+                            tiles.forEach { tile ->
+                                SolsticeCard { cardInk ->
+                                    Text(
+                                        sentences(listOf(tile)),
+                                        color = cardInk,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                            }
                         }
                     }
                 }
