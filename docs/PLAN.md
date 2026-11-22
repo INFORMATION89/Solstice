@@ -3018,3 +3018,9 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   top = `pageTopInset()` (status bar, plus a window's header), bottom = the toolbar dock's measured height
   (`LocalToolbarHeight`); the search lists use their own end padding (`ListEdge`). On Forecast (home and
   windows), This week, Places, windows' pages and both search lists. Removed: the 56/140/14/18 dp bands.
+- **2026-11-21: window header no longer shows content through it (checked on the Pixel).** Motion 3e9ecb8:
+  `EdgeBand.hold` keeps the band at full strength under the chrome, then it eases off over a transition
+  (agreed: the header's own height, `VisitHeaderHeight`); scroll strength ramps over the transition only.
+  `pageTopEdge()` in `PageFrame.kt` is the one top edge for pages. Also checked on the Pixel this round:
+  glass (home, window, search, moon), live clocks, the window header and close button, edge blur on
+  Places, the moon card's stars.

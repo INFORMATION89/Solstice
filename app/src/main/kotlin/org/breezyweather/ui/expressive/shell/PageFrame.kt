@@ -65,6 +65,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import breezyweather.domain.location.model.Location
+import io.github.information89.motion.EdgeBand
 import io.github.information89.motion.EdgeBlurDefaults
 import io.github.information89.motion.Motion
 import io.github.information89.motion.scrollEdgeBlur
@@ -154,8 +155,22 @@ internal val LocalVisit = compositionLocalOf<Visit?> { null }
 @Composable
 internal fun pageTopInset(): Dp {
     val status = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-    return if (LocalVisit.current != null) status + Sizes.TouchTarget else status
+    return if (LocalVisit.current != null) status + VisitHeaderHeight else status
 }
+
+/** A postcard window's header height: one touch target (its close button). */
+private val VisitHeaderHeight = Sizes.TouchTarget
+
+/**
+ * A page's top edge blur (agreed 2026-11-21): under the status bar (and a window's header) fully, then
+ * easing off over the header's own height below it, so nothing reads through the header.
+ */
+@Composable
+internal fun pageTopEdge(fadeTo: Color?): EdgeBand = EdgeBlurDefaults.top(
+    chrome = pageTopInset(),
+    fadeTo = fadeTo,
+    transition = if (LocalVisit.current != null) VisitHeaderHeight else 0.dp
+)
 
 /**
  * A postcard window's header, pinned at the top of each of its pages (agreed 2026-11-21): it slides with
@@ -169,7 +184,7 @@ internal fun VisitHeader(ink: Color, glass: GlassSource?, onClose: () -> Unit, m
         modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .height(Sizes.TouchTarget)
+            .height(VisitHeaderHeight)
             .padding(horizontal = Space.S4)
     ) {
         val label = stringResource(R.string.action_close)
@@ -246,7 +261,7 @@ internal fun PageScaffold(
             // while the list is scrolled under it, fading into the page.
             modifier = Modifier.fillMaxSize().scrollEdgeBlur(
                 listState,
-                top = EdgeBlurDefaults.top(top, page),
+                top = pageTopEdge(page),
                 bottom = EdgeBlurDefaults.bottom(LocalToolbarHeight.current.value, page),
                 strength = pageFade
             )

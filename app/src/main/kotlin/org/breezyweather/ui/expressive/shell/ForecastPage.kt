@@ -145,7 +145,7 @@ internal fun ForecastPage(
                 // the toolbar, only while content is scrolled under them; over the sky it fades out.
                 .scrollEdgeBlur(
                     scrollState,
-                    top = EdgeBlurDefaults.top(pageTopInset(), null),
+                    top = pageTopEdge(null),
                     bottom = EdgeBlurDefaults.bottom(LocalToolbarHeight.current.value, null)
                 )
                 .verticalScroll(scrollState)
