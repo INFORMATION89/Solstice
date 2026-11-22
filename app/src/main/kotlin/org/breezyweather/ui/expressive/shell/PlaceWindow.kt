@@ -307,7 +307,11 @@ internal fun PlaceWindow(
                         ink = lerp(onPage, sky.palette.text, (1f - abs(nav.visualPosition() - 1f)).coerceIn(0f, 1f)),
                         glass = windowGlass,
                         end = listOf(closeAction(onClose)),
-                        modifier = Modifier.align(Alignment.TopCenter).graphicsLayer { alpha = contentShown() }
+                        // It fades out as the window's moon card opens over it, so its button never peeks above
+                        // the sheet's top edge (user 2026-11-22).
+                        modifier = Modifier.align(Alignment.TopCenter).graphicsLayer {
+                            alpha = contentShown() * (1f - windowMoonCards.progress)
+                        }
                     ) { ink -> VisitingLine(ink) }
                     // The home toolbar, as is: This week and Forecast, and Pin budding out of Forecast like search
                     // does out of Places (pin keeps the place; otherwise it's gone when you go back).

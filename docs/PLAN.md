@@ -3064,3 +3064,8 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   windows' pagers and provides `LocalMorphPage`; the moon card takes its pill's page (`MoonCards.page`) and
   passes it as `MorphSettings(page = …)`, so closing while you swipe keeps it inside its page, clipped, as the
   postcard window already did. Search grows from the toolbar (not a page) and is unaffected.
+- **2026-11-22: cards don't bounce like buttons; the window's ✕ no longer peeks above its moon card (built,
+  not yet seen on the phone).** Motion 25ffa86: `MorphSettings.pressable` (off by default): a touch on a moving
+  card catches it without the button-like sink and bounce; buttons opt in later (interactive glass). The
+  window's frame header fades out as the window's moon card opens (`1 − MoonCards.progress`). The rain card's
+  icons already come from Material Symbols (water drop, percent, rainy); asked the user which they meant.
