@@ -3001,3 +3001,7 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   is per screen (`MoonCards`, `LocalMoonCards`, no default): home and each postcard window draw their own,
   so one opened in a window closes and goes with the window (and takes its theme). Built; not checked on
   the Pixel.
+- **2026-11-21 (user):** round 4 phase 1 (the frame skip as a morph settles) is fixed in Motion, along
+  with a new, improved animation and handling for moving between tabs. Not yet on Motion's GitHub main
+  when last checked (latest 4cc4f03); once it is, bump Motion in Solstice and move `ShellNavigation`
+  onto the new tab handling.
