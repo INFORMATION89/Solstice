@@ -48,22 +48,26 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import breezyweather.domain.location.model.Location
-import io.github.information89.motion.EdgeBand
+import io.github.information89.motion.EdgeBlurDefaults
 import io.github.information89.motion.Motion
-import io.github.information89.motion.edgeBlur
+import io.github.information89.motion.scrollEdgeBlur
 import org.breezyweather.R
 import org.breezyweather.ui.expressive.components.GlassSource
 import org.breezyweather.ui.expressive.components.LocalSkyGlass
@@ -108,17 +112,30 @@ internal fun pageFling(pager: PagerState): TargetedFlingBehavior = PagerDefaults
  */
 @Composable
 internal fun ToolbarDock(alpha: () -> Float = { 1f }, content: @Composable ColumnScope.() -> Unit) {
+    val height = LocalToolbarHeight.current
+    val density = LocalDensity.current
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
+                // How much of the screen's bottom it covers (toolbar, its margin, the navigation bar), for
+                // the pages' bottom edge blur.
+                .onSizeChanged { height.value = with(density) { it.height.toDp() } }
                 .navigationBarsPadding()
                 .padding(bottom = Space.S3)
                 .graphicsLayer { this.alpha = alpha() },
             content = content
         )
     }
+}
+
+/**
+ * How much of the screen's bottom the toolbar dock covers, measured by [ToolbarDock] (one shared state:
+ * home and windows use the same dock). Provided by the shell.
+ */
+internal val LocalToolbarHeight = staticCompositionLocalOf<MutableState<Dp>> {
+    error("No toolbar height here: the shell provides it")
 }
 
 /**
@@ -225,10 +242,12 @@ internal fun PageScaffold(
                 bottom = ToolbarClearance
             ),
             verticalArrangement = Arrangement.spacedBy(spacing),
-            modifier = Modifier.fillMaxSize().edgeBlur(
-                // :motion's edge blur (F2): blurred and faded into the page at the top and bottom.
-                top = EdgeBand(top + 56.dp, blur = 18.dp, fadeTo = page, fadeAlpha = 0.85f, fadeLength = 0.8f),
-                bottom = EdgeBand(140.dp, blur = 18.dp, fadeTo = page, fadeAlpha = 0.85f, fadeLength = 0.7f),
+            // Motion's edge blur (agreed 2026-11-21): each edge, as tall as the chrome over it, shows only
+            // while the list is scrolled under it, fading into the page.
+            modifier = Modifier.fillMaxSize().scrollEdgeBlur(
+                listState,
+                top = EdgeBlurDefaults.top(top, page),
+                bottom = EdgeBlurDefaults.bottom(LocalToolbarHeight.current.value, page),
                 strength = pageFade
             )
         ) {

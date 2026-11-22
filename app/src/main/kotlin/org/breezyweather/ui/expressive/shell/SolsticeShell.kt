@@ -382,8 +382,10 @@ fun SolsticeShell(
     // The moon button and sheet share one transition (Compose's container transform).
     // The home screen's moon card (a window has its own, agreed 2026-11-21).
     val homeMoonCards = remember { MoonCards() }
+    // The toolbar dock's height, for the pages' bottom edge blur (measured by the dock).
+    val toolbarHeight = remember { mutableStateOf(0.dp) }
     MoonSharedLayout {
-        CompositionLocalProvider(LocalMoonCards provides homeMoonCards) {
+        CompositionLocalProvider(LocalMoonCards provides homeMoonCards, LocalToolbarHeight provides toolbarHeight) {
             Box(Modifier.fillMaxSize()) {
                 // Everything the toolbar's glass shows, blurred, behind it.
                 AnimatedSkyBackground(

@@ -55,6 +55,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -117,9 +118,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import breezyweather.domain.location.model.Location
-import io.github.information89.motion.EdgeBand
+import io.github.information89.motion.EdgeBlurDefaults
 import io.github.information89.motion.Motion
-import io.github.information89.motion.edgeBlur
+import io.github.information89.motion.scrollEdgeBlur
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -627,11 +628,7 @@ private fun Results(
         targetState = mode,
         transitionSpec = { fadeIn(Motion.content.spec()) togetherWith fadeOut(Motion.snappy.spec()) },
         label = "results",
-        modifier = Modifier.fillMaxSize().edgeBlur(
-            // :motion's edge blur (F2): the list fades away at both ends, over the glass.
-            top = EdgeBand(14.dp, fadeOut = true),
-            bottom = EdgeBand(18.dp, fadeOut = true)
-        )
+        modifier = Modifier.fillMaxSize()
     ) { shown ->
         when (shown) {
             ResultsMode.NONE -> Column(
@@ -663,10 +660,12 @@ private fun Results(
                 // Rows composed within a moment of a new set of hits rise in (new cities); rows that
                 // stay keep their place and slide; rows scrolled into view later just appear.
                 val changedAt = remember(hits.map { it.key }) { SystemClock.uptimeMillis() }
+                val found = rememberLazyListState()
                 LazyColumn(
+                    state = found,
                     reverseLayout = true, // the best match sits right above the field
-                    contentPadding = PaddingValues(horizontal = Space.S2, vertical = Space.S3),
-                    modifier = Modifier.fillMaxSize()
+                    contentPadding = PaddingValues(horizontal = Space.S2, vertical = ListEdge),
+                    modifier = Modifier.fillMaxSize().scrollEdgeBlur(found, listTop(), listBottom())
                 ) {
                     itemsIndexed(hits, key = { _, it -> it.key }) { i, hit ->
                         ResultRow(
@@ -695,9 +694,11 @@ private fun Results(
                 // Top-down list: the rows nearest the field (about the fifth on screen) go first.
                 val rows = (if (recents.isEmpty()) 0 else recents.size + 1) + suggestions.size + 1
                 fun order(index: Int) = (minOf(rows, 6) - 1 - index).coerceAtLeast(0)
+                val suggested = rememberLazyListState()
                 LazyColumn(
-                    contentPadding = PaddingValues(horizontal = Space.S2, vertical = Space.S3),
-                    modifier = Modifier.fillMaxSize()
+                    state = suggested,
+                    contentPadding = PaddingValues(horizontal = Space.S2, vertical = ListEdge),
+                    modifier = Modifier.fillMaxSize().scrollEdgeBlur(suggested, listTop(), listBottom())
                 ) {
                     var at = 0
                     if (recents.isNotEmpty()) {
@@ -900,3 +901,11 @@ private fun ResultRow(
         }
     }
 }
+
+/** The results lists' padding at both ends, which is also their edge blur's band (agreed 2026-11-21). */
+private val ListEdge = Space.S3
+
+/** The results lists' edges: Motion's edge look in the card, fading out over the glass. */
+private fun listTop() = EdgeBlurDefaults.top(ListEdge, null)
+
+private fun listBottom() = EdgeBlurDefaults.bottom(ListEdge, null)

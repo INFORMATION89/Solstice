@@ -3010,3 +3010,11 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   its page and not scrolling; `pageTopInset()` puts the page below it. The window's handle is gone (close
   button, back, swipe); handles on the moon card and search stay, without taps (`SheetHandle` has no
   `onClose`). Next: 4b, edge blur (values to agree).
+- **2026-11-21: round 4 phase 4b, edge blur everywhere, built, not checked on the phone.** Motion 26d1c76:
+  `edgeBlur` has a strength per edge; `EdgeBlurDefaults` holds the agreed look (18 dp blur, 85 % fade,
+  80 % / 70 % of the band) with `top`/`bottom` builders (fade into a colour, or out over a sky);
+  `scrollEdgeBlur` for `ScrollState` and `LazyListState` (reversed too) shows each edge only while content
+  is scrolled under it, over the band's height. Bands come from the chrome over each edge, not numbers:
+  top = `pageTopInset()` (status bar, plus a window's header), bottom = the toolbar dock's measured height
+  (`LocalToolbarHeight`); the search lists use their own end padding (`ListEdge`). On Forecast (home and
+  windows), This week, Places, windows' pages and both search lists. Removed: the 56/140/14/18 dp bands.

@@ -71,6 +71,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import breezyweather.domain.location.model.Location
+import io.github.information89.motion.EdgeBlurDefaults
+import io.github.information89.motion.scrollEdgeBlur
 import org.breezyweather.R
 import org.breezyweather.ui.expressive.components.SolsticeCard
 import org.breezyweather.ui.expressive.components.SolsticeIcons
@@ -139,6 +141,13 @@ internal fun ForecastPage(
                         null
                     }
                 }
+                // Motion's edge blur (agreed 2026-11-21): under the status bar (and a window's header) and
+                // the toolbar, only while content is scrolled under them; over the sky it fades out.
+                .scrollEdgeBlur(
+                    scrollState,
+                    top = EdgeBlurDefaults.top(pageTopInset(), null),
+                    bottom = EdgeBlurDefaults.bottom(LocalToolbarHeight.current.value, null)
+                )
                 .verticalScroll(scrollState)
                 .padding(top = pageTopInset())
                 .padding(horizontal = Space.S5)
