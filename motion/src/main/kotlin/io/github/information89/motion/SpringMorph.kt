@@ -422,6 +422,22 @@ fun SpringMorph(
             if (visible) registry.covered[from] = 1 else registry.covered.remove(from)
         }
     }
+    LaunchedEffect(motion) {
+        var last = 0L
+        while (true) {
+            androidx.compose.runtime.withFrameNanos { t ->
+                if (motion.isVisible) {
+                    val b = motion.bounds
+                    android.util.Log.println(
+                        android.util.Log.WARN,
+                        "SolDbg",
+                        "f dt=${(t - last) / 100_000 / 10f} l=${b.left} t=${b.top} w=${b.width} h=${b.height} r=${motion.cornerRadius} p=${motion.progress} moving=${motion.isMoving} resting=${motion.isRestingOpen}"
+                    )
+                }
+                last = t
+            }
+        }
+    }
     if (!motion.isVisible) return
     val outline = remember(motion, shape) { LiveMorphShape(motion, shape) }
     // Each touch layer's transform as last drawn: scale x, scale y, left, top. A finger's position in a

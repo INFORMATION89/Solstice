@@ -43,6 +43,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import io.github.information89.motion.Motion
+import io.github.information89.motion.PageOvershoot
+import io.github.information89.motion.pageOvershoot
 import io.github.information89.motion.pageSettleFling
 import io.github.information89.motion.pageSpringFling
 import io.github.information89.motion.pageTransition
@@ -120,10 +122,11 @@ internal fun SettleDemo() {
 private fun SettlePager(settle: Settle, spring: () -> io.github.information89.motion.MotionSpring) {
     val pager = rememberPagerState(initialPage = 1) { LabPages.size }
     if (settle == Settle.B) {
+        val overshoot = remember { PageOvershoot() }
         HorizontalPager(
             state = pager,
-            flingBehavior = remember(pager) { pageSpringFling(pager, spring) },
-            modifier = Modifier.fillMaxSize()
+            flingBehavior = remember(pager) { pageSpringFling(pager, overshoot, spring) },
+            modifier = Modifier.fillMaxSize().pageOvershoot(overshoot)
         ) { i -> LabPage(i) }
         return
     }

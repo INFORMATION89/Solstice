@@ -2928,3 +2928,10 @@ user picks one before the app changes.
   ~0.4 %, container ~1.3 %, brisk ~1.5 %, momentum ~1.2 %, playful ~10 %. At the first and last page
   the pager can't overshoot (it stops at the edge). Waiting on the user to pick a spring; the app still
   uses Now.
+- **2026-11-21: settle round 3.** The user picked **momentum** for B, and saw it bounce only toward the
+  middle page. Cause (nothing hard-coded): the pager can't scroll past its first or last page, so the
+  spring's overshoot there was dropped. Now `pageSpringFling` hands the part it couldn't scroll to a
+  `PageOvershoot`, drawn as a shift of the pages (`Modifier.pageOvershoot`, mirrored in RTL) that the
+  same spring brings back. Measured on the Pixel with momentum: ~12 px past the last page, ~38 px past
+  the first (different flick speeds), same scale as between pages. Next: put B with momentum in the
+  app (plan below, to agree).

@@ -21,6 +21,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.TargetedFlingBehavior
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -43,6 +44,7 @@ import androidx.compose.ui.graphics.layer.GraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -320,13 +322,35 @@ internal fun settleTarget(position: Float, velocity: Float, pageCount: Int): Int
 }.coerceIn(0, (pageCount - 1).coerceAtLeast(0))
 
 /**
+ * How far a [pageSpringFling]'s spring has gone past the first or last page, in pixels (+ forward).
+ * The pager itself can't scroll past its ends, so this part of the bounce is drawn instead: put
+ * [pageOvershoot] on the pager (2026-11-21, the user: the bounce only played between pages).
+ */
+@Stable
+class PageOvershoot {
+    var pixels by mutableFloatStateOf(0f)
+        internal set
+}
+
+/** Shifts the pages by [overshoot]'s pixels, so a settle's bounce shows at the first and last page too. */
+fun Modifier.pageOvershoot(overshoot: PageOvershoot): Modifier = offset {
+    // `offset` (not `absoluteOffset`) mirrors in right-to-left layouts, as the pager does.
+    IntOffset(-overshoot.pixels.roundToInt(), 0)
+}
+
+/**
  * A pager fling that's one spring the whole way (Motion Lab option B, 2026-11-21; the user: no linear
  * animations): it picks the page as [pageSettleFling] does, then springs the pages there with [spring],
  * starting at the finger's speed, so a flick carries into the spring and can overshoot and settle.
- * Unlike Compose's default pager fling there's no decay phase first. A touch while it moves stops the
- * pager first (it's really scrolling).
+ * Unlike Compose's default pager fling there's no decay phase first. Past the first or last page the
+ * pager can't scroll, so that part of the bounce goes to [overshoot] (draw it with [pageOvershoot]).
+ * A touch while it moves stops the pager first (it's really scrolling).
  */
-fun pageSpringFling(pager: PagerState, spring: () -> MotionSpring): TargetedFlingBehavior =
+fun pageSpringFling(
+    pager: PagerState,
+    overshoot: PageOvershoot? = null,
+    spring: () -> MotionSpring,
+): TargetedFlingBehavior =
     object : TargetedFlingBehavior {
         override suspend fun ScrollScope.performFling(
             initialVelocity: Float,
@@ -338,12 +362,23 @@ fun pageSpringFling(pager: PagerState, spring: () -> MotionSpring): TargetedFlin
             val target = settleTarget(position, initialVelocity / pageSize, pager.pageCount)
             val distance = (target - position) * pageSize
             var travelled = 0f
-            Animatable(0f).animateTo(
-                distance,
-                spring().spec(Offset.VisibilityThreshold.x),
-                initialVelocity = initialVelocity
-            ) {
-                travelled += scrollBy(value - travelled)
+            try {
+                Animatable(0f).animateTo(
+                    distance,
+                    spring().spec(Offset.VisibilityThreshold.x),
+                    initialVelocity = initialVelocity
+                ) {
+                    travelled += scrollBy(value - travelled)
+                    // What the pager couldn't take (past an end) is drawn as a shift instead.
+                    overshoot?.pixels = value - travelled
+                    android.util.Log.println(
+                        android.util.Log.WARN,
+                        "edge value=$value of $distance shift=${value - travelled}"
+                    )
+                }
+            } finally {
+                // Settled or caught by a finger: never left shifted.
+                overshoot?.pixels = 0f
             }
             onRemainingDistanceUpdated(0f)
             return 0f
