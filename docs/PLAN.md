@@ -3052,3 +3052,10 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
 - **2026-11-22: Places' settings button is a framework button (checked on the Pixel).** `PageScaffold`
   takes `actions: List<FrameAction>` (drawn with `FrameButton` on the plain page's glass tint) instead of a
   free composable slot; `settingsAction(onSettings)` sits next to `closeAction`. Tapping it opens Settings.
+- **2026-11-22: blur crossfade for changing text; cleanup (built, NOT seen on the phone: it locked).**
+  Motion ef4ce05: `BlurCrossfade` (the old content blurs out as the new sharpens in, with `MorphHandOff.Blur` and
+  `Motion.content`; a change mid-way starts from what's shown). The moon card's heading, date and tonight
+  line use it. Removed the unused `Modifier.searchBlur` and its two layers from the shell.
+  **Bug found, not fixed:** in a postcard window the moon card's dial doesn't respond (on home it does).
+  Logs (removed): the touch reaches the moon sheet and its morph content at the right place, but never the
+  dial; next step: log the dial's bounds in the window (the phone locked before that ran).

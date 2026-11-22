@@ -127,6 +127,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import breezyweather.domain.location.model.Location
+import io.github.information89.motion.BlurCrossfade
 import io.github.information89.motion.Dial
 import io.github.information89.motion.DialLook
 import io.github.information89.motion.DialScale
@@ -590,34 +591,43 @@ private fun MoonCard(
             // A big heading, like This week: the phase, and the date under it. It's the button's label
             // grown (shared bounds), so it morphs from and back into the button.
             val heading = breezyweather.domain.weather.model.MoonPhase(angle).getDescription(context) ?: ""
-            Text(
-                heading,
-                color = ink,
-                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold),
-                modifier = headingModifier
-            )
+            // Changing phase while scrubbing, the heading crosses with a blur (Motion's BlurCrossfade).
+            BlurCrossfade(heading, headingModifier) { text ->
+                Text(
+                    text,
+                    color = ink,
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold)
+                )
+            }
             if (restReady) {
                 Column(restModifier) {
-                    Text(
+                    // The date crosses with a blur as the dial passes into another day.
+                    BlurCrossfade(
                         SimpleDateFormat("EEEE, MMMM d", Locale.getDefault()).apply { timeZone = zone }.format(at),
-                        color = ink.copy(alpha = Emphasis.Medium),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = dateModifier
-                    )
+                        dateModifier
+                    ) { date ->
+                        Text(
+                            date,
+                            color = ink.copy(alpha = Emphasis.Medium),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
                     // "Will I see it tonight?" as a line under the date (agreed 2026-11-22), only on today. Away
                     // from today it keeps its space and just fades, so nothing moves under a finger on the dial.
                     tonight?.let { t ->
                         val (res, args) = SkyVisibility.sentence(t, MoonVisibility.texts) {
                             sentenceTime(context, it, zone)
                         }
-                        Text(
-                            sentences(listOf(stringResource(res) to args)),
-                            color = ink.copy(alpha = Emphasis.High),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier
-                                .padding(top = Space.S2)
-                                .graphicsLayer { alpha = if (abs(offset) < 0.5f) 1f else 0f }
-                        )
+                        val line = sentences(listOf(stringResource(res) to args))
+                        // Leaving today it blurs away and coming back it sharpens in, keeping its space.
+                        BlurCrossfade(abs(offset) < 0.5f, Modifier.padding(top = Space.S2)) { onToday ->
+                            Text(
+                                line,
+                                color = ink.copy(alpha = Emphasis.High),
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.graphicsLayer { alpha = if (onToday) 1f else 0f }
+                            )
+                        }
                     }
                     // The moon (the sheet's stars, from the sky's star system, are behind it).
                     Canvas(Modifier.fillMaxWidth().height(200.dp)) {

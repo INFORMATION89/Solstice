@@ -257,8 +257,6 @@ fun SolsticeShell(
             navigate(it)
         }
     }
-    val searchBlur = rememberGraphicsLayer()
-    val searchSharp = rememberGraphicsLayer()
     // Search grows out of the Places button (agreed motion); one spring drives open and close.
     var searchOpen by rememberSaveable { mutableStateOf(false) }
     SideEffect { controller.searchOpen = searchOpen }
@@ -699,34 +697,6 @@ private fun loadStarred(context: Context): Set<String> =
 
 private fun saveStarred(context: Context, starred: Set<String>) =
     context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit { putStringSet(KEY_STARRED, starred) }
-
-/**
- * Blurs the page behind the search card. The blur runs on a quarter-size copy of the page (16x
- * fewer pixels, and a strong blur hides the lower resolution), drawn scaled up over the sharp
- * page and faded in with [progress]. The radius stays fixed, so the GPU's work doesn't grow as
- * the card opens.
- */
-private fun Modifier.searchBlur(layer: GraphicsLayer, sharp: GraphicsLayer, progress: () -> Float): Modifier =
-    drawWithContent {
-        val p = progress().coerceIn(0f, 1f)
-        if (p <= 0.01f || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            drawContent()
-            return@drawWithContent
-        }
-        // The page's background is behind the pager, so the sharp page has to fade out as the blurred
-        // copy fades in (otherwise the sharp text shows through the blur).
-        sharp.record { this@drawWithContent.drawContent() }
-        sharp.alpha = 1f - p
-        drawLayer(sharp)
-        val k = 4f
-        val radius = 28.dp.toPx() / k
-        if (layer.renderEffect == null) layer.renderEffect = BlurEffect(radius, radius, TileMode.Clamp)
-        layer.record(IntSize((size.width / k).toInt().coerceAtLeast(1), (size.height / k).toInt().coerceAtLeast(1))) {
-            scale(1f / k, 1f / k, pivot = Offset.Zero) { this@drawWithContent.drawContent() }
-        }
-        layer.alpha = p
-        scale(k, k, pivot = Offset.Zero) { drawLayer(layer) }
-    }
 
 /** How strongly a plain page's edge blur shows: none until the page is ~40 % in, full when it's there. */
 internal fun edgeFade(position: Float): Float =
