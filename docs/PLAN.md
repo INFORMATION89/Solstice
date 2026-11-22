@@ -2837,3 +2837,45 @@ Steps:
   moon card's handle and bottom corners, search's handle tap. Left as they were (pre-existing, to
   decide): the window fades its content over 25–75 % of the growth while the moon card uses
   `CONTENT_FROM`/`CONTENT_TO` (35–70 %); search's field height is a hard-coded 64 dp in its layout.
+
+### Round 4 plan (agreed with the user 2026-11-21; plan first, no hard-coding, reuse and update systems)
+
+**Decisions (user):** one card material, **Glass**, everywhere (stars become an effect on top of a
+card); **glass tone follows the theme** like the toolbar (dark mode or a night window → dark glass; text
+on glass uses the theme's on-surface roles, text on bare sky keeps the sky's ink); **"Visiting" always**
+in a window; the window's **top line is pinned** at the top of each page (slides with its page, doesn't
+scroll), **centred** on every page; a closing window **follows its postcard live**, even off screen;
+content settles on **`playful`**; two **morph kinds, Page and Sheet**, in `:motion` (search moves onto
+Sheet, replacing `SolsticeSheetState`), tried in the Motion Lab first; **one place-time system**, the
+postcard keeps its stamp typography as a style; **edge blur**: one set of values, named, page and
+in-card contexts; the **handle stays fixed at the top**, drawn above everything; **no tap on handles**.
+
+**Causes found so far:**
+- Floating postcard: `PlaceWindow` always passes `fromBounds` (the postcard's rect captured at open),
+  so `SpringMorph` closes to a stale spot after the page moves; the registry's live anchor is ignored.
+- Five glass tints: toolbar `surfaceContainerHigh` 38 %, search 50 %, messages 60 %, cards white
+  10–34 % guessed from the ink, moon `moonGlassTint` from the sky.
+- Time: one formatter (`time`, `timeDifference`) but three hand-built labels (Forecast row, window
+  line, postcard stamp).
+- Edge blur: only This week/Places/search; one `strength` for all edges (page swipe), not scroll.
+- Search: its own sheet system plus literals (field 64 dp in one place and 56 dp in another, compact
+  280 dp, dismiss 220 dp, fade windows 0.45/0.55 and 0.3, scrim 25 %, tints 50/70 %, list bands 14/18 dp).
+- Still to find: **the frame skip when the container settles** (user: it stops, skips a frame, then
+  lands); measure before fixing.
+
+**Order** (each phase: build, check on the Pixel, commit; values that aren't decided get asked):
+1. **Investigate** on the phone: the settle frame skip (frame stats + a trace around the end of a
+   morph); confirm the handle's draw order.
+2. **Glass system:** one `glass` style from the theme (the toolbar's), one `SolsticeCard` (Glass only,
+   `CardMaterial` removed), text roles on glass with `Emphasis`; moon pill and card, messages, search
+   and toolbar on it; stars as a card effect from `SkyEffects`.
+3. **Place time system:** one model (time, offset, whether to show) and one label with styles (line,
+   stamp) for home Forecast, window header and postcards.
+4. **Page frame:** a pinned header slot per page (the window's centred "Visiting · time"), the handle
+   top-most; edge blur from named tokens with **per-edge strength from scrolling** (`:motion`
+   `edgeBlur` updated), on every page and the search list (in-card context).
+5. **Morph kinds** in `:motion` (Motion Lab first): Page and Sheet (target, shape, springs, handle,
+   detents, keyboard, pass-through), live source re-targeting, content settling on its own spring
+   (`playful`), the settle frame-skip fix; then window, moon card and search on them; search's literals
+   become kind parameters or layout-derived values (listed for the user to review).
+6. Small: remove handle taps; "Visiting" always.
