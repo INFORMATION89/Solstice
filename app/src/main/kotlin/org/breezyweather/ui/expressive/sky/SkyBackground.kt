@@ -111,7 +111,7 @@ private data class BakeKey(
  * shader's (a fixed random field, brighter towards the top, hidden under the sun/moon glow), drawn
  * once into the cached image. No twinkle.
  */
-private fun DrawScope.drawStars(state: SkyState, amount: Float) {
+internal fun DrawScope.drawStars(state: SkyState, amount: Float) {
     if (amount <= 0.01f) return
     val w = size.width
     val h = size.height

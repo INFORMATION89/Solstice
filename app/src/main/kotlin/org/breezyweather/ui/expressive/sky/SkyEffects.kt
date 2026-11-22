@@ -17,6 +17,7 @@
 package org.breezyweather.ui.expressive.sky
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.draw.drawBehind
 
 /**
  * Effects drawn into the sky (F4, agreed 2026-11-21): built into the sky system, not beside it. The
@@ -56,3 +57,14 @@ data class SkyEffects(
         }
     }
 }
+
+/**
+ * The sky's stars as an effect on top of a surface (agreed 2026-11-21: stars are an effect a card can
+ * add, the moon card at night): the same star field as the sky for [state], [effects]' amount.
+ */
+fun androidx.compose.ui.Modifier.skyEffects(state: SkyState, effects: SkyEffects): androidx.compose.ui.Modifier =
+    if (effects.stars <= 0f) {
+        this
+    } else {
+        this.then(androidx.compose.ui.Modifier.drawBehind { drawStars(state, effects.stars) })
+    }

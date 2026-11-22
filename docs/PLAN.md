@@ -2972,3 +2972,13 @@ Two of the user's three recordings (200728, 200959) weren't in Downloads; planne
   (`MorphTouches.WhileClosing` for the window; the moon card keeps `WhileMoving`); checked: a sideways
   swipe during opening left home alone. Not checked: the bounce past the last page (the test flick hit a
   postcard's swipe action and made London the main place; the user is told).
+- **2026-11-21: glass system (round 4 phase 2), built, not seen on the phone** (the user asked to skip the
+  Pixel this time). One glass: `glassTint()` = the theme's `surfaceContainerHigh` at `Opacity.Glass`
+  (agreed: 40 %, one level for everything, after checking Apple: Apple keeps Liquid Glass for floating
+  controls and avoids glass on glass; the user chose glass everywhere anyway). Toolbar, messages, search
+  card and field, moon pill and sheet all use it (`moonGlassTint` and the 38/50/60/70 % tints are gone).
+  One `SolsticeCard` (no `CardMaterial`; Paper removed): glass over the sky where there is one, the plain
+  tint on plain pages (`PageScaffold` provides no sky glass) and inside sheets; its content gets the
+  theme's ink (`onSurface`). Stars are a card/surface effect (`Modifier.skyEffects`, the sky's own star
+  drawing); only the moon sheet uses it, at night at the place. Cards now pad `Space.S4` (Paper was S5).
+  Not done: the moon card opened from a postcard window follows home's theme, not the window's.

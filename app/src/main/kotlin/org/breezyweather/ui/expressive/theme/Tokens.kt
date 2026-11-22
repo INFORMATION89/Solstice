@@ -82,8 +82,14 @@ object Emphasis {
     val Disabled = 0.38f
 }
 
-/** Opacities set by Material 3 for specific parts. */
+/** Opacities for specific parts. */
 object Opacity {
+    /**
+     * Solstice's one glass (agreed 2026-11-21: one level for every surface): the theme's surface colour
+     * at 40 % over the blurred backdrop.
+     */
+    val Glass = 0.40f
+
     /** Material 3's drag handle: the ink at 40 %. */
     val Handle = 0.4f
 }

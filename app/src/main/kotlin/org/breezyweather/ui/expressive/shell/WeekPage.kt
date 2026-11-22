@@ -56,7 +56,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import breezyweather.domain.location.model.Location
 import org.breezyweather.R
-import org.breezyweather.ui.expressive.components.CardMaterial
 import org.breezyweather.ui.expressive.components.SolsticeCard
 import org.breezyweather.ui.expressive.sky.SkyState
 import org.breezyweather.ui.expressive.sky.SkyWeather
@@ -98,8 +97,8 @@ internal fun DaysPage(
         spacing = Space.S3
     ) {
         if (location != null && days.isNotEmpty()) {
-            item { WeekSummary(location, days, onPage, onDay) }
-            item { WeekPills(location, days, onPage, onDay) }
+            item { WeekSummary(location, days, onDay) }
+            item { WeekPills(location, days, onDay) }
         }
     }
 }
@@ -115,7 +114,6 @@ private fun isWet(w: SkyWeather) = w == SkyWeather.RAIN || w == SkyWeather.THUND
 private fun WeekSummary(
     location: Location,
     days: List<breezyweather.domain.weather.model.Daily>,
-    onPage: Color,
     onDay: (Int) -> Unit,
 ) {
     val context = LocalContext.current
@@ -166,24 +164,26 @@ private fun WeekSummary(
             append(".")
         }
     }
-    val inline = mapOf(
+
+    // Inline icons in the card's ink.
+    fun inline(ink: Color) = mapOf(
         "cond" to InlineTextContent(
             Placeholder(18.sp, 18.sp, PlaceholderVerticalAlign.TextCenter)
         ) {
             Icon(
                 hourIcon(wetIcon ?: SkyWeather.RAIN, false),
                 contentDescription = null,
-                tint = onPage.copy(alpha = Emphasis.High)
+                tint = ink.copy(alpha = Emphasis.High)
             )
         }
     )
-    SolsticeCard(CardMaterial.Paper, onPage) {
-        Text(headline, color = onPage, style = MaterialTheme.typography.titleLargeEmphasized)
+    SolsticeCard { ink ->
+        Text(headline, color = ink, style = MaterialTheme.typography.titleLargeEmphasized)
         Spacer(Modifier.height(Space.S2))
         Text(
             body,
-            inlineContent = inline,
-            color = onPage.copy(alpha = Emphasis.High),
+            inlineContent = inline(ink),
+            color = ink.copy(alpha = Emphasis.High),
             style = MaterialTheme.typography.bodyLarge
         )
     }
@@ -199,7 +199,6 @@ private fun WeekSummary(
 private fun WeekPills(
     location: Location,
     days: List<breezyweather.domain.weather.model.Daily>,
-    onPage: Color,
     onDay: (Int) -> Unit,
 ) {
     val context = LocalContext.current
@@ -209,7 +208,7 @@ private fun WeekPills(
     val bottom = lows.filterNotNull().minOrNull() ?: return
     val span = (top - bottom).coerceAtLeast(1.0)
     val pillArea = 84.dp
-    SolsticeCard(CardMaterial.Paper, onPage) {
+    SolsticeCard { ink ->
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             days.forEachIndexed { i, day ->
                 val hi = highs[i] ?: return@forEachIndexed
@@ -224,7 +223,7 @@ private fun WeekPills(
                     ) {
                         Text(
                             day.day?.temperature?.temperature?.let { degrees(context, it) } ?: "",
-                            color = onPage,
+                            color = ink,
                             style = MaterialTheme.typography.labelLarge,
                             modifier = Modifier.padding(bottom = Space.S2)
                         )
@@ -242,19 +241,19 @@ private fun WeekPills(
                         }
                         Text(
                             day.night?.temperature?.temperature?.let { degrees(context, it) } ?: "",
-                            color = onPage.copy(alpha = Emphasis.Medium),
+                            color = ink.copy(alpha = Emphasis.Medium),
                             style = MaterialTheme.typography.labelMedium,
                             modifier = Modifier.padding(top = Space.S2)
                         )
                         Icon(
                             hourIcon(weather, false),
                             contentDescription = day.day?.weatherText,
-                            tint = if (wet) SolsticePalette.Wet else onPage.copy(alpha = Emphasis.High),
+                            tint = if (wet) SolsticePalette.Wet else ink.copy(alpha = Emphasis.High),
                             modifier = Modifier.padding(top = Space.S2, bottom = Space.Half).size(Sizes.IconMedium)
                         )
                         Text(
                             if (i == 0) stringResource(R.string.shell_today) else dayShort(day.date, location.timeZone),
-                            color = if (wet) SolsticePalette.Wet else onPage.copy(alpha = Emphasis.High),
+                            color = if (wet) SolsticePalette.Wet else ink.copy(alpha = Emphasis.High),
                             style = MaterialTheme.typography.labelMedium
                         )
                     }

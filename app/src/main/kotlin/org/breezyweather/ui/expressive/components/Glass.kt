@@ -18,6 +18,7 @@ package org.breezyweather.ui.expressive.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalOf
@@ -37,6 +38,7 @@ import dev.chrisbanes.haze.blur.HazeColorEffect
 import dev.chrisbanes.haze.blur.hazeBlur
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
+import org.breezyweather.ui.expressive.theme.Opacity
 import org.breezyweather.ui.expressive.theme.StrokeWidth
 
 /**
@@ -67,7 +69,16 @@ val LocalPageGlass = compositionLocalOf<GlassSource?> { null }
 fun Modifier.glassSource(source: GlassSource): Modifier = this.hazeSource(source.haze)
 
 /**
- * A frosted-glass background in [shape]: blurred backdrop + [tint] + a hairline light edge.
+ * Solstice's one glass tint (agreed 2026-11-21): the theme's surface colour at [Opacity.Glass], so every
+ * glass surface (toolbar, cards, pills, sheets, messages, search) is the same and goes dark with the
+ * theme (dark mode, or a postcard window at night).
+ */
+@Composable
+fun glassTint(): Color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = Opacity.Glass)
+
+/**
+ * A frosted-glass background in [shape]: blurred backdrop + [tint] + a hairline light edge. Without a
+ * [source] (nothing to blur, e.g. a plain page or inside a sheet), just the tint.
  *
  * [alpha] (read every frame) fades the glass in or out, e.g. while a button's look becomes a
  * sheet's. It fades the whole element, so content inside that must stay visible shouldn't rely on
@@ -77,16 +88,14 @@ fun Modifier.glassSource(source: GlassSource): Modifier = this.hazeSource(source
 fun Modifier.glass(
     source: GlassSource?,
     shape: Shape,
-    tint: Color,
+    tint: Color = glassTint(),
     blur: Dp = 28.dp,
     edge: Color = Color.White.copy(alpha = 0.22f),
     alpha: (() -> Float)? = null,
 ): Modifier {
     val faded = if (alpha != null) this.graphicsLayer { this.alpha = alpha().coerceIn(0f, 1f) } else this
     if (source == null) {
-        return faded.clip(
-            shape
-        ).background(tint.copy(alpha = maxOf(tint.alpha, 0.92f))).border(StrokeWidth.Hairline, edge, shape)
+        return faded.clip(shape).background(tint).border(StrokeWidth.Hairline, edge, shape)
     }
     val style = remember(tint, blur) {
         HazeBlurStyle {

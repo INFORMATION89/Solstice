@@ -85,6 +85,7 @@ import org.breezyweather.R
 import org.breezyweather.ui.expressive.components.GlassSource
 import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.components.glass
+import org.breezyweather.ui.expressive.components.glassTint
 import org.breezyweather.ui.expressive.sky.SkyState
 import org.breezyweather.ui.expressive.sky.SkyWeather
 import org.breezyweather.ui.expressive.theme.Elevation
@@ -147,8 +148,8 @@ internal fun ShellToolbar(
     val starts = widths.runningFold(0.dp) { acc, w -> acc + w }
     val highlightX = tabs.indices.fold(0.dp) { acc, i -> acc + starts[i] * open[i] }
     val highlightW = tabs.indices.fold(0.dp) { acc, i -> acc + widths[i] * open[i] }
-    // Frosted glass: the page behind, blurred, under a light tint of the surface colour.
-    val tint = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.38f)
+    // Solstice's one glass (the page behind, blurred, under the theme's tint).
+    val tint = glassTint()
     // On Forecast the highlight wears the weather (a colour from the sky); swiping to Outlook or
     // Places morphs it into the Material You colour, in step with the swipe.
     val skyAccent = sky.palette.blobs[1]

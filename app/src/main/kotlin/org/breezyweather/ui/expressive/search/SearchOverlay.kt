@@ -407,7 +407,7 @@ fun SearchOverlay(
                 .onGloballyPositioned { onCardBounds(it.boundsInRoot()) }
                 .graphicsLayer { alpha = if (handedOff) 0f else 1f }
                 // The toolbar's glass: the page behind, blurred, under a light tint, with a fine edge.
-                .glass(glass, cardShape, MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.5f))
+                .glass(glass, cardShape)
                 .clip(cardShape)
         ) {
             // While still small it's the bubble's search icon.
@@ -526,8 +526,8 @@ private fun SearchField(query: String, onQuery: (String) -> Unit, focus: FocusRe
             .fillMaxWidth()
             .padding(start = Space.S2, end = Space.S2, bottom = Space.S2)
             .height(56.dp)
-            .clip(CornerShapes.L)
-            .background(MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.7f))
+            // The one glass (on the card's glass there's nothing to blur: just its tint).
+            .glass(null, CornerShapes.L)
             .padding(horizontal = Space.S4)
     ) {
         Icon(SolsticeIcons.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)

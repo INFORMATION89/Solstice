@@ -213,7 +213,7 @@ fun ShellMessageHost(messages: ShellMessages, glass: GlassSource, modifier: Modi
                     scaleX = 0.92f + 0.08f * r
                     scaleY = 0.92f + 0.08f * r
                 }
-                .glass(glass, CircleShape, MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.6f))
+                .glass(glass, CircleShape)
                 .semantics { liveRegion = LiveRegionMode.Polite }
                 .padding(start = Space.S4, end = if (message.action != null) Space.S2 else Space.S5)
         ) {

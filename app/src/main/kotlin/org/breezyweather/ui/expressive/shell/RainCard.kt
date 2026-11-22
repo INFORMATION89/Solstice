@@ -65,7 +65,6 @@ import androidx.compose.ui.unit.dp
 import breezyweather.domain.location.model.Location
 import org.breezyweather.R
 import org.breezyweather.common.extensions.formatMeasure
-import org.breezyweather.ui.expressive.components.CardMaterial
 import org.breezyweather.ui.expressive.components.SolsticeCard
 import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.sky.SkyWeather
@@ -180,7 +179,7 @@ internal fun rainOutlook(context: Context, location: Location, now: Long): RainO
  * probability. Light blue when the rain is within the hour.
  */
 @Composable
-internal fun RainCard(rain: RainOutlook.Coming, location: Location, text: Color) {
+internal fun RainCard(rain: RainOutlook.Coming, location: Location) {
     val context = LocalContext.current
     val strength = stringArrayResource(R.array.shell_rain_strength)[rain.heavy]
     val sentence = when (rain.kind) {
@@ -194,7 +193,7 @@ internal fun RainCard(rain: RainOutlook.Coming, location: Location, text: Color)
     // When the amount rounds to nothing (a likely drizzle), probability says more: start there.
     val dryAmount = rain.total < 0.1
     var showChance by remember(rain.minutely) { mutableStateOf(dryAmount && chances != null) }
-    SolsticeCard(CardMaterial.Glass, text, tint = if (rain.soon) SolsticePalette.RainSoon else null) {
+    SolsticeCard(tint = if (rain.soon) SolsticePalette.RainSoon else null) { text ->
         // No separate title: the sentence is the header.
         Text(sentence, color = text, style = MaterialTheme.typography.titleMediumEmphasized)
         Spacer(Modifier.height(Space.S1))

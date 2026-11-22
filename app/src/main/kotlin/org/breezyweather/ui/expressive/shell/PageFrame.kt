@@ -43,6 +43,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +60,7 @@ import io.github.information89.motion.EdgeBand
 import io.github.information89.motion.Motion
 import io.github.information89.motion.edgeBlur
 import org.breezyweather.R
+import org.breezyweather.ui.expressive.components.LocalSkyGlass
 import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.theme.Emphasis
 import org.breezyweather.ui.expressive.theme.Sizes
@@ -170,40 +172,45 @@ internal fun PageScaffold(
 ) {
     val top = pageTopInset()
     val visiting = LocalVisit.current != null
-    LazyColumn(
-        state = listState,
-        contentPadding = PaddingValues(
-            start = Space.S4,
-            end = Space.S4,
-            top = top + PageTitleTop,
-            bottom = ToolbarClearance
-        ),
-        verticalArrangement = Arrangement.spacedBy(spacing),
-        modifier = Modifier.fillMaxSize().edgeBlur(
-            // :motion's edge blur (F2): blurred and faded into the page at the top and bottom.
-            top = EdgeBand(top + 56.dp, blur = 18.dp, fadeTo = page, fadeAlpha = 0.85f, fadeLength = 0.8f),
-            bottom = EdgeBand(140.dp, blur = 18.dp, fadeTo = page, fadeAlpha = 0.85f, fadeLength = 0.7f),
-            strength = pageFade
-        )
-    ) {
-        if (visiting) {
-            item(key = "visit") { VisitingLine(onPage.copy(alpha = Emphasis.High), Modifier.padding(start = Space.S1)) }
-        }
-        item(key = "header") {
-            // As tall as an icon button, with or without one, so the title sits at the same height.
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.heightIn(min = Sizes.TouchTarget).padding(bottom = Space.S1)
-            ) {
-                Text(
-                    title,
-                    color = onPage,
-                    style = MaterialTheme.typography.displaySmallEmphasized.copy(fontWeight = FontWeight.SemiBold),
-                    modifier = Modifier.weight(1f).padding(start = Space.S1)
-                )
-                action?.invoke()
+    // A plain page has no sky behind its cards: their glass is just the tint (agreed 2026-11-21).
+    CompositionLocalProvider(LocalSkyGlass provides null) {
+        LazyColumn(
+            state = listState,
+            contentPadding = PaddingValues(
+                start = Space.S4,
+                end = Space.S4,
+                top = top + PageTitleTop,
+                bottom = ToolbarClearance
+            ),
+            verticalArrangement = Arrangement.spacedBy(spacing),
+            modifier = Modifier.fillMaxSize().edgeBlur(
+                // :motion's edge blur (F2): blurred and faded into the page at the top and bottom.
+                top = EdgeBand(top + 56.dp, blur = 18.dp, fadeTo = page, fadeAlpha = 0.85f, fadeLength = 0.8f),
+                bottom = EdgeBand(140.dp, blur = 18.dp, fadeTo = page, fadeAlpha = 0.85f, fadeLength = 0.7f),
+                strength = pageFade
+            )
+        ) {
+            if (visiting) {
+                item(key = "visit") {
+                    VisitingLine(onPage.copy(alpha = Emphasis.High), Modifier.padding(start = Space.S1))
+                }
             }
+            item(key = "header") {
+                // As tall as an icon button, with or without one, so the title sits at the same height.
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.heightIn(min = Sizes.TouchTarget).padding(bottom = Space.S1)
+                ) {
+                    Text(
+                        title,
+                        color = onPage,
+                        style = MaterialTheme.typography.displaySmallEmphasized.copy(fontWeight = FontWeight.SemiBold),
+                        modifier = Modifier.weight(1f).padding(start = Space.S1)
+                    )
+                    action?.invoke()
+                }
+            }
+            content()
         }
-        content()
     }
 }

@@ -72,7 +72,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import breezyweather.domain.location.model.Location
 import org.breezyweather.R
-import org.breezyweather.ui.expressive.components.CardMaterial
 import org.breezyweather.ui.expressive.components.SolsticeCard
 import org.breezyweather.ui.expressive.components.SolsticeIcons
 import org.breezyweather.ui.expressive.sky.SkyState
@@ -216,10 +215,10 @@ internal fun ForecastPage(
             // path; otherwise a short "no rain" line sits after the hourly card.
             val rain = remember(location.weather, now / 60_000L) { rainOutlook(context, location, now) }
             if (rain is RainOutlook.Coming) {
-                RainCard(rain, location, text)
+                RainCard(rain, location)
                 Spacer(Modifier.height(Space.S3))
             }
-            TodayCard(location, now, text)
+            TodayCard(location, now)
             if (rain is RainOutlook.None) {
                 Spacer(Modifier.height(Space.S3))
                 NoRainLine(rain.hours, text)
@@ -469,11 +468,11 @@ private fun TimeLabel(time: String, label: String, text: Color, align: Alignment
 
 /** The next hours, "Now" first, on a translucent card. */
 @Composable
-private fun TodayCard(location: Location, now: Long, text: Color) {
+private fun TodayCard(location: Location, now: Long) {
     val context = LocalContext.current
     val hours = location.weather?.nextHourlyForecast?.take(6).orEmpty()
     if (hours.isEmpty()) return
-    SolsticeCard(CardMaterial.Glass, text) {
+    SolsticeCard { text ->
         // The title says what's happening, so you don't have to read the numbers.
         Text(
             hourlyHeadline(context, hours) ?: stringResource(R.string.shell_today),

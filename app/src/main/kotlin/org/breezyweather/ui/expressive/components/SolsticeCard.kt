@@ -16,69 +16,43 @@
 
 package org.breezyweather.ui.expressive.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import org.breezyweather.ui.expressive.sky.SkyEffects
+import org.breezyweather.ui.expressive.sky.SkyState
+import org.breezyweather.ui.expressive.sky.skyEffects
 import org.breezyweather.ui.expressive.theme.CornerShapes
+import org.breezyweather.ui.expressive.theme.Opacity
 import org.breezyweather.ui.expressive.theme.Space
-import org.breezyweather.ui.expressive.theme.StrokeWidth
-
-/** What a [SolsticeCard] is made of. */
-enum class CardMaterial {
-    /** Frosted glass over the sky (Forecast): the sky behind shows through, blurred. */
-    Glass,
-
-    /** Plain paper over a plain page (This week): a faint surface. */
-    Paper,
-}
 
 /**
- * Solstice's one card (component catalog, 2026-11-19): full width, the large corner, and one of two
- * materials. [ink] is the text colour on it, which picks the glass's strength (dark text means a
- * light sky, so whiter glass) and the paper's tone. [tint] colours the glass (e.g. rain soon).
+ * Solstice's one card (agreed 2026-11-21: one card material everywhere, glass): full width, the large
+ * corner, the one glass (theme colour at [Opacity.Glass], blurring the sky behind it where there is one,
+ * otherwise just the tint, as on a plain page or inside a sheet). Its content gets the theme's ink for
+ * text on glass. [tint] colours the glass for a reason (e.g. rain soon); [effects] adds the sky's stars
+ * on top ([state] is the sky they belong to).
  */
 @Composable
 fun SolsticeCard(
-    material: CardMaterial,
-    ink: Color,
     modifier: Modifier = Modifier,
     tint: Color? = null,
-    content: @Composable ColumnScope.() -> Unit,
+    state: SkyState? = null,
+    effects: SkyEffects = SkyEffects.None,
+    content: @Composable ColumnScope.(ink: Color) -> Unit,
 ) {
     val shape = CornerShapes.L
-    val surface = when (material) {
-        CardMaterial.Glass -> {
-            val light = ink.red + ink.green + ink.blue < 1.5f // dark text → light sky → white glass
-            val alpha = when {
-                light -> 0.34f
-                tint != null -> 0.24f
-                else -> 0.10f
-            }
-            val fill = (tint ?: Color.White).copy(alpha = alpha)
-            // Real frosted glass: the sky behind it, blurred, under the tint (plain tint without a sky).
-            val sky = LocalSkyGlass.current
-            val material = if (sky != null) {
-                Modifier.glass(sky, shape, fill, edge = Color.White.copy(alpha = 0.14f))
-            } else {
-                Modifier.clip(shape).background(fill)
-            }
-            material.padding(Space.S4)
-        }
-        CardMaterial.Paper ->
-            Modifier
-                .clip(shape)
-                .background(ink.copy(alpha = 0.09f))
-                .border(StrokeWidth.Hairline, ink.copy(alpha = 0.10f), shape)
-                .padding(Space.S5)
+    val glass = Modifier.glass(LocalSkyGlass.current, shape, tint?.copy(alpha = Opacity.Glass) ?: glassTint())
+    val stars = if (state != null) Modifier.clip(shape).skyEffects(state, effects) else Modifier
+    val ink = MaterialTheme.colorScheme.onSurface
+    Box(modifier.fillMaxWidth().then(glass).then(stars).padding(Space.S4)) {
+        Column { content(ink) }
     }
-    Box(modifier.fillMaxWidth().then(surface)) { Column(content = content) }
 }

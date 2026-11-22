@@ -148,10 +148,14 @@ import org.breezyweather.domain.weather.model.getDescription
 import org.breezyweather.ui.expressive.components.GlassSource
 import org.breezyweather.ui.expressive.components.SheetHandle
 import org.breezyweather.ui.expressive.components.SheetShape
+import org.breezyweather.ui.expressive.components.SolsticeCard
 import org.breezyweather.ui.expressive.components.SolsticeMotion
 import org.breezyweather.ui.expressive.components.glass
+import org.breezyweather.ui.expressive.sky.SkyEffects
 import org.breezyweather.ui.expressive.sky.SkyVisibility
+import org.breezyweather.ui.expressive.sky.SkyWeather
 import org.breezyweather.ui.expressive.sky.Tonight
+import org.breezyweather.ui.expressive.sky.skyEffects
 import org.breezyweather.ui.expressive.theme.CornerShapes
 import org.breezyweather.ui.expressive.theme.Corners
 import org.breezyweather.ui.expressive.theme.Emphasis
@@ -267,36 +271,25 @@ internal fun MoonButton(
     }
     // While its card is open, the morph draws the pill exactly as it is and grows it into the sheet
     // (the button becomes the card, 2026-11-21); morphSource hides the real pill only while it does.
-    // Material 3 outlined button, in the sky's ink.
-    // One material at both ends (MOTION.md, 2026-11-21): the pill is the sheet's own glass, in the
-    // same tint, so opening grows it rather than swapping an outline for glass.
+    // One material at both ends (MOTION.md, 2026-11-21): the pill is the sheet's own glass, Solstice's one
+    // glass, so opening grows it rather than swapping materials; its label in the theme's ink on glass.
     val pill = androidx.compose.foundation.shape.CircleShape
+    val glassInk = MaterialTheme.colorScheme.onSurface
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .morphSource(pillKey(location), cornerRadius = 100.dp)
-            .glass(skyGlass, pill, moonGlassTint(palette, night))
+            .glass(skyGlass, pill)
             .clip(pill)
             .clickable(role = androidx.compose.ui.semantics.Role.Button) {
                 MoonCardState.glass = pageGlass
-                MoonCardState.buttonInk = text
+                MoonCardState.buttonInk = glassInk
                 MoonCardState.show(location, now, null, phase + suffix, palette, night)
             }
             .padding(horizontal = Space.S3, vertical = Space.S2)
     ) {
-        MoonPillContent(phase, suffix, text, Modifier.morphAnchor(labelKey(location)))
+        MoonPillContent(phase, suffix, glassInk, Modifier.morphAnchor(labelKey(location)))
     }
-}
-
-/**
- * The moon's glass tint, shared by the pill and the sheet it grows into: the sky's base colour,
- * darkened at night (dark mode when it's night at the place) and lightened by day.
- */
-@Composable
-internal fun moonGlassTint(sky: org.breezyweather.ui.expressive.sky.SkyPalette?, night: Boolean): Color = when {
-    sky == null -> MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.5f)
-    night -> lerp(sky.base, SolsticePalette.NightDeep, 0.55f).copy(alpha = 0.62f)
-    else -> lerp(sky.base, Color.White, 0.55f).copy(alpha = 0.55f)
 }
 
 /** The pill's label: the phase and its "· 85 %". The morph draws the same, so the swap is invisible. */
@@ -381,16 +374,11 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
     fun close() = motion.close()
     BackHandler(enabled = motion.isOpen) { close() }
 
-    // The forecast's tint: the sky's base colour, darkened at night (the card goes dark mode when it's
-    // night at the place) and lightened by day.
-    val sky = MoonCardState.palette
-    val night = MoonCardState.night
-    val tint = moonGlassTint(sky, night)
-    val ink = when {
-        sky == null -> MaterialTheme.colorScheme.onSurface
-        night -> SolsticePalette.MoonNightText
-        else -> sky.text
-    }
+    // Solstice's one glass and the theme's ink on it (agreed 2026-11-21); stars on top at night at the
+    // place, from the sky's own star system (the moon card is the one card with them).
+    val ink = MaterialTheme.colorScheme.onSurface
+    val placeSky = remember(location, now) { skyFor(location, now) }
+    val stars = SkyEffects.of(placeSky, SkyWeather.of(location.weather?.current?.weatherCode))
     val status = WindowInsets.statusBars
     // Where the sheet rests: full width, docked at the bottom, at full screen height below the status
     // bar (agreed 2026-11-19).
@@ -434,7 +422,7 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
             target = target,
             motion = motion,
             // One material the whole way (MOTION.md): the pill's own glass grows into the sheet's.
-            material = { shape -> glass(MoonCardState.glass ?: glass, shape, tint) },
+            material = { shape -> glass(MoonCardState.glass ?: glass, shape) },
             shape = sheetShape,
             // The pill's label blurs out as the sheet's content sharpens in (and back on the way home).
             sourceContent = {
@@ -443,7 +431,7 @@ private fun MoonSheet(location: Location, now: Long, glass: GlassSource) {
                 MoonPillContent(phase, label.removePrefix(phase), MoonCardState.buttonInk)
             }
         ) {
-            Box(Modifier.fillMaxSize()) {
+            Box(Modifier.fillMaxSize().skyEffects(placeSky, stars)) {
                 Column {
                     Spacer(Modifier.height(Sizes.HandleStrip)) // room for the handle, drawn on top
                     MoonCard(
@@ -858,15 +846,11 @@ private fun MoonCard(
                         }
                     )
                     val body = sentences(sentences)
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .clip(CornerShapes.L)
-                            .background(ink.copy(alpha = 0.09f))
-                            .border(StrokeWidth.Hairline, ink.copy(alpha = 0.10f), CornerShapes.L)
-                            .padding(Space.S5)
-                    ) {
-                        Text(body, color = ink, style = MaterialTheme.typography.bodyLarge)
+                    // The one card (inside the sheet there's nothing to blur: just the glass tint).
+                    CompositionLocalProvider(org.breezyweather.ui.expressive.components.LocalSkyGlass provides null) {
+                        SolsticeCard { cardInk ->
+                            Text(body, color = cardInk, style = MaterialTheme.typography.bodyLarge)
+                        }
                     }
                 }
             }
