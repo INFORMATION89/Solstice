@@ -60,12 +60,12 @@ none. The Motion Lab gets a switch to compare subtle against no bounce on every 
    header (`Copyright 2026 INFORMATION89`); anything Breezy-derived is reported to Marco, not fixed on
    the spot (RULES.md section 5). Commit in Motion, then bump the submodule in Solstice.
 3. **Model spread test for Mexico City (Marco: asap, 2026-11-23):** a standalone research script, not
-   app code, in `tools/`. Compares each model's archived forecasts (Open-Meteo's Historical Forecast
-   API: GFS, ECMWF, ICON, GEM and others) with what the MMMX airport reported (Iowa State's METAR
-   archive; aviationweather.gov only keeps recent days), June to October 2026: temperature error and
-   whether rain was right, per model and by hour of day. These sessions can't reach those sites, so it
-   runs as a manual GitHub Actions workflow (or on Marco's computer) and commits a short report to
-   `docs/research/`. Results feed PLAN.md research queue 15 and the engine's starting weights.
+   app code, in `tools/model_test/`, built from `docs/research/MODEL_TEST_SPEC.md`. It uses Open-Meteo's
+   **Previous Runs API** (fixed 1 to 3 day lead times; the Historical Forecast API only keeps the first
+   hours of each run, so it would flatter every model) against the MMMX airport reports from the Iowa
+   Environmental Mesonet's archive, June to mid-October 2026. These sessions can't reach those sites,
+   so it runs as a manual GitHub Actions workflow (or on Marco's computer) and opens a pull request
+   with the report.
 4. **Guardrails:** the CI check (decision 7) on `ui/expressive/` and Motion's UI code (`dp`/`sp`
    literals, `Color(0x…)`, `spring(`, `tween(`, `delay(`); **show the allowlist to Marco** before
    merging. Run the app's unit tests in CI too.

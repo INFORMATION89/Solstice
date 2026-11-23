@@ -82,7 +82,7 @@ logs, session notes or build reports here.
 |---|---|
 | Colour | Material You (wallpaper) colour; sky-blue seed when it's off |
 | Type | Google Sans Flex, Material type scale, named hero styles |
-| Icons | Interface: Material Symbols, one catalog (`SolsticeIcons`), one weight (500), fill only for on/selected; **a setting for Rounded, Outlined or Sharp** (decided 2026-11-22; Rounded default). Weather conditions: **Material Symbols for now** (decided 2026-11-23: no animated icons); later option: **our own set built from Material Symbols' weather shapes** with a Solstice colour layer (two or three tones; Apache 2.0 allows it). Contrast checked on every sky. Moon phases stay the one exception |
+| Icons | Interface: Material Symbols, one catalog (`SolsticeIcons`), one weight (500), fill only for on/selected; **a setting for Rounded, Outlined or Sharp** (decided 2026-11-22; Rounded default). Weather conditions: **Material Symbols for now** (decided 2026-11-23: no animated icons); later option: **our own set built from Material Symbols' weather shapes** with a Solstice colour layer (two or three tones; Apache 2.0 allows it). Contrast checked on every sky. Moon phases stay the one exception. Coverage and gaps: docs/research/ICONS.md |
 | Glass | `surfaceContainerHigh` at 40 % for the toolbar, buttons and sheets; cards get a thicker card material (decided 2026-11-22, values to pick) |
 | Toolbar | One toolbar at shell level: a pages pill (navigation only) plus one accessory (home: Search; window: Pin); contexts are data. **Its current animation stays** (Marco, 2026-11-22) |
 | Close button | ✕ at the **end** of the header by default (Marco, 2026-11-22: easier to reach). **Motion option** to swap it with the leading button (✕ at the start, Apple's and Material's placement); mirrored for right-to-left. Back, predictive back and pull-down still close |
@@ -348,7 +348,8 @@ review): `docs/SOURCES.md`, proposal awaiting Marco.
     (IFS, ICON, GFS, NAM, UKMO, GEM, ARPEGE, AIFS and its own NEMS), but its numbers are only in
     images. The hard season is the rainy one (June to early October, about 85 % of the year's rain);
     in November meteoblue rates predictability "very high". Measuring it properly needs a small
-    script (Open-Meteo's archived forecasts against the MMMX airport reports, rainy season 2026): a
+    script (Open-Meteo's Previous Runs API against the MMMX airport reports, rainy season 2026;
+    spec in docs/research/MODEL_TEST_SPEC.md): a
     research job, Saturday step 3 (CONTINUE.md).
 16. **Leaving the Breezy fork, inventory** (2026-11-23; Kotlin lines today): screens 39,000 (main 12.2k,
     common 8.8k, settings 7.3k, details 7.1k, theme, search, about, alert) → Motion UI; sources 8,700,
@@ -358,7 +359,7 @@ review): `docs/SOURCES.md`, proposal awaiting Marco.
     new strings, translated again. Proposed order: units and models (the engine's base), sources
     and refresh (adapters first), screens (ongoing with Motion UI), background and notifications,
     widgets and sharing, settings and the rest, then translations, then the package name
-    (`org.breezyweather`) and licence change last.
+    (`org.breezyweather`) and licence change last. Translations and widgets: docs/research/AFTER_FORK.md.
 
 ## Upstream files touched
 - `app/src/main/kotlin/org/breezyweather/ui/theme/compose/Theme.kt`: `BreezyWeatherTheme` delegates
