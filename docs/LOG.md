@@ -1463,3 +1463,5 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 - **2026-11-23:** Engine named **Meridian**.
 - **2026-11-23:** Proposals for Outlook, partial sheets per card and Settings (PROPOSALS.md); information requests to SMN and SGIRPC drafted (OUTREACH.md).
 - **2026-11-23:** Decided: Outlook first version (Up next, Best time to be outside, days; 10 days ahead); Outlook keeps its own Settings section; cards open one sheet with two heights (no separate page; map full screen); tappable grabber.
+- **2026-11-23:** Meridian research and build plan (MERIDIAN_PLAN.md): libraries, modules, API sketch, the four sources' endpoints and terms, blending and correction methods from published work, storage, side-by-side rollout, milestones M0–M8. PR #3 merged.
+- **2026-11-23:** Decided for Meridian: Room; Solstice switches directly feature by feature (alerts first); M0 at the end of Saturday if time is left (CONTINUE.md step 10).
