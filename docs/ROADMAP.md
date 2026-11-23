@@ -71,9 +71,15 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 - [x] 💬⭐ **App layout:** Forecast keeps today's layout (2026-11-22). A2 from the layout canvas is the
   pattern for partial sheets (PLAN.md Direction 2).
 - [ ] ⭐ **Partial sheet in Motion's kit** (the A2 pattern): grows out of its card, dimmed page behind,
-  medium and full heights, grabber (drag, tap, TalkBack), swipe down to close, ✕ at the end, room for a
+  medium height first, then full page for every card, grabber (drag, tap, TalkBack), swipe down to close, ✕ at the end, room for a
   chart and setting rows. Lab page first; then which Forecast cards open one (to agree).
-- [ ] 💬 Optional cards on Forecast (add or remove wind, pressure…): still wanted?
+- [ ] ⭐ **Header close side as a Motion option:** ✕ at the end (default) or swapped with the leading
+  button; mirrored for right-to-left; a lab switch.
+- [ ] ⭐ **Optional, reorderable Forecast cards** with a general "most important moves to the top" rule
+  (replaces the rain-only special case in `ForecastPage.kt`). Order rules to agree first.
+- [ ] ⭐ **Forecast spacing pass** against Material's spacing guidance, kit tokens only (hero temperature,
+  sun/moon path and time stay).
+- [ ] ⭐ **Moon card rework** on `motion-ui` as a partial sheet (with the kit move).
 - [ ] 💬 **Postcards in a standard look**, the physical feel kept in the interaction (Direction 3).
 - [ ] 💬⭐ **Proactive alerts the Gradient Weather way** (Direction 4): alerts you choose to watch, rain or
   snow countdown as a Live Update, cooldowns, official warnings in full, evening summary, what to wear.

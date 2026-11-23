@@ -29,8 +29,16 @@ logs, session notes or build reports here.
      a grabber you can drag, tap and resize with TalkBack; swipe down to close; one sheet at a time
      (a sheet never opens another on top); no Done button when settings apply at once; ✕ at the end
      stays our decided exception (Apple: leading edge).
-   - Optional cards (add or remove, e.g. wind or pressure) and "everything essential at a glance":
-     still wanted? To confirm with Marco.
+   - **Every card opens partially first, then to a full page** (Marco, 2026-11-22): medium height,
+     drag or scroll up for full height.
+   - **Optional, reorderable cards** (Marco, 2026-11-22): you add or remove cards (e.g. wind,
+     pressure) and reorder them. **The most important card moves to the top when it matters**
+     (today only rain does this, hardcoded in `ForecastPage.kt`; it becomes a general priority rule).
+     How your own order and the automatic "moves to the top" combine: to agree.
+   - **Forecast keeps** the hero temperature with the sun/moon path and the time; it gets a **spacing
+     pass** against Material's spacing guidance using the kit's tokens.
+   - **The moon card gets reworked** with the move to `motion-ui`: it becomes a partial sheet built from
+     the kit (it doesn't follow the Material work so far).
 3. **Skeuomorphism moves into interaction, not looks** (Marco, 2026-11-22): physical feel (springs,
    drag, press, peel, haptics) stays; visuals follow a more standard design. The postcards go first.
 4. **Proactive alerts the Gradient Weather way** (Marco, 2026-11-22: "should be used as well"):
@@ -70,7 +78,7 @@ logs, session notes or build reports here.
 | Icons | Material Symbols Rounded, one catalog (`SolsticeIcons`), one weight (500), fill only for on/selected; moon phases are the one exception |
 | Glass | `surfaceContainerHigh` at 40 % for the toolbar, buttons and sheets; cards get a thicker card material (decided 2026-11-22, values to pick) |
 | Toolbar | One toolbar at shell level: a pages pill (navigation only) plus one accessory (home: Search; window: Pin); contexts are data. **Its current animation stays** (Marco, 2026-11-22) |
-| Close button | ✕ at the **end** of the header (Marco, 2026-11-22: easier to reach). Back, predictive back and pull-down still close |
+| Close button | ✕ at the **end** of the header by default (Marco, 2026-11-22: easier to reach). **Motion option** to swap it with the leading button (✕ at the start, Apple's and Material's placement); mirrored for right-to-left. Back, predictive back and pull-down still close |
 | Handles | On the moon card and search, without tap actions (accessibility check pending) |
 | Look of cards | Standard, readable design; physical feel through interaction (Direction 3) |
 
@@ -119,8 +127,7 @@ logs, session notes or build reports here.
 
 ## Open questions (to settle with Marco)
 
-1. **Partial sheets (A2 pattern):** which cards get one first; medium height first or full; optional
-   cards on Forecast, yes or no.
+1. **Card order:** how your own order and "the most important moves to the top" combine.
 2. **The card material's values** (opacity, blur), picked in the lab on Saturday.
 3. **Spring mapping:** confirm the table in CONTINUE.md "Next session".
 4. **Handles without taps:** Apple's grabber is tappable (cycles heights) and works with VoiceOver;

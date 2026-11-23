@@ -1426,3 +1426,6 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
   the summary, the cards and the hours.
 - **2026-11-22 (Marco): Forecast keeps today's layout** (more unique). From the layout canvas, A2 becomes the
   pattern for partial sheets (cards that aren't full pages), checked against Apple's sheet guidance.
+- **2026-11-22 (Marco):** close side becomes a Motion option (✕ at the end by default, or swapped to the start);
+  every card opens partially, then full page; optional, reorderable cards with the most important moving to the
+  top; Forecast keeps hero + sun/moon path + time, gets a spacing pass; moon card reworked on `motion-ui`.
