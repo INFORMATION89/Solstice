@@ -213,14 +213,14 @@ Values follow the unit settings; a card is skipped when the source has no data f
 2. The page receding behind a sheet, done cheaply (plan in LOG.md, 2026-11-22: dim + recede).
 3. Long press alongside drag to reorder (iOS context menu as reference).
 4. Proactive channels: Live Updates, daily brief, clothing.
+5. Card explainers (swipe up past the details): short Solstice texts, with "Read more" from Wikipedia
+   (CC BY-SA: credit and link, never silently edited).
 6. **Rainbow.ai nowcast** as an optional rain source (minute by minute, 4 hours, 1 km; free tier 5,000
    requests a month per key, so bring-your-own-key like other keyed sources): terms for client apps,
    attribution, and whether it cuts false rain alerts. Gradient Weather lists it among its sources.
 7. **Alerts coverage after the 2026-11-18 source cut:** Gradient gets official warnings from MeteoAlarm,
    NWS, ECCC, SACHET, Hong Kong Observatory, CWA and WMO's national services (CAP); Solstice keeps NWS,
    ECCC and WMO severe weather. Check what Europe and Asia lost.
-5. Card explainers (swipe up past the details): short Solstice texts, with "Read more" from Wikipedia
-   (CC BY-SA: credit and link, never silently edited).
 
 ## Upstream files touched
 - `app/src/main/kotlin/org/breezyweather/ui/theme/compose/Theme.kt`: `BreezyWeatherTheme` delegates
