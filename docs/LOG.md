@@ -1450,3 +1450,5 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 - **2026-11-23 (Marco): UV.** The UV card opens the sun sheet with UV first (index, next-hours timeline, what to do);
   card and button turn red when UV is very high; What to wear suggests sunscreen from the same rule. Research
   queued: Rainbow.ai nowcast as an optional source; alerts coverage vs Gradient Weather's sources.
+- **2026-11-23 (chat): research.** Rainbow.ai (keyed source like AccuWeather, terms, free tier), localized accuracy by
+  blending sources (Marco wants it for Mexico City), Conagua/SMN's municipal forecasts: PLAN.md research queue 6, 8, 9.

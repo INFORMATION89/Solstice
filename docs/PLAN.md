@@ -215,12 +215,25 @@ Values follow the unit settings; a card is skipped when the source has no data f
 4. Proactive channels: Live Updates, daily brief, clothing.
 5. Card explainers (swipe up past the details): short Solstice texts, with "Read more" from Wikipedia
    (CC BY-SA: credit and link, never silently edited).
-6. **Rainbow.ai nowcast** as an optional rain source (minute by minute, 4 hours, 1 km; free tier 5,000
-   requests a month per key, so bring-your-own-key like other keyed sources): terms for client apps,
-   attribution, and whether it cuts false rain alerts. Gradient Weather lists it among its sources.
+6. **Rainbow.ai nowcast** (checked 2026-11-23): fits Breezy's keyed-source pattern (like AccuWeather: own
+   key in the source's settings, per-feature choice, attribution). Gives minute-by-minute precipitation
+   for 4 hours at 1 km (updated every 10 min), an hourly/daily Weather API and precipitation/cloud map
+   tiles. Free tier is per account (5,000 requests a month per API on the pricing table), so each user
+   brings a free key; a shared key would run out. Terms: key kept private, "Powered by Rainbow.ai" with a
+   link wherever its data shows, not for safety-critical use (alerts stay official), may end free use
+   without notice. Call it only when rain is plausible or the countdown runs.
 7. **Alerts coverage after the 2026-11-18 source cut:** Gradient gets official warnings from MeteoAlarm,
    NWS, ECCC, SACHET, Hong Kong Observatory, CWA and WMO's national services (CAP); Solstice keeps NWS,
    ECCC and WMO severe weather. Check what Europe and Asia lost.
+8. **Localized accuracy and combined sources** (Marco, 2026-11-23; Mexico City is hard to forecast):
+   blend several models (Open-Meteo serves ECMWF, GFS, ICON, GEM and more) into a consensus with its
+   spread shown (Acme's alternative-model lines); correct the next hours from recent observations (e.g.
+   METAR at the airport, SMN stations, CDMX's own networks); Rainbow's nowcast for the first hours. A
+   Solstice "blend" source behind the data interface (Q3). Feasibility and design to propose.
+9. **Conagua / SMN** (checked 2026-11-23): free web service, no key, forecasts per municipality (CDMX by
+   alcaldía): hourly for 48 hours and daily for 3 days, updated hourly at :15, as one national gzip
+   file of several MB. Its forecasts come from the FV3-GFS model, so it's local GFS, not a separate
+   local model. Terms of reuse, the endpoint details and SMN's official warnings (CAP) to check.
 
 ## Upstream files touched
 - `app/src/main/kotlin/org/breezyweather/ui/theme/compose/Theme.kt`: `BreezyWeatherTheme` delegates
