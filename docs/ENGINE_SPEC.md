@@ -2,7 +2,8 @@
 
 Status: **draft for Marco** (2026-11-23). Clean room step 1 (RULES.md section 5): written in our own
 words from public sources only (list at the end). The build session works from this file, never from
-Breezy's code. Design background: SOURCES.md. Decisions: PLAN.md, "Weather engine".
+Breezy's code. Design background: SOURCES.md. Decisions: PLAN.md, "Weather engine". Libraries, modules, sources' terms, methods and
+milestones: MERIDIAN_PLAN.md.
 
 ## 1. What it is
 

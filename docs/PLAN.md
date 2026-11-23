@@ -154,7 +154,7 @@ Values follow the unit settings; a card is skipped when the source has no data f
 - **Accessibility:** follows Android's "Time to take action" timeout; a message with an action waits
   until dismissed when TalkBack is on.
 
-### Weather engine (decided 2026-11-23; design in SOURCES.md, spec in ENGINE_SPEC.md)
+### Weather engine (decided 2026-11-23; design in SOURCES.md, spec in ENGINE_SPEC.md, plan in MERIDIAN_PLAN.md)
 - **Name: Meridian** (the sun's highest point at noon; an iOS app "Meridian: Daylight" shares the
   name, acceptable for a library).
 - **Its own library repo**, like Motion: works on the phone, has no UI, any Android app can include
