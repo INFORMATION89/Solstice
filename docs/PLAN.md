@@ -59,11 +59,24 @@ logs, session notes or build reports here.
 | Colour | Material You (wallpaper) colour; sky-blue seed when it's off |
 | Type | Google Sans Flex, Material type scale, named hero styles |
 | Icons | Material Symbols Rounded, one catalog (`SolsticeIcons`), one weight (500), fill only for on/selected; moon phases are the one exception |
-| Glass | One glass (`surfaceContainerHigh` at 40 %) for every surface (2026-11-21). **Under review:** Apple keeps glass for controls and navigation, not content (see Open questions) |
+| Glass | `surfaceContainerHigh` at 40 % for the toolbar, buttons and sheets; cards get a thicker card material (decided 2026-11-22, values to pick) |
 | Toolbar | One toolbar at shell level: a pages pill (navigation only) plus one accessory (home: Search; window: Pin); contexts are data. **Its current animation stays** (Marco, 2026-11-22) |
 | Close button | ✕ at the **end** of the header (Marco, 2026-11-22: easier to reach). Back, predictive back and pull-down still close |
 | Handles | On the moon card and search, without tap actions (accessibility check pending) |
 | Look of cards | Standard, readable design; physical feel through interaction (Direction 3) |
+
+### Framework (decided 2026-11-22)
+- **Motion = two modules in one repo:** `motion` (core: springs, gestures, morphs, haptics; Compose
+  only) and `motion-ui` (the UI kit: theme, page frame, card, sheet pieces, header buttons, glass;
+  Material 3 and Haze). The kit never leaks into the core.
+- **Tokens:** the kit defines the names with neutral Material-based defaults; each app passes its own
+  values through the kit's theme. Solstice passes its current values.
+- **Springs:** speed (fast, default, slow) × bounce (none, slight, playful) for movement, plus effects
+  springs (opacity, colour, blur) that never bounce; `wobble` stays for the toolbar bud.
+- **Reduce Motion:** Apple's list, built into every Motion piece.
+- **Materials:** glass for controls, navigation and sheets; a thicker card material for cards.
+- **Motion Lab:** Motion's own app, built on the kit.
+- **No typed-in values:** CI check with a reviewed allowlist that only shrinks.
 
 ### Motion (full rules: MOTION.md)
 - Springs only, from tokens; things morph, never pop; one material per morph; the button becomes the card.
@@ -96,20 +109,13 @@ logs, session notes or build reports here.
 
 ## Open questions (to settle with Marco)
 
-1. **Motion as the UI framework:** module split (motion core vs UI kit), what moves first, naming,
-   licence of moved code (only code written for Solstice, never upstream-derived), versioning for
-   several apps.
-2. **New layout for Solstice** (not an endless list): which direction.
-3. **Glass on cards:** keep one glass everywhere, or glass for controls and a thicker material for
-   cards (Apple's rule)? Contrast on bright skies either way.
-4. **Reduce Motion:** what each motion does when animations are off (Apple: fades instead of moves,
-   no blur hand-offs, no depth, less bounce).
-5. **Spring tokens:** 12 today with duplicates (`control` = `settle`); move to speed × bounce plus
-   non-bouncy effects springs?
-6. **Handles without taps:** TalkBack needs an action to resize or close.
-7. **Proactive alerts (Direction 4):** which alerts at first, their defaults and wording, and where you
+1. **New layout for Solstice** (not an endless list): which direction.
+2. **The card material's values** (opacity, blur), picked in the lab on Saturday.
+3. **Spring mapping:** confirm the table in CONTINUE.md "Next session".
+4. **Handles without taps:** TalkBack needs an action to resize or close.
+5. **Proactive alerts (Direction 4):** which alerts at first, their defaults and wording, and where you
    switch them on.
-8. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
+6. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
 
 ## Research queue
 1. Gradient Weather's rain countdown on screen: how it looks and how it disappears (the Threads post

@@ -1408,3 +1408,10 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
   framework; the app gets a new layout that isn't an endless list; proactive alerts the Gradient Weather
   way (PLAN.md Direction 4). Research done in chat: top weather apps, Apple HIG, Live Update rules.
   Saturday's plan: CONTINUE.md "Next session".
+
+- **2026-11-22 (chat, Marco): Saturday's decisions.** Motion splits into `motion` (core) and `motion-ui`
+  (UI kit); token names in the kit, values from each app; first pieces to move: theme and tokens, glass
+  and card, page frame, sheet pieces; springs as speed × bounce plus non-bouncy effects springs (mapping
+  to confirm); Reduce Motion follows Apple's list; two materials (glass for controls, a card material);
+  CI no-hardcoding check with a shrinking allowlist; Motion Lab as Motion's own app on the kit. Order in
+  CONTINUE.md "Next session".

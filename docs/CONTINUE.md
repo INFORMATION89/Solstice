@@ -9,36 +9,62 @@ Theme: **guardrails and the start of Motion as the UI framework.** Nothing on sc
 this session except where Marco agreed to a change beforehand. RULES.md applies throughout: anything
 not listed here, or any surprise, goes back to Marco before it's built.
 
-**To settle in chat before Saturday** (anything not settled is skipped, not guessed):
-1. Motion's module split and names: a core module (springs, gestures, morphs, haptics; Compose only)
-   and a UI kit module (theme of tokens, page frame, card, sheet pieces, header buttons, glass;
-   adds Material 3 and Haze). Which pieces move first.
-2. How the tokens become a theme: the kit holds the token *names* with neutral defaults, each app
-   passes its own values (Solstice passes today's). This replaces MOTION_REPO_PLAN phase 2's "swap
-   Solstice's tokens for Material 3's defaults" in the lab: the lab would use the kit's theme.
-3. Optional, only if decided: spring tokens as speed × bounce plus non-bouncy effects springs;
-   Reduce Motion behaviour; glass on cards.
+**Decided in chat (2026-11-22, Marco):**
+1. **Motion splits into two modules** in the same repo: `motion` (springs, gestures, morphs, haptics;
+   Compose only) and `motion-ui`, the UI kit (theme, page frame, card, sheet pieces, header buttons,
+   glass; adds Material 3 and Haze). `motion-ui` depends on `motion`, never the other way.
+2. **Tokens: names in the kit, values from the app.** The kit defines the token names with neutral,
+   Material-based defaults and a theme (like `MaterialTheme`) that apps fill in; Solstice passes
+   today's values, so it looks the same.
+3. **First pieces to move:** theme and tokens; glass and card; the page frame (scaffold, header,
+   `FrameAction`, `FrameButton`, top edge); sheet pieces (handle, shape, screen corners, `SheetDialog`).
+   These have no weather code today (except a few string resources, which become parameters).
+4. **Springs become speed × bounce**, plus effects springs that never bounce (proposal below; confirm
+   the table before Saturday).
+5. **Reduce Motion ("Remove animations") follows Apple's list:** morphs and sheets become quick fades
+   in place, blur hand-offs become plain crossfades, no bounce, no recede; drags still follow the finger.
+   Built into every Motion piece.
+6. **Two materials:** glass for the toolbar, buttons and sheets; a thicker card material for cards. Both
+   are kit tokens. The card material's values get picked with Marco in the lab (that is the one visible
+   change this Saturday).
+7. **CI check: baseline, then shrink.** Today's typed-in values go on an allowlist Marco reviews; anything
+   new fails the build; the list only shrinks.
+8. **The Motion Lab becomes Motion's own app, built on the kit** (its first real user); Solstice's copy
+   and the "Solstice Lab" launcher icon go.
+
+**Spring tokens, proposed mapping (response in seconds / damping; to confirm):**
+
+| | No bounce (1.0) | Slight (0.8) | Playful (0.5) |
+|---|---|---|---|
+| **Fast** (0.2) | `snappy` (was 0.9 damping) | | |
+| **Default** (0.31) | `control`, `settle` (identical today) | `container` (0.78), `content` (0.85) | `playful` |
+| **Slow** (0.4) | `dismiss` (0.39), `smooth`, `gentle` (0.44) | `brisk` (0.78), `momentum` | |
+
+- **Effects** (opacity, colour, blur; never bounce), Material's values: fast 0.10 s, default 0.16 s,
+  slow 0.22 s. `BlurCrossfade` and every fade move to these.
+- `wobble` (0.31 / 0.32) stays as a named special for the toolbar bud (its animation stays).
+- Small shifts to feel on the phone: `snappy` loses its last 10 % of bounce, `gentle` gets a little
+  quicker, `content`'s scale bounces a touch more. Old names stay as aliases until every use moves.
 
 **Order for Saturday** (each step: build, check, commit; stop and ask if a step doesn't go as planned):
 1. **Pull and read** RULES.md, PLAN.md, this file; `git submodule update --init`.
-2. **Guardrails** (agreed with RULES.md 3.4 and 7):
-   - A CI check that fails on typed-in values in `ui/expressive/` and in Motion's UI code: `dp`/`sp`
-     literals, `Color(0x…)`, `spring(`, `tween(`, `delay(`. Today's occurrences go into a baseline
-     allowlist that can only shrink; **show the allowlist to Marco** before merging.
-   - Run the app's unit tests in CI too (`SummaryTest`, `FreshnessTest`, `SkyVisibilityTest` never
-     run there today).
-3. **Motion clean-up, no visible change:**
-   - One Motion Lab: the copy in Solstice (`ui/expressive/lab/`, identical to `motion/lab/`) goes once
-     the lab runs as Motion's own app (MOTION_REPO_PLAN phase 2, adjusted by point 2 above).
-   - Remove the old `Morph` composable if only the lab uses it (the app uses `SpringMorph`).
-   - Motion's README up to date: `SpringMorph`, `BlurCrossfade`, `MorphSettings`, all spring tokens.
-4. **UI kit, first pieces (if point 1 is agreed):** create the module; move the token theme, then
-   `Glass`, the card, and the page frame pieces (`FrameHeader`, `FrameAction`, `FrameButton`,
-   `PageScaffold`, the top edge), each with a lab page. Solstice imports them and passes its values.
-   Check: screenshots of every page before and after must match.
-5. **Docs:** UI_SYSTEMS.md refreshed (it describes files that no longer exist), LOG.md entries,
-   ROADMAP.md ticks.
-6. **Phone pass**, if the Pixel is connected: the "built, not checked" items further down this file.
+2. **Guardrails:** the CI check (decision 7) on `ui/expressive/` and Motion's UI code (`dp`/`sp`
+   literals, `Color(0x…)`, `spring(`, `tween(`, `delay(`); **show the allowlist to Marco** before
+   merging. Run the app's unit tests in CI too.
+3. **Motion core clean-up:** spring tokens (decision 4, with aliases); effects springs; Reduce Motion in
+   `SpringMorph`, `BlurCrossfade`, `Dial`, page springs (decision 5); remove the old `Morph` composable
+   if only the lab uses it; tests for each.
+4. **`motion-ui` module:** theme and tokens → glass and card (two materials, decision 6) → page frame →
+   sheet pieces. Solstice imports each and passes its values. Check: screenshots of every page before
+   and after match, except the card material.
+5. **Motion Lab as its own app** on `motion-ui`, one page per piece (core and kit); remove Solstice's
+   copy.
+6. **Docs:** Motion README (all pieces, the new springs, the kit), UI_SYSTEMS.md, MOTION.md's token
+   table, LOG.md, ROADMAP.md.
+7. **Phone pass**, if the Pixel is connected: the "built, not checked" items further down this file,
+   and the spring changes above.
+
+If time runs short, stop after a finished step; the rest moves to the next session in this order.
 
 **Not this Saturday** (proposals to Marco first, in chat): the new app layout (not an endless list),
 the postcards' standard look, proactive alerts the Gradient way (PLAN.md Direction 4), the spring
