@@ -123,6 +123,36 @@ first one that matches.
 
 ---
 
+## 9. Proactive alerts (proposal, PROPOSALS.md section 4)
+
+Mexican Spanish uses **tú** (to confirm with Marco). Titles say what's happening; the text says what to
+do or when. No exclamation marks; official warnings use the agency's own title.
+
+| Alert | English | Español (México) |
+|---|---|---|
+| Countdown, title | Rain in {minutes} min | Lluvia en {minutes} min |
+| Countdown, text | It should start around {time} and last about {duration}. | Debería empezar cerca de las {time} y durar unos {duration}. |
+| Countdown, snow or mixed | Precipitation in {minutes} min | Precipitación en {minutes} min |
+| Countdown, starting | Rain is starting now | Ya está empezando a llover |
+| Countdown, passed | The rain went around you | La lluvia ya no pasará por aquí |
+| Countdown, stop button | Stop | Detener |
+| Official warning, title | {agency title} | {título de la agencia} |
+| Official warning, text | From {agency}, until {time}. {first instruction} | De {agency}, hasta las {time}. {primera instrucción} |
+| Warning updated | {agency title}, updated | {título de la agencia}, actualizado |
+| Tomorrow, title | Tomorrow: {high}°, {condition} | Mañana: {high}°, {condition} |
+| Tomorrow, rain | You'll need an umbrella in the {part of day}. | Vas a necesitar paraguas en la {parte del día}. |
+| Tomorrow, colder | It will be {difference}° colder than today. | Va a hacer {difference}° menos que hoy. |
+| Tomorrow, warmer | It will be {difference}° warmer than today. | Va a hacer {difference}° más que hoy. |
+| Very high UV, title | Very high UV from {time} | UV muy alto desde las {time} |
+| Very high UV, text | Wear sunscreen and look for shade around midday. | Usa bloqueador y busca sombra cerca del mediodía. |
+| Frost, title | Frost possible tonight | Posible helada esta noche |
+| Frost, text | It will go down to {temp} around {time}. Cover your plants. | Bajará a {temp} cerca de las {time}. Cubre tus plantas. |
+| First-time hint | Get a heads-up before it rains. | Recibe un aviso antes de que llueva. |
+| Permission reason | To tell you before it rains, Solstice needs to send notifications. | Para avisarte antes de que llueva, Solstice necesita enviar notificaciones. |
+
+Notes: "paraguas" over "sombrilla" (both used in CDMX; "sombrilla" is also a sun umbrella); "bloqueador"
+is the everyday word in Mexico; times follow the phone's 12/24-hour setting.
+
 ## After the session
 
 Your versions become the strings in `app/src/main/res/values/strings_expressive.xml`, and any new

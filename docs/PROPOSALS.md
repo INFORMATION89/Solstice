@@ -1,5 +1,8 @@
 # Proposals waiting for Marco
 
+Mockups (sample data): Outlook, a rain card's sheet at both heights, onboarding and Settings, on the
+canvas https://claude.ai/artifact/PQ6PAqLwXQ4CnAQnExJk6p (2026-11-23).
+
 Status: **proposals** (2026-11-23). Nothing here is built until it's agreed (RULES.md section 1). Once
 a part is agreed it moves to PLAN.md "Decisions in force" and leaves this file.
 
@@ -95,3 +98,33 @@ Units, Appearance stay; Debug hidden.
 **Decided (Marco, 2026-11-23):** Outlook keeps its own section.
 
 **Question for Marco:** search inside Settings, needed with nine sections?
+
+## 4. Proactive alerts (PLAN.md Direction 4, open question 4)
+
+Proposed 2026-11-23. Wording in WRITING.md section 9.
+
+**First set** (the ones that answer "do I need to do something now?"):
+
+| Alert | Default | You set | Ends or repeats |
+|---|---|---|---|
+| Precipitation soon, with a live countdown | off | heads-up 10, **15** or 20 min before; which places | ends when it starts or the chance passes; once per rain spell, then 3 h quiet |
+| Official warnings | **on**, severe and above | minimum level (all, moderate, severe, extreme) | once per warning; again only when it's updated or upgraded |
+| Tomorrow, in the evening | off | time (default 8:00 PM) | once a day; skipped when nothing is worth saying |
+| Very high UV | off | level (default 8, WHO "very high") | once a day, in the morning before it gets there |
+| Frost tonight | off | temperature (default 2°) | once a night |
+
+**Later** (each needs its data first): pollen per allergen, air quality dropping, rapid pressure
+changes, what to wear.
+
+**Where you switch them on:** in the card's own sheet (the rain card's sheet has the countdown switch,
+the UV card's the UV alert), and all together in Settings › Notifications. Not in onboarding: the first
+time you open a card that has an alert, a one-line hint under its title.
+
+**How it runs** (from SOURCES.md, no server): the phone's scheduled refresh checks the minutely
+forecast more often only while a rain alert is armed and rain is possible in the next 2 hours
+(otherwise the normal schedule). Notification permission is asked when you first switch an alert on,
+never at start. The countdown is an Android Live Update (you started it, it has a Stop button);
+older Android versions get an ongoing notification with the same text.
+
+**Rules:** the same thing never notifies twice (cooldowns above); quiet hours follow the phone's Do
+Not Disturb, except extreme official warnings; every notification opens the matching card's sheet.
