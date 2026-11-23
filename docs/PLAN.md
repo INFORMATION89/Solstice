@@ -206,7 +206,16 @@ Values follow the unit settings; a card is skipped when the source has no data f
    ours has no tap. Change for partial sheets?
 5. **Proactive alerts (Direction 4):** which alerts at first, their defaults and wording, and where you
    switch them on.
-6. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
+6. **Optional sources** (Marco, 2026-11-23: with very local sources, don't bundle everything). Facts:
+   cutting 40 source packages saved 1.36 MB on the debug APK and less after R8 (release is 15.1 MB
+   total, mostly libraries), so code size isn't the problem. Sources are never contacted unless
+   picked, and settings already hide sources that don't cover a location. Ways to make them
+   downloadable: separate plugin apps (each its own install, versioning and signing), or Play
+   Feature Delivery (works only through Google Play, not GitHub or Obtainium). Proposal: keep them
+   built in, but "off until relevant": a local source (SMN, CDMX network, SGIRPC) appears only for
+   places it covers, starts off, and is offered once ("Mexico City has a local network, use it?").
+   Revisit plugins only if the source list grows a lot. To decide with Marco.
+7. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
 
 ## Research queue
 1. Gradient Weather's rain countdown on screen: how it looks and how it disappears.
@@ -233,6 +242,16 @@ Values follow the unit settings; a card is skipped when the source has no data f
 7. **Alerts coverage after the 2026-11-18 source cut:** Gradient gets official warnings from MeteoAlarm,
    NWS, ECCC, SACHET, Hong Kong Observatory, CWA and WMO's national services (CAP); Solstice keeps NWS,
    ECCC and WMO severe weather. Check what Europe and Asia lost.
+   **Checked 2026-11-23** against upstream's SOURCES.md and WMO's source list (sources.json): the cut
+   removed national alert sources for 13 European places (Météo-France, GeoSphere, DMI, Bright Sky,
+   Veðurstofa, MET Éireann, LHMT, MeteoLux, IPMA…), 8 in Asia and the Pacific (China, HKO, BMKG,
+   IMS, JMA, SMG, CWA/NCDR, MGM) and 17 African countries (ClimWeb). WMO lists an operating feed for
+   all of them **except Japan, Taiwan and Türkiye**, so those three lost official alerts; everywhere
+   else WMO stands in. (MET Norway stayed.) WMO also covers places upstream never had: Spain, Italy,
+   UK, Netherlands, Belgium, Switzerland, India, Korea, Philippines, Australia, Brazil, Argentina,
+   Colombia, Chile. Not checked: whether WMO's copy is as detailed or as quick as the national source
+   (Germany's DWD directly is per municipality); FOSS Public Alert Server is still "early testing"
+   upstream. Proposal: bring back JMA, CWA/NCDR and MGM for alerts only, or accept the gap.
 8. **Localized accuracy and combined sources** (Marco, 2026-11-23; Mexico City is hard to forecast:
    afternoon storms shaped by the mountains and the city are poorly captured by models). Proposed in
    steps, each verified before the next:
