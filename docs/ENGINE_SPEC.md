@@ -145,13 +145,19 @@ Cerro Catedral radar, published only as images on SMN's site; ask SMN about acce
 - Android: Solstice re-exposes results to other apps on the phone (the data sharing Breezy already
   offers to Gadgetbridge and launchers), with the person's consent.
 
-## 12. Configuration and tokens
+## 12. First sources (decided 2026-11-23)
+
+Open-Meteo (forecast, air quality; no key), aviationweather.gov airport reports (current conditions;
+public, no key), WMO Severe Weather and the FOSS Public Alert Server (official alerts). Everything
+else plugs in later.
+
+## 13. Configuration and tokens
 
 Every threshold, weight, distance, age, window, cell size and interval is configuration with a named
 default, never typed into code (RULES.md section 3). The list grows with the code; each new one is
 agreed with Marco.
 
-## 13. Testing
+## 14. Testing
 
 - Each adapter is tested offline against recorded responses (fixtures), including error and empty
   responses.
@@ -161,9 +167,7 @@ agreed with Marco.
 ## Open questions for Marco
 
 1. Engine repo name (for example `solstice-engine` or a name of its own).
-2. Which sources the engine starts with: proposal Open-Meteo (forecast, air quality), aviationweather
-   (airport observations), WMO and FOSS Public Alert Server (alerts).
-3. How long the on-phone log keeps data (proposal: 30 days).
+2. How long the on-phone log keeps data (proposal: 30 days).
 
 ## Consulted (public sources only)
 

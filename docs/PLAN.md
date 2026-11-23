@@ -346,7 +346,7 @@ review): `docs/SOURCES.md`, proposal awaiting Marco.
     images. The hard season is the rainy one (June to early October, about 85 % of the year's rain);
     in November meteoblue rates predictability "very high". Measuring it properly needs a small
     script (Open-Meteo's archived forecasts against the MMMX airport reports, rainy season 2026): a
-    research job for a coding session, to schedule with Marco.
+    research job, Saturday step 3 (CONTINUE.md).
 16. **Leaving the Breezy fork, inventory** (2026-11-23; Kotlin lines today): screens 39,000 (main 12.2k,
     common 8.8k, settings 7.3k, details 7.1k, theme, search, about, alert) → Motion UI; sources 8,700,
     common utilities 8,100, domain models 5,200, units 5,500, storage 2,300, map geometry 1,800 → the

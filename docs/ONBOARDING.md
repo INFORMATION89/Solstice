@@ -1,6 +1,7 @@
 # Onboarding: proposal
 
-Status: **proposal for Marco** (2026-11-23). Nothing is built until it's agreed (RULES.md section 1).
+Status: **proposal for Marco** (2026-11-23); step 1 as a separate first screen decided the same day.
+Nothing is built until it's agreed (RULES.md section 1).
 
 ## What it has to respect
 
@@ -17,13 +18,13 @@ Status: **proposal for Marco** (2026-11-23). Nothing is built until it's agreed 
 
 ## The flow (two steps, no slides)
 
-**Step 1: Where are you?** The Forecast page itself, already drawn with empty cards that shimmer, and
-one sheet at the bottom:
+**Step 1: Where are you?** A separate first screen (Marco, 2026-11-23), still one screen and not
+slides: the app's name, one short line, and two choices.
 - "Use my location" (primary). Opens Android's prompt, approximate and precise together. Approximate
   is enough for weather; we never ask again for precise.
 - "Choose a place" (secondary). Opens search; the place picked becomes home.
-- Granting or picking fills the page behind the sheet as the forecast loads: the first thing you see
-  is the app working, not a description of it.
+- Once location is allowed or a place is picked, the screen morphs into Forecast (MOTION.md: things
+  morph, never pop), already loading, so the next thing you see is the app working.
 
 **Step 2: Help improve forecasts** (only once sharing exists, see below). A sheet, after the forecast
 has loaded, so it never stands between you and the weather:
@@ -58,6 +59,6 @@ sharing launches: new installs see step 2; existing users get it once as a messa
 
 ## Questions for Marco
 
-1. Does step 1 as a sheet over the forecast fit your idea, or do you want a separate first screen?
+1. What the first screen shows besides the two choices (the app's name only, or a live sky behind it).
 2. Should the opt-in also show a running count of what you've shared so far (in Settings)?
 3. The wording above is a first draft; every sentence goes through WRITING.md and you before it ships.
