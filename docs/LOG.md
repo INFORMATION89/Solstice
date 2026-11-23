@@ -1461,3 +1461,4 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 - **2026-11-23:** Decided: onboarding step 1 is a separate first screen; the engine starts with Open-Meteo, aviationweather.gov, WMO and FOSS Public Alert Server; the Mexico City model spread test is Saturday step 3 (runs on GitHub Actions or Marco's computer, since sessions can't reach the data).
 - **2026-11-23:** Decided: forecast log kept 30 days on the phone; spring mapping confirmed as written; onboarding first screen sits on Forecast's gradient field. PR #2 merged into main.
 - **2026-11-23:** Engine named **Meridian**.
+- **2026-11-23:** Proposals for Outlook, partial sheets per card and Settings (PROPOSALS.md); information requests to SMN and SGIRPC drafted (OUTREACH.md).
