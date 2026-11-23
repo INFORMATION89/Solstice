@@ -25,8 +25,8 @@ can be self-hosted later if needed.
 5. A short glossary per language (weather terms: "chubasco" versus "aguacero", alert levels) so
    translators stay consistent.
 
-**Questions for Marco:** Spanish (Mexico) only, or a neutral Spanish as well? When to open Weblate (with
-the first Motion UI screens, or once most strings are new)?
+**Decided (Marco, 2026-11-23):** Mexican Spanish only at first. **Still open:** when to open Weblate
+(with the first Motion UI screens, or once most strings are new).
 
 ## Widgets
 
@@ -55,5 +55,5 @@ Glance theme (a small `motion-glance` piece later), so widgets match the app.
 **Updates:** pushed from each Meridian refresh (WorkManager), not Android's periodic widget timer, so
 widgets are never staler than the app.
 
-**Questions for Marco:** which first widget? Should widgets follow the system's dynamic colour or
-Solstice's own palette?
+**Decided (Marco, 2026-11-23):** the 2×2 comes first, then the 4×2. Colours are a Settings option:
+Solstice's sky palette by default, the phone's dynamic colour as a choice.
