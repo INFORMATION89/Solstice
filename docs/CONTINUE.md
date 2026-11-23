@@ -56,6 +56,8 @@ none. The Motion Lab gets a switch to compare subtle against no bounce on every 
 2. **Guardrails:** the CI check (decision 7) on `ui/expressive/` and Motion's UI code (`dp`/`sp`
    literals, `Color(0x…)`, `spring(`, `tween(`, `delay(`); **show the allowlist to Marco** before
    merging. Run the app's unit tests in CI too.
+   Then branch protection on `main` (Marco, 2026-11-23): block force pushes and deletion; once the
+   checks exist, require them to pass before merging (sessions work on a branch, merge by pull request).
 3. **Motion core clean-up:** spring tokens (decision 4, with aliases); effects springs; Reduce Motion in
    `SpringMorph`, `BlurCrossfade`, `Dial`, page springs (decision 5); remove the old `Morph` composable
    if only the lab uses it; tests for each.
