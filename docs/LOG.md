@@ -1442,3 +1442,5 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 - **2026-11-23 (Marco): icons.** Weather conditions use Material Symbols for now (no animated icons; Meteocons
   and others looked at and dropped); later option: our own set built from Material Symbols with a colour layer.
 - **2026-11-23 (Marco):** branch protection for `main` added to Saturday's guardrails (no force push or deletion; then CI required before merging).
+- **2026-11-23 (Marco): Forecast card catalog** (PLAN.md): UV, air quality and wind appear when they matter by
+  default; air quality matters as soon as it isn't "good".

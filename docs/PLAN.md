@@ -109,6 +109,29 @@ logs, session notes or build reports here.
 - **A place's local time** shows wherever its time differs from your phone's (saved or previewed),
   from one place-time component.
 
+### Forecast card catalog (decided 2026-11-23; thresholds are tokens, tuned with real use)
+Values follow the unit settings; a card is skipped when the source has no data for it.
+
+| Card | Small view | Moves to the top when | Default |
+|---|---|---|---|
+| Alerts | Official warning title and severity | Always, while one is active | On, can't be turned off |
+| Rain and snow | Start or stop time, chance, amount | It meets the rain rule within 2 hours | On, appears when it matters |
+| Hourly | Next 6 hours: temperature and icon | Never (the anchor card) | On |
+| UV | Index and "high until 4 PM" | Index 6 or above (WHO "high") | On, appears when it matters |
+| Air quality | Index and level | **Anything worse than "good"** | On, appears when it matters |
+| Wind | Speed, gusts, direction | Gusts of 50 km/h or more | On, appears when it matters |
+| Feels like | Feels-like temperature and why | 4° or more from the real temperature, or 35° and above | Off |
+| Humidity and dew point | Humidity, dew point, "muggy" or "dry" | Dew point 20° or above | Off |
+| Pressure | Value and trend | 3 hPa or more change in 3 hours | Off |
+| Visibility | Distance | Under 1 km | Off |
+| Pollen | Main allergen and level | High for any allergen | Off |
+| Sun and moon | Sunrise, sunset, moon phase | Never | Off (open: keep it at all?) |
+
+- Default order: Alerts, Rain, Hourly, then your own order. "Appears when it matters" cards are hidden
+  on normal days; any card can be set to always show.
+- Several important at once: alerts, rain, wind, UV, air quality.
+- Open: a "What to wear" card; whether "Sun and moon" exists as a card.
+
 ### Messages (decided 2026-11-22; a Motion UI component)
 - Several at once: **two options in Motion UI**, queue-and-merge (priority order, repeats merge, one
   morphs into the next) or stacked above the toolbar.
@@ -163,7 +186,8 @@ logs, session notes or build reports here.
 
 ## Open questions (to settle with Marco)
 
-1. **Card priority:** what makes each card "important" (thresholds), and where the switch to turn it off lives.
+1. **Card catalog leftovers:** a "What to wear" card? Keep "Sun and moon" as a card? Where the switch for
+   "important cards move to the top" lives.
 2. **The card material's values** (opacity, blur), picked in the lab on Saturday.
 3. **Spring mapping:** confirm the table in CONTINUE.md "Next session".
 4. **Handles without taps:** Apple's grabber is tappable (cycles heights) and works with VoiceOver;
