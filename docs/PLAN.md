@@ -29,8 +29,10 @@ logs, session notes or build reports here.
      a grabber you can drag, tap and resize with TalkBack; swipe down to close; one sheet at a time
      (a sheet never opens another on top); no Done button when settings apply at once; ✕ at the end
      stays our decided exception (Apple: leading edge).
-   - **Every card opens partially first, then to a full page** (Marco, 2026-11-22): medium height,
-     drag or scroll up for full height.
+   - **Every card opens one sheet with two heights** (Marco, 2026-11-22; refined 2026-11-23 after
+     Apple's guidelines): medium first (the answer and its timeline), drag, scroll or tap the grabber
+     for large (details, explainer, sources). No separate full page; the map stays full screen. The
+     grabber is tappable (cycles heights) and has a TalkBack action. Per-card contents: PROPOSALS.md.
    - **Optional, reorderable cards** (Marco, 2026-11-22): you add or remove cards (e.g. wind,
      pressure) and reorder them. **The most important card moves to the top when it matters**
      (today only rain does this, hardcoded in `ForecastPage.kt`; it becomes a general priority rule).
@@ -222,11 +224,9 @@ Values follow the unit settings; a card is skipped when the source has no data f
 1. **Card catalog leftovers:** where the switch for "important cards move to the top" lives.
 2. **Outlook's content:** which proactive answers it gives (Direction 6); proposal in PROPOSALS.md.
 3. **The card material's values** (opacity, blur), picked in the lab on Saturday.
-4. **Handles without taps:** Apple's grabber is tappable (cycles heights) and works with VoiceOver;
-   ours has no tap. Change for partial sheets?
-5. **Proactive alerts (Direction 4):** which alerts at first, their defaults and wording, and where you
+4. **Proactive alerts (Direction 4):** which alerts at first, their defaults and wording, and where you
    switch them on.
-6. **Optional sources** (Marco, 2026-11-23: with very local sources, don't bundle everything). Facts:
+5. **Optional sources** (Marco, 2026-11-23: with very local sources, don't bundle everything). Facts:
    cutting 40 source packages saved 1.36 MB on the debug APK and less after R8 (release is 15.1 MB
    total, mostly libraries), so code size isn't the problem. Sources are never contacted unless
    picked, and settings already hide sources that don't cover a location. Ways to make them
@@ -236,9 +236,9 @@ Values follow the unit settings; a card is skipped when the source has no data f
    places it covers, starts off, and is offered once ("Mexico City has a local network, use it?").
    Revisit plugins only if the source list grows a lot. **Decided 2026-11-23:** all built in, off
    until relevant where needed (SOURCES.md).
-7. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
+6. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
 
-8. **Clean room leftovers:** Motion Lab's 7 demo files still carry Breezy's LGPL header; first job on
+7. **Clean room leftovers:** Motion Lab's 7 demo files still carry Breezy's LGPL header; first job on
    Saturday (CONTINUE.md, step 2).
 
 ## Research queue

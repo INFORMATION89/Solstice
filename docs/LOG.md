@@ -1462,3 +1462,4 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 - **2026-11-23:** Decided: forecast log kept 30 days on the phone; spring mapping confirmed as written; onboarding first screen sits on Forecast's gradient field. PR #2 merged into main.
 - **2026-11-23:** Engine named **Meridian**.
 - **2026-11-23:** Proposals for Outlook, partial sheets per card and Settings (PROPOSALS.md); information requests to SMN and SGIRPC drafted (OUTREACH.md).
+- **2026-11-23:** Decided: Outlook first version (Up next, Best time to be outside, days; 10 days ahead); Outlook keeps its own Settings section; cards open one sheet with two heights (no separate page; map full screen); tappable grabber.

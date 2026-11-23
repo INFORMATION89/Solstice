@@ -31,10 +31,8 @@ Direction 6: a proactive planning page, like Acme Weather, not just a list of da
 **Later, not first:** "Plan something": pick an activity (a run, drying laundry, a picnic, photos at
 golden hour) and Outlook finds the best slot.
 
-**Questions for Marco**
-1. Which sections first? Proposal: Up next, Best time to be outside, and the day list; then Changes
-   ahead; then Evenings for the sky.
-2. How far ahead Outlook looks: 7 or 10 days?
+**Decided (Marco, 2026-11-23):** first version is Up next, Best time to be outside and the day list;
+then Changes ahead; then Evenings for the sky. Outlook looks 10 days ahead (picks within about 5).
 
 ## 2. Partial sheets per card
 
@@ -63,9 +61,9 @@ Decided: every card opens a partial sheet first, then a full page (Marco, 2026-1
 | What to wear | The suggestion for now or tomorrow morning, with the reasons | Through the day: layers, umbrella, sunscreen |
 | Moon (hero button) | Phase, rise and set | Next phases, the moon card redesign (on hold) |
 
-**Questions for Marco**
-1. Does the full height replace the full page, or does the full page stay a separate step after it?
-2. The grabber: tappable to switch heights (Apple's behaviour; open question 4 in PLAN.md)?
+**Decided (Marco, 2026-11-23, after Apple's sheet guidelines and Apple Weather):** one sheet with two
+heights, no separate page; the map stays full screen; the grabber is tappable. The table above is the
+proposal for each card's contents, still to confirm card by card.
 
 ## 3. Settings structure
 
@@ -94,6 +92,6 @@ Debug stays hidden (debug builds only).
 updates → Data and sources; Modules (sharing with other apps) → Data and sources; Notifications,
 Units, Appearance stay; Debug hidden.
 
-**Questions for Marco**
-1. Search inside Settings: needed with nine sections?
-2. Should Outlook's settings live inside Forecast instead of their own section?
+**Decided (Marco, 2026-11-23):** Outlook keeps its own section.
+
+**Question for Marco:** search inside Settings, needed with nine sections?
