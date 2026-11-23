@@ -138,7 +138,11 @@ Values follow the unit settings; a card is skipped when the source has no data f
 - **What to wear** (Marco, 2026-11-23): a Forecast card that **always shows**; what it covers depends on the
   time (today by day, tomorrow morning from the evening switch). Can also be one of the alerts you choose
   (Direction 4).
-- Open: whether the UV card opens the sun sheet.
+- **UV** (Marco, 2026-11-23): the UV card opens the sun sheet with UV first. The card (and the sun button)
+  **turns red when UV is very high** (WHO 8 and above), with an icon or word too, never colour alone. The UV
+  part of the sheet: today's index as a number, a **timeline of the next hours**, and **what to do** for
+  the current level (e.g. sunscreen, shade at midday), following WHO's guidance per level.
+- **What to wear suggests sunscreen** from the same UV rule (one shared rule, like rain).
 
 ### Messages (decided 2026-11-22; a Motion UI component)
 - Several at once: **two options in Motion UI**, queue-and-merge (priority order, repeats merge, one
@@ -194,8 +198,7 @@ Values follow the unit settings; a card is skipped when the source has no data f
 
 ## Open questions (to settle with Marco)
 
-1. **Card catalog leftovers:** whether the UV card opens the sun sheet; where the switch for "important
-   cards move to the top" lives.
+1. **Card catalog leftovers:** where the switch for "important cards move to the top" lives.
 2. **Outlook's content:** which proactive answers it gives (Direction 6).
 2. **The card material's values** (opacity, blur), picked in the lab on Saturday.
 3. **Spring mapping:** confirm the table in CONTINUE.md "Next session".
@@ -210,6 +213,12 @@ Values follow the unit settings; a card is skipped when the source has no data f
 2. The page receding behind a sheet, done cheaply (plan in LOG.md, 2026-11-22: dim + recede).
 3. Long press alongside drag to reorder (iOS context menu as reference).
 4. Proactive channels: Live Updates, daily brief, clothing.
+6. **Rainbow.ai nowcast** as an optional rain source (minute by minute, 4 hours, 1 km; free tier 5,000
+   requests a month per key, so bring-your-own-key like other keyed sources): terms for client apps,
+   attribution, and whether it cuts false rain alerts. Gradient Weather lists it among its sources.
+7. **Alerts coverage after the 2026-11-18 source cut:** Gradient gets official warnings from MeteoAlarm,
+   NWS, ECCC, SACHET, Hong Kong Observatory, CWA and WMO's national services (CAP); Solstice keeps NWS,
+   ECCC and WMO severe weather. Check what Europe and Asia lost.
 5. Card explainers (swipe up past the details): short Solstice texts, with "Read more" from Wikipedia
    (CC BY-SA: credit and link, never silently edited).
 

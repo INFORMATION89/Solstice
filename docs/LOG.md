@@ -1447,3 +1447,6 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 - **2026-11-23 (Marco):** sun and moon aren't cards; the sun gets its own hero button and sheet (with UV), like the moon.
 - **2026-11-23 (Marco):** "What to wear" is an always-shown Forecast card that follows the time of day; This week
   becomes "Outlook", a proactive planning page (best weekend day to go out, notable days), like Acme Weather.
+- **2026-11-23 (Marco): UV.** The UV card opens the sun sheet with UV first (index, next-hours timeline, what to do);
+  card and button turn red when UV is very high; What to wear suggests sunscreen from the same rule. Research
+  queued: Rainbow.ai nowcast as an optional source; alerts coverage vs Gradient Weather's sources.
