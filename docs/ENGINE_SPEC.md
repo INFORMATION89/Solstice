@@ -1,4 +1,4 @@
-# Solstice weather engine: spec
+# Meridian, the weather engine: spec
 
 Status: **draft for Marco** (2026-11-23). Clean room step 1 (RULES.md section 5): written in our own
 words from public sources only (list at the end). The build session works from this file, never from
@@ -6,7 +6,8 @@ Breezy's code. Design background: SOURCES.md. Decisions: PLAN.md, "Weather engin
 
 ## 1. What it is
 
-A weather library with no UI. Given a place, it returns a forecast, current conditions, next-hour
+**Meridian** (name decided 2026-11-23; repo `INFORMATION89/Meridian` when it's created) is a
+weather library with no UI. Given a place, it returns a forecast, current conditions, next-hour
 rain, alerts, air quality and UV, each with a record of where every number came from. Solstice uses it
 first; other apps (a macOS menu bar app, a Windhawk mod, a clock app) can use it later.
 
@@ -111,7 +112,7 @@ validity match. Updates replace what they reference; cancels remove it. The most
 ## 8. Learning (on the phone)
 
 - A short rolling log per saved place: what each source forecast for each hour, and what the nearest
-  observation later measured. Kept for a window set in configuration, then deleted.
+  observation later measured. Kept 30 days by default (configuration; decided 2026-11-23), then deleted.
 - From it: each source's recent error, used for weights, and a bias correction for the next hours
   that fades out with lead time.
 - Seeded from public data so it works from day one: archived past forecasts (Open-Meteo keeps them
@@ -166,8 +167,7 @@ agreed with Marco.
 
 ## Open questions for Marco
 
-1. Engine repo name (for example `solstice-engine` or a name of its own).
-2. How long the on-phone log keeps data (proposal: 30 days).
+None right now.
 
 ## Consulted (public sources only)
 

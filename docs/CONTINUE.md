@@ -32,7 +32,7 @@ not listed here, or any surprise, goes back to Marco before it's built.
 8. **The Motion Lab becomes Motion's own app, built on the kit** (its first real user); Solstice's copy
    and the "Solstice Lab" launcher icon go.
 
-**Spring tokens, proposed mapping (response in seconds / damping; to confirm):**
+**Spring tokens, mapping (response in seconds / damping; confirmed by Marco 2026-11-23):**
 
 **Opinion (Marco, 2026-11-22): movement always has some bounce.** The lowest level is "subtle", not
 none. The Motion Lab gets a switch to compare subtle against no bounce on every demo before it's final.

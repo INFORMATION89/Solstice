@@ -170,7 +170,7 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 - [x] 💬⭐ **App layout:** Forecast keeps today's layout (2026-11-22). A2 from the layout canvas is the
   pattern for partial sheets (PLAN.md Direction 2).
 - [ ] ⭐ **Partial sheet in Motion's kit** (the A2 pattern): grows out of its card, dimmed page behind,
-  medium height first, then full page for every card, grabber (drag, tap, TalkBack), swipe down to close, ✕ at the end, room for a
+  medium height first, then large (no separate page) for every card, grabber (drag, tap cycles heights, TalkBack), swipe down to close, ✕ at the end, room for a
   chart and setting rows. Lab page first; then which Forecast cards open one (to agree).
 - [ ] ⭐ **Header close side as a Motion option:** ✕ at the end (default) or swapped with the leading
   button; mirrored for right-to-left; a lab switch.
