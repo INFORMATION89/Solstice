@@ -125,12 +125,14 @@ Values follow the unit settings; a card is skipped when the source has no data f
 | Pressure | Value and trend | 3 hPa or more change in 3 hours | Off |
 | Visibility | Distance | Under 1 km | Off |
 | Pollen | Main allergen and level | High for any allergen | Off |
-| Sun and moon | Sunrise, sunset, moon phase | Never | Off (open: keep it at all?) |
 
 - Default order: Alerts, Rain, Hourly, then your own order. "Appears when it matters" cards are hidden
   on normal days; any card can be set to always show.
 - Several important at once: alerts, rain, wind, UV, air quality.
-- Open: a "What to wear" card; whether "Sun and moon" exists as a card.
+- **Sun and moon are not cards** (Marco, 2026-11-23): the sun gets its own button in the hero, like the
+  moon's, opening a sun sheet (sunrise, sunset, daylight, UV through the day).
+- Open: where "What to wear" lives (proposal: Forecast, today by day and tomorrow morning in the evening);
+  whether the UV card opens the sun sheet.
 
 ### Messages (decided 2026-11-22; a Motion UI component)
 - Several at once: **two options in Motion UI**, queue-and-merge (priority order, repeats merge, one
@@ -186,8 +188,8 @@ Values follow the unit settings; a card is skipped when the source has no data f
 
 ## Open questions (to settle with Marco)
 
-1. **Card catalog leftovers:** a "What to wear" card? Keep "Sun and moon" as a card? Where the switch for
-   "important cards move to the top" lives.
+1. **Card catalog leftovers:** where "What to wear" lives; whether the UV card opens the sun sheet; where
+   the switch for "important cards move to the top" lives; This week renamed "Outlook"?
 2. **The card material's values** (opacity, blur), picked in the lab on Saturday.
 3. **Spring mapping:** confirm the table in CONTINUE.md "Next session".
 4. **Handles without taps:** Apple's grabber is tappable (cycles heights) and works with VoiceOver;

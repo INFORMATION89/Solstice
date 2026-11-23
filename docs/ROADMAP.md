@@ -180,6 +180,8 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 - [ ] ⭐ **Forecast spacing pass** against Material's spacing guidance, kit tokens only (hero temperature,
   sun/moon path and time stay).
 - [ ] ⭐ **Moon card rework** on `motion-ui` as a partial sheet (with the kit move).
+- [ ] ⭐ **Sun button and sun sheet** (decided 2026-11-23): a button in the hero like the moon's, opening a
+  partial sheet with sunrise, sunset, daylight and UV through the day. Design to agree.
 - [ ] 💬 **Postcards in a standard look**, the physical feel kept in the interaction (Direction 3).
 - [ ] 💬⭐ **Proactive alerts the Gradient Weather way** (Direction 4): alerts you choose to watch, rain or
   snow countdown as a Live Update, cooldowns, official warnings in full, evening summary, what to wear.

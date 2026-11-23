@@ -1444,3 +1444,4 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 - **2026-11-23 (Marco):** branch protection for `main` added to Saturday's guardrails (no force push or deletion; then CI required before merging).
 - **2026-11-23 (Marco): Forecast card catalog** (PLAN.md): UV, air quality and wind appear when they matter by
   default; air quality matters as soon as it isn't "good".
+- **2026-11-23 (Marco):** sun and moon aren't cards; the sun gets its own hero button and sheet (with UV), like the moon.
