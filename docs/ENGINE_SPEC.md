@@ -1,4 +1,4 @@
-# Solstice weather engine: spec
+# Meridian, the weather engine: spec
 
 Status: **draft for Marco** (2026-11-23). Clean room step 1 (RULES.md section 5): written in our own
 words from public sources only (list at the end). The build session works from this file, never from
@@ -6,7 +6,8 @@ Breezy's code. Design background: SOURCES.md. Decisions: PLAN.md, "Weather engin
 
 ## 1. What it is
 
-A weather library with no UI. Given a place, it returns a forecast, current conditions, next-hour
+**Meridian** (name decided 2026-11-23; repo `INFORMATION89/Meridian` when it's created) is a
+weather library with no UI. Given a place, it returns a forecast, current conditions, next-hour
 rain, alerts, air quality and UV, each with a record of where every number came from. Solstice uses it
 first; other apps (a macOS menu bar app, a Windhawk mod, a clock app) can use it later.
 
@@ -166,7 +167,6 @@ agreed with Marco.
 
 ## Open questions for Marco
 
-1. Engine repo name (for example `solstice-engine` or a name of its own).
 
 ## Consulted (public sources only)
 
