@@ -1439,3 +1439,5 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
   / Sharp setting plus a filled gradient weather set (Meteocons Fill candidate); messages: queue-and-merge
   or stacked as Motion UI options, two lines, accessibility timing; professional clean-up of the app,
   docs and store text (Smartspacer plans dropped).
+- **2026-11-23 (Marco): icons.** Weather conditions use Material Symbols for now (no animated icons; Meteocons
+  and others looked at and dropped); later option: our own set built from Material Symbols with a colour layer.

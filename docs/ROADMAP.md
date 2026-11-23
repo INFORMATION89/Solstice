@@ -133,8 +133,10 @@ foundations, then the kit pieces in R2's order. Each item still gets agreed befo
   scrolled; touch slop, settle and blur sizes as tokens.
 
 ### Decisions and clean-up
-- [ ] **Q1 · Icons** (PLAN.md "Icons"): build the Rounded / Outlined / Sharp setting; try Meteocons
-  "Fill" (Lottie) for weather conditions; keep Breezy's icon packs as the "other sets" option.
+- [ ] **Q1 · Icons** (PLAN.md "Icons"): build the Rounded / Outlined / Sharp setting; weather conditions
+  in Material Symbols for now (no animated icons).
+- [ ] 💬 Later: our own weather set from Material Symbols' shapes with a Solstice colour layer (mock six
+  conditions on the design canvas first).
 - [ ] **Q2 · Professional feel** (PLAN.md): Advanced section for Data sharing, Gadgetbridge, Debug;
   Settings reshaped; README and docs rewritten; store text, name and About.
 - [ ] **Q3 · Breezy behind an interface:** a Solstice data interface over Breezy's sources and data;
