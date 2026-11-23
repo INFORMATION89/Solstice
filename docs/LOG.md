@@ -1415,3 +1415,6 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
   to confirm); Reduce Motion follows Apple's list; two materials (glass for controls, a card material);
   CI no-hardcoding check with a shrinking allowlist; Motion Lab as Motion's own app on the kit. Order in
   CONTINUE.md "Next session".
+- **2026-11-22 (Marco): movement always has some bounce** (opinionated): the lowest spring level is
+  "subtle" (0.9), not none; a Motion Lab switch compares it with no bounce. Effects springs and Reduce
+  Motion stay bounce-free. Next in chat: the app's layout, then which kit components to build.

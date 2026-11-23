@@ -71,8 +71,9 @@ logs, session notes or build reports here.
   Material 3 and Haze). The kit never leaks into the core.
 - **Tokens:** the kit defines the names with neutral Material-based defaults; each app passes its own
   values through the kit's theme. Solstice passes its current values.
-- **Springs:** speed (fast, default, slow) × bounce (none, slight, playful) for movement, plus effects
-  springs (opacity, colour, blur) that never bounce; `wobble` stays for the toolbar bud.
+- **Springs:** speed (fast, default, slow) × bounce (subtle, slight, playful) for movement: **movement
+  always has some bounce** (Marco's opinion; a lab switch compares it with none). Effects springs
+  (opacity, colour, blur) never bounce; Reduce Motion removes bounce; `wobble` stays for the toolbar bud.
 - **Reduce Motion:** Apple's list, built into every Motion piece.
 - **Materials:** glass for controls, navigation and sheets; a thicker card material for cards.
 - **Motion Lab:** Motion's own app, built on the kit.

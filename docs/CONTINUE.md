@@ -34,17 +34,22 @@ not listed here, or any surprise, goes back to Marco before it's built.
 
 **Spring tokens, proposed mapping (response in seconds / damping; to confirm):**
 
-| | No bounce (1.0) | Slight (0.8) | Playful (0.5) |
-|---|---|---|---|
-| **Fast** (0.2) | `snappy` (was 0.9 damping) | | |
-| **Default** (0.31) | `control`, `settle` (identical today) | `container` (0.78), `content` (0.85) | `playful` |
-| **Slow** (0.4) | `dismiss` (0.39), `smooth`, `gentle` (0.44) | `brisk` (0.78), `momentum` | |
+**Opinion (Marco, 2026-11-22): movement always has some bounce.** The lowest level is "subtle", not
+none. The Motion Lab gets a switch to compare subtle against no bounce on every demo before it's final.
 
-- **Effects** (opacity, colour, blur; never bounce), Material's values: fast 0.10 s, default 0.16 s,
-  slow 0.22 s. `BlurCrossfade` and every fade move to these.
+| | Subtle (0.9) | Slight (0.8) | Playful (0.5) |
+|---|---|---|---|
+| **Fast** (0.2) | `snappy` | | |
+| **Default** (0.31) | `control`, `settle` (were 1.0) | `container` (0.78), `content` (0.85) | `playful` |
+| **Slow** (0.4) | `dismiss` (0.39, was 1.0), `smooth`, `gentle` (0.44, were 1.0) | `brisk` (0.78), `momentum` | |
+
+- **Effects** (opacity, colour, blur), Material's values: fast 0.10 s, default 0.16 s, slow 0.22 s,
+  no bounce: opacity and blur can't go past "fully shown", so a bounce there reads as a flicker.
+- **Reduce Motion** removes the bounce everywhere (Apple: tighten springs).
 - `wobble` (0.31 / 0.32) stays as a named special for the toolbar bud (its animation stays).
-- Small shifts to feel on the phone: `snappy` loses its last 10 % of bounce, `gentle` gets a little
-  quicker, `content`'s scale bounces a touch more. Old names stay as aliases until every use moves.
+- What changes in feel: closing, settling after a drag and controls gain a hint of bounce (MOTION.md's
+  "dismiss: no bounce" and "settle: no bounce" rules change with it); `gentle` gets a little quicker.
+  Old names stay as aliases until every use moves.
 
 **Order for Saturday** (each step: build, check, commit; stop and ask if a step doesn't go as planned):
 1. **Pull and read** RULES.md, PLAN.md, this file; `git submodule update --init`.
