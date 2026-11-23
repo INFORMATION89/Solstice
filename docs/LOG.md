@@ -1418,3 +1418,7 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 - **2026-11-22 (Marco): movement always has some bounce** (opinionated): the lowest spring level is
   "subtle" (0.9), not none; a Motion Lab switch compares it with no bounce. Effects springs and Reduce
   Motion stay bounce-free. Next in chat: the app's layout, then which kit components to build.
+- **2026-11-22 (Marco): layout Direction A, "Glance".** One-liners first, then the temperature, the cards
+  that matter and the hours; everything essential at a glance; detail by tapping a card (it grows into
+  its sheet); optional cards (automatic ones like rain, UV, air; added ones like wind or pressure). Kit
+  components to build listed in ROADMAP.md. Wireframes: the "Solstice layout directions" design canvas.

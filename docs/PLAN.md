@@ -20,8 +20,16 @@ logs, session notes or build reports here.
    glass, tokens) move into the Motion repo, so Solstice and future apps are mostly configuration.
    Work happens in Motion first (with its lab), then the app imports and configures it.
    Structure, names and order: to propose and agree (see "Open questions").
-2. **Redesign Solstice's layout so it isn't an endless list of cards.** Each page answers one question
-   (DESIGN.md check 1); details open from what was touched. Directions to propose to Marco.
+2. **New layout: Direction A, "Glance"** (Marco, 2026-11-22; wireframes on the design canvas
+   "Solstice layout directions", A1–A3). Not an endless list:
+   - Forecast opens with the **useful one-liners** (the summary engine), then the temperature, the
+     cards that matter and the hours. **Everything essential is visible at a glance.**
+   - **More detail by tapping a card:** it grows into its own sheet (✕ at the end, pull down, back).
+   - **Cards are optional:** some appear by themselves when they matter (rain, UV, air quality);
+     others you add to always show (wind, pressure, humidity, sun and moon, pollen). Alerts always
+     show. Hold a card to move or hide it.
+   - This week works the same way: days expand in place.
+   - Open: does Forecast stay one screen when many cards are added, or scroll only then?
 3. **Skeuomorphism moves into interaction, not looks** (Marco, 2026-11-22): physical feel (springs,
    drag, press, peel, haptics) stays; visuals follow a more standard design. The postcards go first.
 4. **Proactive alerts the Gradient Weather way** (Marco, 2026-11-22: "should be used as well"):
@@ -110,7 +118,8 @@ logs, session notes or build reports here.
 
 ## Open questions (to settle with Marco)
 
-1. **New layout for Solstice** (not an endless list): which direction.
+1. **Glance layout details:** one screen even with many added cards, or scroll only then? Which cards
+   exist at first, and which are automatic.
 2. **The card material's values** (opacity, blur), picked in the lab on Saturday.
 3. **Spring mapping:** confirm the table in CONTINUE.md "Next session".
 4. **Handles without taps:** TalkBack needs an action to resize or close.
