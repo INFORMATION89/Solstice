@@ -155,7 +155,7 @@ Values follow the unit settings; a card is skipped when the source has no data f
 ### Weather engine (decided 2026-11-23; design in SOURCES.md)
 - **Its own library repo**, like Motion: works on the phone, has no UI, any Android app can include
   it. Solstice imports and configures it, and shares its results with other apps on the phone
-  (Breezy's data sharing). Code taken from Breezy stays LGPL-3.0.
+  (Breezy's data sharing). Written clean room (RULES.md section 5), no Breezy code in it.
 - **No Rainbow.ai** (Marco: signing up asks for a card even for free use). Next-hour rain is phased:
   Open-Meteo's 15-minute data and the blend first; our own radar nowcast later, where public radar
   exists (optical flow, as in pysteps and LibreWXR).
@@ -228,8 +228,15 @@ Values follow the unit settings; a card is skipped when the source has no data f
    Feature Delivery (works only through Google Play, not GitHub or Obtainium). Proposal: keep them
    built in, but "off until relevant": a local source (SMN, CDMX network, SGIRPC) appears only for
    places it covers, starts off, and is offered once ("Mexico City has a local network, use it?").
-   Revisit plugins only if the source list grows a lot. To decide with Marco.
+   Revisit plugins only if the source list grows a lot. **Decided 2026-11-23:** all built in, off
+   until relevant where needed (SOURCES.md).
 7. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
+
+8. **Clean room follow-ups** (RULES.md section 5): the engine's licence (Apache 2.0 proposed, like
+   Motion); whether Solstice stops being a Breezy fork (engine replaces the data layer, Motion UI the
+   screens; about 88 % of today's Kotlin is Breezy's, and its 65 translations are LGPL too); how
+   sources plug into a clean engine. Motion Lab's 7 demo files still carry Breezy's LGPL header:
+   check they hold no Breezy code, then mark them Apache 2.0 like the rest of Motion.
 
 ## Research queue
 Weather sources design (coverage, Automatic per refresh, merged alerts, transparency graphic, Gradient

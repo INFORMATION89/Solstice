@@ -1455,3 +1455,4 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 - **2026-11-23 (chat): more research** on localized accuracy (steps), Mexico City observations, CDMX's alcaldía rain
   alerts, and SIMAT air quality and UV: PLAN.md research queue 8, 10, 11.
 - **2026-11-23:** RULES.md: added section 4 (data, sources and privacy: opt-in only, data minimized, provenance, sources as data) and section 10 (git: branches and pull requests, commit as INFORMATION89, never commit gradlew.bat or secrets); the engine follows the Motion rule (2.6). Code guardrails (CI check, tests, branch protection) stay first on Saturday.
+- **2026-11-23:** Clean room agreed for the engine, Motion and future apps (RULES.md section 5: allowed sources, spec then build, PR lists what was consulted). Open: engine licence, leaving the Breezy fork, how sources plug in (PLAN.md open question 8).

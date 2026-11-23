@@ -28,7 +28,7 @@ They change only with Marco's OK. If a task seems to need breaking one, stop and
 5. New code in the app goes in `ui/expressive/`; edits to upstream files stay small and are listed in
    PLAN.md.
 6. **The weather engine works like Motion:** its own library, no UI code and no Solstice code in it;
-   Solstice imports and configures it. Code taken from Breezy stays LGPL-3.0.
+   Solstice imports and configures it. Written clean room (section 5).
 
 ## 3. Never hardcode anything
 
@@ -75,7 +75,23 @@ Design in [SOURCES.md](SOURCES.md).
 5. Sources are tested offline with recorded responses, and changes to the blend are verified against
    public archives before they ship.
 
-## 5. Platform guidelines
+## 5. Clean room (agreed 2026-11-23)
+
+Applies to the weather engine, Motion and future apps; the Solstice app itself stays a Breezy fork
+until Marco decides otherwise.
+1. **Never copy, translate or closely paraphrase another project's code**, Breezy included, into
+   these projects. Ideas, algorithms, public standards and data formats are fine.
+2. **Allowed sources:** public specs and standards (CAP, METAR, WMO), each service's own API docs and
+   terms, published papers, platform docs and guidelines, our own docs, and how things behave from
+   the outside. Libraries are used through their API, under their licence, never pasted in.
+3. **Spec, then build:** one session writes a spec in our own words from allowed sources and saves it
+   in the project's docs; a separate session builds only from that spec and never opens the original
+   code for that part.
+4. Each pull request lists what was consulted. Code that looks close to an existing project gets
+   rewritten, not justified.
+5. Honest limit: AI models have seen public code, so this lowers the risk rather than removing it.
+
+## 6. Platform guidelines
 
 Android first in structure, iOS quality in feel. Check both before proposing anything.
 
@@ -95,7 +111,7 @@ button or a TalkBack action; nothing that disappears on a timer alone; RTL mirro
 **Decided exceptions** (Marco): the ✕ sits at the end of headers; the toolbar keeps its current
 animation; glass on cards is under review. Exceptions are listed here and in PLAN.md, nowhere else.
 
-## 6. Motion
+## 7. Motion
 
 Full rules in [MOTION.md](MOTION.md). In short:
 - Springs only, from tokens. Movement and size use spatial springs; opacity, colour and blur use
@@ -108,7 +124,7 @@ Full rules in [MOTION.md](MOTION.md). In short:
 - Haptics from tokens only; they follow the system setting; none added without agreeing them.
 - Every new or changed motion is proposed with options and agreed before it's built.
 
-## 7. Design
+## 8. Design
 
 - [DESIGN.md](DESIGN.md)'s checks apply to every proposal: one screen one job, someone needs it,
   essentials first, every state designed (loading, empty, error, offline), any size and orientation.
@@ -116,7 +132,7 @@ Full rules in [MOTION.md](MOTION.md). In short:
   clean and standard.
 - [WRITING.md](WRITING.md) for every sentence; every new sentence goes to Marco before it ships.
 
-## 8. Done means checked
+## 9. Done means checked
 
 A change is done when:
 1. CI passes (lint, the no-hardcoding check, Motion's and the app's unit tests);
@@ -126,16 +142,16 @@ A change is done when:
 4. the docs are updated: PLAN.md (decisions), LOG.md (a dated line), ROADMAP.md (ticked), Motion's
    README for any Motion API change.
 
-## 9. Docs
+## 10. Docs
 
 One source of truth per topic: PLAN.md decisions, LOG.md history, ROADMAP.md to-dos, CONTINUE.md
 where things stand, DESIGN/MOTION/WRITING the rules, this file how we work. Fix contradictions
 instead of adding to them. Never push upstream's history; never build with `-Pbreezy`.
 
-## 10. Git
+## 11. Git
 
 1. Work on a branch and merge to `main` through a pull request; nothing is pushed to `main` directly.
 2. Commit as INFORMATION89. Never commit `gradlew.bat` (it shows as changed on Linux checkouts),
    secrets, keys or `local.properties`.
-3. A pull request says what changed and what was checked (section 8). Once CI exists, `main` is
+3. A pull request says what changed and what was checked (section 9). Once CI exists, `main` is
    protected and merges need it to pass.
