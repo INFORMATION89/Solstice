@@ -180,6 +180,9 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 - [ ] ⭐ **Forecast spacing pass** against Material's spacing guidance, kit tokens only (hero temperature,
   sun/moon path and time stay).
 - [ ] ⭐ **Moon card rework** on `motion-ui` as a partial sheet (with the kit move).
+- [ ] 💬⭐ **Outlook** (This week renamed, decided 2026-11-23): propose its proactive answers (best weekend day
+  to go out, notable days ahead, good sky evenings); the day list stays. PLAN.md Direction 6.
+- [ ] ⭐ **What to wear card** on Forecast, always shown, today by day and tomorrow from the evening switch.
 - [ ] ⭐ **Sun button and sun sheet** (decided 2026-11-23): a button in the hero like the moon's, opening a
   partial sheet with sunrise, sunset, daylight and UV through the day. Design to agree.
 - [ ] 💬 **Postcards in a standard look**, the physical feel kept in the interaction (Direction 3).

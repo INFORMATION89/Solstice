@@ -54,6 +54,10 @@ logs, session notes or build reports here.
    - Official warnings open in full inside Solstice, coloured by severity.
    - Which alerts, their wording, defaults and where you set them up: to propose and agree. Source:
      gradientweather.app and its Play Store listing (2026-11-22).
+6. **This week becomes "Outlook"** (Marco, 2026-11-23): a proactive planning page, like Acme Weather's
+   approach, not just a list of days. Examples: the best weekend day to be outside, notable days ahead
+   (heat, a cold front, a rainy stretch), good evenings for the sky. The day list stays. What it answers,
+   and how, to propose to Marco.
 5. **No coding until the next session (Saturday 1:00 AM)**; this week is research, rules and planning.
    Saturday's plan: [CONTINUE.md](CONTINUE.md), "Next session".
 
@@ -131,8 +135,10 @@ Values follow the unit settings; a card is skipped when the source has no data f
 - Several important at once: alerts, rain, wind, UV, air quality.
 - **Sun and moon are not cards** (Marco, 2026-11-23): the sun gets its own button in the hero, like the
   moon's, opening a sun sheet (sunrise, sunset, daylight, UV through the day).
-- Open: where "What to wear" lives (proposal: Forecast, today by day and tomorrow morning in the evening);
-  whether the UV card opens the sun sheet.
+- **What to wear** (Marco, 2026-11-23): a Forecast card that **always shows**; what it covers depends on the
+  time (today by day, tomorrow morning from the evening switch). Can also be one of the alerts you choose
+  (Direction 4).
+- Open: whether the UV card opens the sun sheet.
 
 ### Messages (decided 2026-11-22; a Motion UI component)
 - Several at once: **two options in Motion UI**, queue-and-merge (priority order, repeats merge, one
@@ -188,8 +194,9 @@ Values follow the unit settings; a card is skipped when the source has no data f
 
 ## Open questions (to settle with Marco)
 
-1. **Card catalog leftovers:** where "What to wear" lives; whether the UV card opens the sun sheet; where
-   the switch for "important cards move to the top" lives; This week renamed "Outlook"?
+1. **Card catalog leftovers:** whether the UV card opens the sun sheet; where the switch for "important
+   cards move to the top" lives.
+2. **Outlook's content:** which proactive answers it gives (Direction 6).
 2. **The card material's values** (opacity, blur), picked in the lab on Saturday.
 3. **Spring mapping:** confirm the table in CONTINUE.md "Next session".
 4. **Handles without taps:** Apple's grabber is tappable (cycles heights) and works with VoiceOver;
