@@ -76,7 +76,7 @@ logs, session notes or build reports here.
 |---|---|
 | Colour | Material You (wallpaper) colour; sky-blue seed when it's off |
 | Type | Google Sans Flex, Material type scale, named hero styles |
-| Icons | Material Symbols Rounded, one catalog (`SolsticeIcons`), one weight (500), fill only for on/selected; moon phases are the one exception |
+| Icons | Interface: Material Symbols, one catalog (`SolsticeIcons`), one weight (500), fill only for on/selected; **a setting for Rounded, Outlined or Sharp** (decided 2026-11-22; Rounded default). Weather conditions: **a separate filled, gradient set** in the spirit of Pixel Weather's (Google's own art can't be used); Meteocons "Fill" (MIT, SVG + Lottie) is the candidate, with Breezy's icon-pack support as the "other sets" option. Contrast checked on every sky. Moon phases stay the one exception |
 | Glass | `surfaceContainerHigh` at 40 % for the toolbar, buttons and sheets; cards get a thicker card material (decided 2026-11-22, values to pick) |
 | Toolbar | One toolbar at shell level: a pages pill (navigation only) plus one accessory (home: Search; window: Pin); contexts are data. **Its current animation stays** (Marco, 2026-11-22) |
 | Close button | ✕ at the **end** of the header by default (Marco, 2026-11-22: easier to reach). **Motion option** to swap it with the leading button (✕ at the start, Apple's and Material's placement); mirrored for right-to-left. Back, predictive back and pull-down still close |
@@ -96,6 +96,41 @@ logs, session notes or build reports here.
 - **Materials:** glass for controls, navigation and sheets; a thicker card material for cards.
 - **Motion Lab:** Motion's own app, built on the kit.
 - **No typed-in values:** CI check with a reviewed allowlist that only shrinks.
+
+### Places and travel (decided 2026-11-22)
+- **Home is your current location** by default. Without location access, onboarding asks you to
+  choose a place, which becomes home. Using a fixed place instead lives in Settings › Locations.
+- **No star.** Places is a plain saved list (reorderable).
+- **Travel swaps automatically:** away from home (e.g. home Mexico City, you're in Tijuana), Forecast
+  shows where you are and your home place moves to the top of Places marked "Home" with its time;
+  it swaps back when you return.
+- **Search opens a preview** with Cancel and Add (Apple Weather's pattern). **"Visiting" only marks a
+  preview** of a place you haven't added.
+- **A place's local time** shows wherever its time differs from your phone's (saved or previewed),
+  from one place-time component.
+
+### Messages (decided 2026-11-22; a Motion UI component)
+- Several at once: **two options in Motion UI**, queue-and-merge (priority order, repeats merge, one
+  morphs into the next) or stacked above the toolbar.
+- Up to **two lines** (the action moves below when it doesn't fit); always an icon, chosen by the
+  message's kind (never matched from its text).
+- **Accessibility:** follows Android's "Time to take action" timeout; a message with an action waits
+  until dismissed when TalkBack is on.
+
+### Rain and alerts (decided 2026-11-22)
+- **One "precipitation is likely" rule** for the rain card, notifications and Live Updates: hourly at
+  least 40 % chance and 0.2 mm; minute by minute at least 0.1 mm/h for two steps in a row; snow counts;
+  at most one alert per 3 hours for the same rain. Tokens, tuned with real use. Replaces upstream's
+  "any radar trace" notification rule.
+
+### Professional feel (decided 2026-11-22)
+- In the app: Data sharing, Gadgetbridge and Debug move under "Advanced"; Settings shaped like Apple's
+  and Google's weather apps.
+- Docs and README written as a product's (no plugin side plans or hobby wording).
+- Store-facing text (name, description, About) written like a real product.
+- Solstice keeps Breezy's weather sources and data behind a Solstice interface the UI never reaches
+  past, and replaces all of upstream's UI, settings and widgets (so it doesn't look or behave like a
+  clone). Breezy-derived code stays LGPL; Motion stays Apache.
 
 ### Motion (full rules: MOTION.md)
 - Springs only, from tokens; things morph, never pop; one material per morph; the button becomes the card.
@@ -138,14 +173,12 @@ logs, session notes or build reports here.
 6. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
 
 ## Research queue
-1. Gradient Weather's rain countdown on screen: how it looks and how it disappears (the Threads post
-   couldn't be opened; a screenshot from Marco would settle it).
+1. Gradient Weather's rain countdown on screen: how it looks and how it disappears.
 2. The page receding behind a sheet, done cheaply (plan in LOG.md, 2026-11-22: dim + recede).
 3. Long press alongside drag to reorder (iOS context menu as reference).
 4. Proactive channels: Live Updates, daily brief, clothing.
-
-## Far future
-- Native Smartspacer Targets and Complications inside Solstice (SDK licence to check first).
+5. Card explainers (swipe up past the details): short Solstice texts, with "Read more" from Wikipedia
+   (CC BY-SA: credit and link, never silently edited).
 
 ## Upstream files touched
 - `app/src/main/kotlin/org/breezyweather/ui/theme/compose/Theme.kt`: `BreezyWeatherTheme` delegates

@@ -71,6 +71,10 @@ none. The Motion Lab gets a switch to compare subtle against no bounce on every 
 
 If time runs short, stop after a finished step; the rest moves to the next session in this order.
 
+**Bug review (2026-11-22):** ROADMAP.md "Review 2026-11-22" (B1–B5, D1–D3, F1–F5, R1–R3, Q1–Q3).
+Its R3 findings shape step 3 (Motion core); B3 and B4 come from the same code. Ask Marco before adding any
+of them to this Saturday.
+
 **Not this Saturday** (proposals to Marco first, in chat): the new app layout (not an endless list),
 the postcards' standard look, proactive alerts the Gradient way (PLAN.md Direction 4), the spring
 token grid and Reduce Motion unless decided, interactive glass.
@@ -276,7 +280,7 @@ unused; `unresist` caps at 99.9 %.
 
 **Research the chat environment is doing** (PLAN.md "Research queue"): the page recede done cheaply as a
 `:motion` piece, long press alongside drag to reorder, proactive channels (Live Updates, daily brief,
-clothing), what the summaries should say, Smartspacer's SDK license. Far future: native Smartspacer.
+clothing), what the summaries should say.
 
 Rules that still apply: propose and agree any new or changed motion before building it; keep the
 PLAN.md log and [ROADMAP.md](ROADMAP.md) up to date; new code in `ui/expressive/` or `:motion`; check on

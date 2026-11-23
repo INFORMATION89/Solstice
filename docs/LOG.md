@@ -1430,3 +1430,12 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
   every card opens partially, then full page; optional, reorderable cards with the most important moving to the
   top; Forecast keeps hero + sun/moon path + time, gets a spacing pass; moon card reworked on `motion-ui`.
 - **2026-11-22 (Marco):** by default the important, relevant card moves to the top (back to your order afterwards; can be switched off).
+- **2026-11-22 (chat, Marco): bug review and decisions.** Bugs B1–B5, design fixes, framework pieces,
+  rebuild list and earlier bugs cross-checked: ROADMAP.md "Review 2026-11-22". Decided: home is your
+  current location (onboarding asks for a place without location access), no star, automatic travel
+  swap with "Home" in Places, search preview with Cancel / Add ("Visiting" only for previews); one rain
+  rule (40 % and 0.2 mm hourly; 0.1 mm/h for two steps minute by minute; one alert per 3 hours) for the
+  card, notifications and Live Updates; three text-change options in the lab; icons: a Rounded / Outlined
+  / Sharp setting plus a filled gradient weather set (Meteocons Fill candidate); messages: queue-and-merge
+  or stacked as Motion UI options, two lines, accessibility timing; professional clean-up of the app,
+  docs and store text (Smartspacer plans dropped).

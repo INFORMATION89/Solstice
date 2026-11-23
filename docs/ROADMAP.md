@@ -61,6 +61,103 @@ neighbouring glass buttons merging into one shape (most ambitious); haptics from
 Rules: never blocks input, values from Motion tokens only, Reduce Motion keeps light and haptics but drops
 stretch and scale.
 
+## 🐞 Review 2026-11-22: bugs, fixes and what to rebuild (from chat; details per item below)
+
+Suggested order: R3 with B3 and B4 (Motion's core), then B2's rule and D1's text, then Saturday's kit
+foundations, then the kit pieces in R2's order. Each item still gets agreed before it's built.
+
+### Bugs
+- [ ] **B1 · Place time on the "Visiting" line** (`PageFrame.kt` `VisitingLine`): says "Visiting" even for
+  saved places (ignores `pinned`); four different looks for a place's time (Forecast header, window
+  line with a typed-in " · ", postcard caption in capitals without the clock, search). Fix: one
+  place-time component in the kit (variants), shown whenever the time differs; "Visiting" only for
+  previews; separator as a string.
+- [ ] **B2 · Rain card at 0 %, noisy rain notifications** (`RainCard.kt` `rainOutlook`: any trace over
+  0.05 mm, or a "rain" code at 0 %; snow ignored; "10m"… typed in. Upstream `Weather.hasMinutelyPrecipitation`:
+  any radar reading > 0). Fix: one shared rule (PLAN.md "Rain and alerts") for card, notification
+  and Live Update, with a cooldown; unit tests from real AccuWeather data.
+- [ ] **B3 · Tapping after a swipe stops the tabs** (`PageSpring.kt`): the pager counts as scrolling
+  until the bounce settles, and Compose's pager swallows the tap that stops a scroll; `SpringMorph`
+  also takes any tap while opening. Fix: travel by scroll without overshoot, draw the bounce as an
+  offset; a "settled" threshold token; lab test of swipe-then-tap.
+- [ ] **B4 · Jumping across the toolbar flashes Forecast** (`springToPage` scrolls through every page;
+  `Toolbar.kt:157` blends the highlight colour from the scroll position). Fix: a Motion "jump"
+  (snap next to the target, spring the last page), highlight driven by the target tab; a Motion UI
+  option. Replaces "tab tap speeds" and "a little spring on the edge-to-edge jump" below.
+- [ ] **B5 · Blur text change too fast and distracting** (`BlurCrossfade.kt`: both texts blur at once on a
+  bouncy spring). Lab options, all three: A fade-through (out, then in, no bounce), B softer blur and
+  slower spring, C only what changed moves (rolling digits). Marco picks on the phone.
+
+### Design fixes
+- [ ] **D1 · This week's text:** drop "through the week", "all week", "this week" from its summary lines
+  (`strings_expressive.xml` `week_*`).
+- [ ] **D2 · Top edge blur bigger** (`PageFrame.kt` `pageTopEdge`: ends exactly at the status bar): the
+  larger of the status bar and the camera cutout, plus an eased fade below, from tokens.
+- [ ] **D3 · The "no rain" line** becomes a small card that fits the card layout.
+
+### Framework pieces (Motion UI)
+- [ ] **F1 · Cards with several pages:** one sliding indicator (like iOS's segmented control),
+  animated content, tap to switch (no sideways swipe inside a card). The rain card first.
+- [ ] **F2 · Card heights:** medium shows the details, full shows an explainer (PLAN.md research 5).
+- [ ] **F3 · Page-transition blur** as a Motion UI option (on or off).
+- [ ] **F4 · Toolbar jump transition** (B4).
+- [ ] **F5 · Settings pieces:** collapsing large title, section header, rows (plain, switch, value,
+  connected-button choice), slider row, picker sheet, navigation stack with predictive back, About and
+  licences pages.
+- [ ] **Messages in Motion UI** (PLAN.md "Messages"): queue-and-merge or stacked as options, two lines,
+  accessibility timing, kinds with icons; every typed-in value to tokens.
+- [ ] **Header close side option** (✕ at the end or the start), already listed above.
+
+### Rebuilds
+- [ ] **R1 · This week's temperature card** on the kit (layout kept; spacing and sizes checked); days as
+  kit rows instead of plain `Surface` buttons.
+- [ ] **R2 · Everything onto Motion UI:**
+  - Kit as is: `Glass`, `SolsticeCard`, `SheetHandle`, `SheetShape`, `ScreenCorners`, `SheetDialog`,
+    `SolsticeSheetState`, `IconBadge`, `PressMorph`, `ExpressiveChoices`, `CollapsingTopBar`,
+    `ScreenPush`, `PageFrame`, `Toolbar` + `ToolbarMotion`, `Messages`, theme files.
+  - Kit pieces from today's code: paged card (`RainCard`), partial sheet (moon card), full-page window
+    (`PlaceWindow`), search sheet (`SearchOverlay`), reorderable list (`ReorderList`, `PlacesPage`),
+    footnote line (`UpdatedLine`), place time (`PlaceTime`).
+  - Main pages off the framework today: Forecast's own frame (not `PageScaffold`), "More details"
+    (upstream's screen) and the empty state's plain buttons, the hand-drawn sun path with typed-in
+    sizes, the 700 ms develop timer; This week's day buttons; Places' own gestures and postcards (timed
+    animations and `delay()`s); the window's own pager.
+  - Stays in the app, built from kit parts: sky, sun path, postcard content, moon renderer,
+    summaries, rain logic. Goes: `SolsticeMotion.kt`, the lab copy.
+- [ ] **R3 · Motion's core, compared with Compose, Material 3, UIKit/SwiftUI, Framer Motion, React
+  Native's gesture handler:** explicit states for every interactive piece (not "are springs still
+  running"; `SpringMorph` runs five values in five coroutines); declared gesture rules (together,
+  exclusive, wait-for) instead of on/off flags (`shareTouchesWhile`, `morphPassThrough`); build on
+  Compose's `AnchoredDraggable` + nested scroll (sheet heights) and `SharedTransitionLayout` /
+  `SeekableTransitionState` (morphs, predictive back) with Motion's springs; bounces drawn, never
+  scrolled; touch slop, settle and blur sizes as tokens.
+
+### Decisions and clean-up
+- [ ] **Q1 · Icons** (PLAN.md "Icons"): build the Rounded / Outlined / Sharp setting; try Meteocons
+  "Fill" (Lottie) for weather conditions; keep Breezy's icon packs as the "other sets" option.
+- [ ] **Q2 · Professional feel** (PLAN.md): Advanced section for Data sharing, Gadgetbridge, Debug;
+  Settings reshaped; README and docs rewritten; store text, name and About.
+- [ ] **Q3 · Breezy behind an interface:** a Solstice data interface over Breezy's sources and data;
+  replace upstream's UI, settings and widgets.
+- [ ] **Places model** (PLAN.md "Places and travel"): current location as home, no star, automatic
+  travel swap with "Home" in Places, search preview with Cancel / Add, onboarding place choice.
+
+### Earlier bugs checked against the rebuild
+| Earlier item | Status |
+|---|---|
+| One toolbar for home and window | Fixed by the kit toolbar (R2) |
+| Tab tap speeds; spring on the edge-to-edge jump | Replaced by B4 |
+| Frames drop opening the moon card and search | Likely fixed by the moon card and search rebuilds; re-measure |
+| Drawing past the edges while the page recedes | Gone (recede dropped) |
+| Rain card with real rain; animate amount ↔ chance | Covered by B2 and F1 |
+| Precipitation element for This week | Part of R1 |
+| Toolbar label and page heading showing together | A page-frame rule in the kit |
+| Places: dragging a card partly off screen; no scrolling at the edge | Not fixed by the move: fix in the kit's reorderable list (shared with Forecast cards) |
+| Reset Places' scroll when you leave | Small fix, or a page-frame option |
+| Search keeps "Puebla" | Separate re-test |
+| "Last updated" and refresh on start | Already built; duplicate roadmap lines to remove |
+| Swapping main and pinned when you travel | Decided: automatic swap (PLAN.md "Places and travel") |
+
 ## 🗓 Saturday 2026-11-28, 1:00 AM
 
 Plan in CONTINUE.md "Next session": guardrails (no-hardcoding CI check, app tests in CI), one Motion
@@ -157,8 +254,6 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 - [ ] 💬 **Very subtle toolbar haptics**, once F1's haptics system exists.
 - [x] **Fix:** taps blocked while a tab transition plays (done 2026-11-21: `:motion` PageTransition; closing sheets let taps through too).
 - [x] **Fix:** the postcard window's pages lack home's blur between tabs (done 2026-11-21: `ShellNavigation`, shared with home).
-- [ ] 🔭 **Far future: native Smartspacer** Targets and Complications in Solstice, no bridge app (needs Android 10,
-  the new minimum; check the SDK's license). PLAN.md "Far future".
 - [ ] **Icons vs M3** (PLAN.md "Icons", gaps 1–4): grade -25 for light icons on dark backgrounds; selected
   toolbar tab filled; audit small-icon labels, 48 dp touch targets, icon/text alignment; optical size 40 for big icons.
 - [ ] Icons later (agree first): animated fill.
@@ -276,9 +371,8 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 ### Functionality
 - [x] ⭐💬 **The starred place folds into a compact version.**
 - [x] **When another place is starred, the current location becomes a one-line card.**
-- [ ] 💬 **Swapping main and pinned when you travel:** e.g. Mexico City is main and Tijuana pinned;
-  move to Tijuana and they swap (Tijuana main, Mexico City pinned). Research how Apple Maps and
-  Apple Weather handle it before building.
+- [x] 💬 **Swapping main and pinned when you travel:** decided 2026-11-22, automatic (PLAN.md "Places and
+  travel"); build it with the Places model in the review section.
 
 ### Refinement
 - [x] Remove the grain paper effect for now; use the same background and edge fade as This week.
