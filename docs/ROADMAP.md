@@ -68,18 +68,12 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 
 ## 💬 Proposals to bring to Marco (from chat 2026-11-22)
 
-- [x] 💬⭐ **New app layout**: Direction A, Glance, chosen 2026-11-22 (PLAN.md Direction 2).
-- [ ] ⭐ **Kit components for the Glance layout**, in Motion's `motion-ui`, in this order (each with a lab
-  page; app configures them afterwards; details to agree piece by piece):
-  1. Summary text block (under the temperature; text changes with the blur crossfade).
-  2. Tile: a small card with label, value and caption, sizes 1×1 and 2×1, a morph source.
-  3. Tile grid: adaptive columns that wrap for small screens and 200 % text.
-  4. Detail sheet: grows out of the tile that opened it (Sheet kind, ✕ at the end, pull down, back).
-  5. Hour strip: scrollable hours, each one opening its sheet.
-  6. Alert banner: severity colour plus icon (never colour alone), opens the full warning.
-  7. Card picker: toggle rows in a sheet (automatic vs always show) and hold-to-move or hide on the page.
-  8. Expanding row: This week's days open in place.
-  9. Chart pieces for sheets (bars, lines), reusing the app's existing chart library where it fits.
+- [x] 💬⭐ **App layout:** Forecast keeps today's layout (2026-11-22). A2 from the layout canvas is the
+  pattern for partial sheets (PLAN.md Direction 2).
+- [ ] ⭐ **Partial sheet in Motion's kit** (the A2 pattern): grows out of its card, dimmed page behind,
+  medium and full heights, grabber (drag, tap, TalkBack), swipe down to close, ✕ at the end, room for a
+  chart and setting rows. Lab page first; then which Forecast cards open one (to agree).
+- [ ] 💬 Optional cards on Forecast (add or remove wind, pressure…): still wanted?
 - [ ] 💬 **Postcards in a standard look**, the physical feel kept in the interaction (Direction 3).
 - [ ] 💬⭐ **Proactive alerts the Gradient Weather way** (Direction 4): alerts you choose to watch, rain or
   snow countdown as a Live Update, cooldowns, official warnings in full, evening summary, what to wear.

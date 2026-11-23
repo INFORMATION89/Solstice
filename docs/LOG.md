@@ -1424,3 +1424,5 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
   components to build listed in ROADMAP.md. Wireframes: the "Solstice layout directions" design canvas.
 - **2026-11-22 (Marco): correction:** no one-liners at the top; Forecast keeps the temperature first, then
   the summary, the cards and the hours.
+- **2026-11-22 (Marco): Forecast keeps today's layout** (more unique). From the layout canvas, A2 becomes the
+  pattern for partial sheets (cards that aren't full pages), checked against Apple's sheet guidance.

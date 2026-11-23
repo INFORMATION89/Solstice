@@ -20,17 +20,17 @@ logs, session notes or build reports here.
    glass, tokens) move into the Motion repo, so Solstice and future apps are mostly configuration.
    Work happens in Motion first (with its lab), then the app imports and configures it.
    Structure, names and order: to propose and agree (see "Open questions").
-2. **New layout: Direction A, "Glance"** (Marco, 2026-11-22; wireframes on the design canvas
-   "Solstice layout directions", A1–A3). Not an endless list:
-   - Forecast keeps today's order: the temperature first, then the summary line, the cards that
-     matter and the hours (one-liners at the top were tried and dropped, 2026-11-22). **Everything
-     essential is visible at a glance.**
-   - **More detail by tapping a card:** it grows into its own sheet (✕ at the end, pull down, back).
-   - **Cards are optional:** some appear by themselves when they matter (rain, UV, air quality);
-     others you add to always show (wind, pressure, humidity, sun and moon, pollen). Alerts always
-     show. Hold a card to move or hide it.
-   - This week works the same way: days expand in place.
-   - Open: does Forecast stay one screen when many cards are added, or scroll only then?
+2. **Forecast keeps today's layout** (Marco, 2026-11-22: "it's more unique"). The layout wireframes
+   (design canvas "Solstice layout directions") are not the new Forecast; what stays from them:
+   - **A2 is the pattern for cards that aren't full pages:** a partial sheet that grows out of the
+     card you tapped, over a dimmed page, with the detail, a chart and that card's own settings (e.g.
+     the rain countdown). Full-page windows (postcards) stay for whole places.
+   - Checked against Apple's sheet guidance: open at a medium height and expand to full (detents);
+     a grabber you can drag, tap and resize with TalkBack; swipe down to close; one sheet at a time
+     (a sheet never opens another on top); no Done button when settings apply at once; ✕ at the end
+     stays our decided exception (Apple: leading edge).
+   - Optional cards (add or remove, e.g. wind or pressure) and "everything essential at a glance":
+     still wanted? To confirm with Marco.
 3. **Skeuomorphism moves into interaction, not looks** (Marco, 2026-11-22): physical feel (springs,
    drag, press, peel, haptics) stays; visuals follow a more standard design. The postcards go first.
 4. **Proactive alerts the Gradient Weather way** (Marco, 2026-11-22: "should be used as well"):
@@ -119,11 +119,12 @@ logs, session notes or build reports here.
 
 ## Open questions (to settle with Marco)
 
-1. **Glance layout details:** one screen even with many added cards, or scroll only then? Which cards
-   exist at first, and which are automatic.
+1. **Partial sheets (A2 pattern):** which cards get one first; medium height first or full; optional
+   cards on Forecast, yes or no.
 2. **The card material's values** (opacity, blur), picked in the lab on Saturday.
 3. **Spring mapping:** confirm the table in CONTINUE.md "Next session".
-4. **Handles without taps:** TalkBack needs an action to resize or close.
+4. **Handles without taps:** Apple's grabber is tappable (cycles heights) and works with VoiceOver;
+   ours has no tap. Change for partial sheets?
 5. **Proactive alerts (Direction 4):** which alerts at first, their defaults and wording, and where you
    switch them on.
 6. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
