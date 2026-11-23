@@ -1452,3 +1452,5 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
   queued: Rainbow.ai nowcast as an optional source; alerts coverage vs Gradient Weather's sources.
 - **2026-11-23 (chat): research.** Rainbow.ai (keyed source like AccuWeather, terms, free tier), localized accuracy by
   blending sources (Marco wants it for Mexico City), Conagua/SMN's municipal forecasts: PLAN.md research queue 6, 8, 9.
+- **2026-11-23 (chat): more research** on localized accuracy (steps), Mexico City observations, CDMX's alcaldía rain
+  alerts, and SIMAT air quality and UV: PLAN.md research queue 8, 10, 11.

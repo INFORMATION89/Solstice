@@ -225,15 +225,32 @@ Values follow the unit settings; a card is skipped when the source has no data f
 7. **Alerts coverage after the 2026-11-18 source cut:** Gradient gets official warnings from MeteoAlarm,
    NWS, ECCC, SACHET, Hong Kong Observatory, CWA and WMO's national services (CAP); Solstice keeps NWS,
    ECCC and WMO severe weather. Check what Europe and Asia lost.
-8. **Localized accuracy and combined sources** (Marco, 2026-11-23; Mexico City is hard to forecast):
-   blend several models (Open-Meteo serves ECMWF, GFS, ICON, GEM and more) into a consensus with its
-   spread shown (Acme's alternative-model lines); correct the next hours from recent observations (e.g.
-   METAR at the airport, SMN stations, CDMX's own networks); Rainbow's nowcast for the first hours. A
-   Solstice "blend" source behind the data interface (Q3). Feasibility and design to propose.
+8. **Localized accuracy and combined sources** (Marco, 2026-11-23; Mexico City is hard to forecast:
+   afternoon storms shaped by the mountains and the city are poorly captured by models). Proposed in
+   steps, each verified before the next:
+   1. **Consensus:** several models from Open-Meteo (ECMWF, GFS, ICON, GEM…) blended, with their spread
+      shown ("the models disagree today"), like Acme and meteoblue's multi-model view.
+   2. **Nowcast first:** Rainbow.ai for the first hours when the user has a key.
+   3. **Learn locally:** keep a log of each source's forecast against what was observed at your place,
+      and weight sources by their recent error there (what Gradient's "localized accuracy" implies);
+      nudge the next hours by the current error.
+   4. **Observations for Mexico City:** the airport METAR (MMMX, public), SMN's automatic stations
+      (10-minute data, ~5 km representative radius), the Tacubaya observatory, CDMX's own network on
+      aire.cdmx.gob.mx (hourly weather, air quality and UV per station; no official API found, open data
+      portal has some sets). UNAM's 55-station rain network (Observatorio Hidrológico) is reported out
+      of operation.
+   A Solstice "blend" source behind the data interface (Q3).
 9. **Conagua / SMN** (checked 2026-11-23): free web service, no key, forecasts per municipality (CDMX by
    alcaldía): hourly for 48 hours and daily for 3 days, updated hourly at :15, as one national gzip
    file of several MB. Its forecasts come from the FV3-GFS model, so it's local GFS, not a separate
    local model. Terms of reuse, the endpoint details and SMN's official warnings (CAP) to check.
+10. **Local alerts for Mexico City:** CDMX's civil protection (SGIRPC) issues a colour alert per alcaldía
+    for rain (green under 15 mm, yellow 15–29, orange 30–49, red 50–70, purple above), plus wind, hail,
+    heat and cold, published on official channels; no machine-readable feed found yet. SMN adopted CAP
+    in 2014 and Mexico is building a CAP cell-alert system; check whether SMN warnings reach WMO's feed
+    in Solstice's build (WMO severe weather is only in the non-free-net flavour).
+11. **Mexico City air quality and UV:** SIMAT measures both per station; a local source would beat the
+    global CAMS model there. Access method to check.
 
 ## Upstream files touched
 - `app/src/main/kotlin/org/breezyweather/ui/theme/compose/Theme.kt`: `BreezyWeatherTheme` delegates
