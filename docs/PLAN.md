@@ -218,6 +218,8 @@ Values follow the unit settings; a card is skipped when the source has no data f
 7. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
 
 ## Research queue
+Weather sources design (coverage, Automatic per refresh, merged alerts, transparency graphic, Gradient
+review): `docs/SOURCES.md`, proposal awaiting Marco.
 1. Gradient Weather's rain countdown on screen: how it looks and how it disappears.
 2. The page receding behind a sheet, done cheaply (plan in LOG.md, 2026-11-22: dim + recede).
 3. Long press alongside drag to reorder (iOS context menu as reference).
