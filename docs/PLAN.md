@@ -222,6 +222,14 @@ Values follow the unit settings; a card is skipped when the source has no data f
    brings a free key; a shared key would run out. Terms: key kept private, "Powered by Rainbow.ai" with a
    link wherever its data shows, not for safety-critical use (alerts stay official), may end free use
    without notice. Call it only when rain is plausible or the countdown runs.
+   Terms read in full (2026-11-23, effective 2025-04-16): signing up asks for payment details even for
+   free use (pay-as-you-go), and users must be 18 or older, so "bring your own key" is a setup step for
+   adults with a card; say so in the source's settings. Attribution wherever its data or anything
+   derived from it shows (so the blend too), reasonably prominent, following their branding guidelines;
+   logo and name not altered. Apps may be distributed to anyone, as long as nobody gets direct API
+   access; reselling or sharing a key is out. The key stays on the device, never in the repo or the
+   build. Caching isn't addressed; keep it short (the data is stale in 10 minutes anyway). Rainbow can
+   end access at any time without reason, so Solstice must work fully without it.
 7. **Alerts coverage after the 2026-11-18 source cut:** Gradient gets official warnings from MeteoAlarm,
    NWS, ECCC, SACHET, Hong Kong Observatory, CWA and WMO's national services (CAP); Solstice keeps NWS,
    ECCC and WMO severe weather. Check what Europe and Asia lost.
@@ -239,6 +247,16 @@ Values follow the unit settings; a card is skipped when the source has no data f
       aire.cdmx.gob.mx (hourly weather, air quality and UV per station; no official API found, open data
       portal has some sets). UNAM's 55-station rain network (Observatorio Hidrológico) is reported out
       of operation.
+      Access (checked 2026-11-23):
+      - **METAR MMMX:** the only one ready for "now": public, every 30–60 minutes, standard format.
+      - **SMN stations:** SMN publishes the station list and a KMZ map; I found no download or API for
+        the readings. The 10-minute averages reach SMN by satellite every 1 or 3 hours, so they can't
+        drive "now" anyway; they're useful for step 3 (checking forecasts after the fact). Ask SMN, or
+        check Conagua's hydrological system (SIH), before relying on them.
+      - **CDMX network (REDMET for weather, SIMAT for air):** yearly CSV/Excel files plus the latest
+        hours on the site; a BSD-licensed R package (aire.zmvm) and research scripts read the current
+        hour from the site's pages, so it works but by reading pages, which breaks when the site
+        changes and the site goes down at times. Treat it as best-effort with a fallback.
    A Solstice "blend" source behind the data interface (Q3).
 9. **Conagua / SMN** (checked 2026-11-23): free web service, no key, forecasts per municipality (CDMX by
    alcaldía): hourly for 48 hours and daily for 3 days, updated hourly at :15, as one national gzip
@@ -247,10 +265,15 @@ Values follow the unit settings; a card is skipped when the source has no data f
 10. **Local alerts for Mexico City:** CDMX's civil protection (SGIRPC) issues a colour alert per alcaldía
     for rain (green under 15 mm, yellow 15–29, orange 30–49, red 50–70, purple above), plus wind, hail,
     heat and cold, published on official channels; no machine-readable feed found yet. SMN adopted CAP
-    in 2014 and Mexico is building a CAP cell-alert system; check whether SMN warnings reach WMO's feed
-    in Solstice's build (WMO severe weather is only in the non-free-net flavour).
+    in 2014 and Mexico is building a CAP cell-alert system.
+    **SMN warnings already reach Solstice** (checked 2026-11-23): Solstice builds the `basic` variant,
+    which includes WMO severe weather, and `SourceManager.getDefaultSourceForFeature` already makes WMO
+    the default alert source. WMO's source list has "CONAGUA - Servicio Meteorológico Nacional de
+    México" as registered, official and operating, with its own CAP feed. To confirm on the phone
+    during the next storm warning: how fine its areas are (state, region or municipality). SGIRPC's
+    per-alcaldía colours stay the gap; ask SGIRPC whether a feed exists.
 11. **Mexico City air quality and UV:** SIMAT measures both per station; a local source would beat the
-    global CAMS model there. Access method to check.
+    global CAMS model there. Access is the same as REDMET above (site pages, best-effort).
 
 ## Upstream files touched
 - `app/src/main/kotlin/org/breezyweather/ui/theme/compose/Theme.kt`: `BreezyWeatherTheme` delegates
