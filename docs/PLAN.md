@@ -163,7 +163,7 @@ Values follow the unit settings; a card is skipped when the source has no data f
   correction runs on the phone.
 - **Sharing data is opt-in, always.** Asked during onboarding, never on by default, and the screen
   shows exactly what would be sent and visualizes how it travels to us. Later: anonymized forecast
-  errors per area, which needs a server. Rules in SOURCES.md "Engine guardrails".
+  errors per area, which needs a server. Rules in RULES.md section 4.
 - Coding starts after Saturday's session; Saturday stays as planned (guardrails, then Motion).
 
 ### Rain and alerts (decided 2026-11-22)

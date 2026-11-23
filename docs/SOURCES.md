@@ -144,37 +144,9 @@ Marco:
 Proposal: 2 on the main chart (it's the only one visible without tapping), 1 and 5 in each card's
 sheet, 3 and 4 on the place's Sources page.
 
-## Engine guardrails (proposal, to agree with Marco before any engine code)
+## Engine guardrails
 
-Decided 2026-11-23: the engine is its own library repo, Rainbow.ai is dropped, and sharing data
-is always opt-in. These rules make that hold; once agreed they move into RULES.md.
-
-**Privacy**
-1. Nothing leaves the phone except the weather requests needed to fetch a forecast, unless the
-   person opted in.
-2. Opt-in is asked once during onboarding, off by default, and can be changed any time in settings.
-   Saying no changes nothing else in the app.
-3. The opt-in screen shows the actual data that would be sent (a real example from that phone), and
-   a visualization of its path: phone → what's removed (place, time, identifiers) → our server →
-   what's done with it → what comes back to everyone.
-4. Data minimized before it leaves the phone: forecast error only (forecast against observation),
-   the area rounded to a coarse cell, time rounded to the hour. No account, no device or advertising
-   ID, no location history, no raw coordinates. Cell size and rounding are tokens.
-5. The server only uses an area once enough phones have contributed there; below that, nothing
-   about the area is kept. The threshold is a token.
-6. Contributions are kept for a short, stated time, and the server code is open source.
-7. Applicable law checked before the server exists: Mexico's LFPDPPP, the EU's GDPR.
-
-**Engine design**
-1. No UI code and no Solstice code in the engine; Solstice configures it (same rule as Motion).
-2. Every number is configuration or a token: thresholds, weights, distances, ages, cell sizes.
-3. Each source declares its coverage, tier, terms and required attribution as data.
-4. Every result carries its provenance: which sources, their weights, any correction, and how
-   fresh each part is. The transparency graphic is built from this, never from guesses.
-5. No single source can break a forecast: if one fails, the next tier fills in, and the provenance
-   says so.
-6. Tested offline with recorded responses for each source, and verified against public archives
-   before a change ships.
+Agreed 2026-11-23; they live in RULES.md, section 4 (Data, sources and privacy) and section 2.6.
 
 ## Sources to add or bring back
 

@@ -1454,3 +1454,4 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
   blending sources (Marco wants it for Mexico City), Conagua/SMN's municipal forecasts: PLAN.md research queue 6, 8, 9.
 - **2026-11-23 (chat): more research** on localized accuracy (steps), Mexico City observations, CDMX's alcaldía rain
   alerts, and SIMAT air quality and UV: PLAN.md research queue 8, 10, 11.
+- **2026-11-23:** RULES.md: added section 4 (data, sources and privacy: opt-in only, data minimized, provenance, sources as data) and section 10 (git: branches and pull requests, commit as INFORMATION89, never commit gradlew.bat or secrets); the engine follows the Motion rule (2.6). Code guardrails (CI check, tests, branch protection) stay first on Saturday.
