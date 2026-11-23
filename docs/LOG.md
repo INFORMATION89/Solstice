@@ -1429,3 +1429,4 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 - **2026-11-22 (Marco):** close side becomes a Motion option (✕ at the end by default, or swapped to the start);
   every card opens partially, then full page; optional, reorderable cards with the most important moving to the
   top; Forecast keeps hero + sun/moon path + time, gets a spacing pass; moon card reworked on `motion-ui`.
+- **2026-11-22 (Marco):** by default the important, relevant card moves to the top (back to your order afterwards; can be switched off).

@@ -76,7 +76,8 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 - [ ] ⭐ **Header close side as a Motion option:** ✕ at the end (default) or swapped with the leading
   button; mirrored for right-to-left; a lab switch.
 - [ ] ⭐ **Optional, reorderable Forecast cards** with a general "most important moves to the top" rule
-  (replaces the rain-only special case in `ForecastPage.kt`). Order rules to agree first.
+  (replaces the rain-only special case in `ForecastPage.kt`): on by default, the card returns to your order
+  once it no longer matters, a switch to turn it off. Thresholds per card to agree.
 - [ ] ⭐ **Forecast spacing pass** against Material's spacing guidance, kit tokens only (hero temperature,
   sun/moon path and time stay).
 - [ ] ⭐ **Moon card rework** on `motion-ui` as a partial sheet (with the kit move).

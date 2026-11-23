@@ -34,7 +34,8 @@ logs, session notes or build reports here.
    - **Optional, reorderable cards** (Marco, 2026-11-22): you add or remove cards (e.g. wind,
      pressure) and reorder them. **The most important card moves to the top when it matters**
      (today only rain does this, hardcoded in `ForecastPage.kt`; it becomes a general priority rule).
-     How your own order and the automatic "moves to the top" combine: to agree.
+     **By default the important, relevant card moves to the top** while it matters, then goes back to its
+     place in your order (Marco, 2026-11-22). "By default" means it can be switched off.
    - **Forecast keeps** the hero temperature with the sun/moon path and the time; it gets a **spacing
      pass** against Material's spacing guidance using the kit's tokens.
    - **The moon card gets reworked** with the move to `motion-ui`: it becomes a partial sheet built from
@@ -127,7 +128,7 @@ logs, session notes or build reports here.
 
 ## Open questions (to settle with Marco)
 
-1. **Card order:** how your own order and "the most important moves to the top" combine.
+1. **Card priority:** what makes each card "important" (thresholds), and where the switch to turn it off lives.
 2. **The card material's values** (opacity, blur), picked in the lab on Saturday.
 3. **Spring mapping:** confirm the table in CONTINUE.md "Next session".
 4. **Handles without taps:** Apple's grabber is tappable (cycles heights) and works with VoiceOver;
