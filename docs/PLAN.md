@@ -219,8 +219,7 @@ Values follow the unit settings; a card is skipped when the source has no data f
 
 1. **Card catalog leftovers:** where the switch for "important cards move to the top" lives.
 2. **Outlook's content:** which proactive answers it gives (Direction 6).
-2. **The card material's values** (opacity, blur), picked in the lab on Saturday.
-3. **Spring mapping:** confirm the table in CONTINUE.md "Next session".
+3. **The card material's values** (opacity, blur), picked in the lab on Saturday.
 4. **Handles without taps:** Apple's grabber is tappable (cycles heights) and works with VoiceOver;
    ours has no tap. Change for partial sheets?
 5. **Proactive alerts (Direction 4):** which alerts at first, their defaults and wording, and where you

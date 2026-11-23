@@ -111,7 +111,7 @@ validity match. Updates replace what they reference; cancels remove it. The most
 ## 8. Learning (on the phone)
 
 - A short rolling log per saved place: what each source forecast for each hour, and what the nearest
-  observation later measured. Kept for a window set in configuration, then deleted.
+  observation later measured. Kept 30 days by default (configuration; decided 2026-11-23), then deleted.
 - From it: each source's recent error, used for weights, and a bias correction for the next hours
   that fades out with lead time.
 - Seeded from public data so it works from day one: archived past forecasts (Open-Meteo keeps them
@@ -167,7 +167,6 @@ agreed with Marco.
 ## Open questions for Marco
 
 1. Engine repo name (for example `solstice-engine` or a name of its own).
-2. How long the on-phone log keeps data (proposal: 30 days).
 
 ## Consulted (public sources only)
 

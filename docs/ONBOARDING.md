@@ -19,7 +19,8 @@ Nothing is built until it's agreed (RULES.md section 1).
 ## The flow (two steps, no slides)
 
 **Step 1: Where are you?** A separate first screen (Marco, 2026-11-23), still one screen and not
-slides: the app's name, one short line, and two choices.
+slides: the app's name, one short line, and two choices, over Forecast's gradient field (Marco,
+2026-11-23), so the morph into Forecast is seamless.
 - "Use my location" (primary). Opens Android's prompt, approximate and precise together. Approximate
   is enough for weather; we never ask again for precise.
 - "Choose a place" (secondary). Opens search; the place picked becomes home.
@@ -59,6 +60,5 @@ sharing launches: new installs see step 2; existing users get it once as a messa
 
 ## Questions for Marco
 
-1. What the first screen shows besides the two choices (the app's name only, or a live sky behind it).
-2. Should the opt-in also show a running count of what you've shared so far (in Settings)?
-3. The wording above is a first draft; every sentence goes through WRITING.md and you before it ships.
+1. Should the opt-in also show a running count of what you've shared so far (in Settings)?
+2. The wording above is a first draft; every sentence goes through WRITING.md and you before it ships.
