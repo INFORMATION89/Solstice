@@ -1,7 +1,48 @@
 # Continuing on another computer
 
-Where things stand and how to pick the work up anywhere. The plan, decisions and log are in
-[PLAN.md](PLAN.md).
+Where things stand and how to pick the work up anywhere. Read [RULES.md](RULES.md) first; decisions
+are in [PLAN.md](PLAN.md), history in [LOG.md](LOG.md).
+
+## Next session: Saturday 2026-11-28, 1:00 AM (planned in chat 2026-11-22)
+
+Theme: **guardrails and the start of Motion as the UI framework.** Nothing on screen should change
+this session except where Marco agreed to a change beforehand. RULES.md applies throughout: anything
+not listed here, or any surprise, goes back to Marco before it's built.
+
+**To settle in chat before Saturday** (anything not settled is skipped, not guessed):
+1. Motion's module split and names: a core module (springs, gestures, morphs, haptics; Compose only)
+   and a UI kit module (theme of tokens, page frame, card, sheet pieces, header buttons, glass;
+   adds Material 3 and Haze). Which pieces move first.
+2. How the tokens become a theme: the kit holds the token *names* with neutral defaults, each app
+   passes its own values (Solstice passes today's). This replaces MOTION_REPO_PLAN phase 2's "swap
+   Solstice's tokens for Material 3's defaults" in the lab: the lab would use the kit's theme.
+3. Optional, only if decided: spring tokens as speed × bounce plus non-bouncy effects springs;
+   Reduce Motion behaviour; glass on cards.
+
+**Order for Saturday** (each step: build, check, commit; stop and ask if a step doesn't go as planned):
+1. **Pull and read** RULES.md, PLAN.md, this file; `git submodule update --init`.
+2. **Guardrails** (agreed with RULES.md 3.4 and 7):
+   - A CI check that fails on typed-in values in `ui/expressive/` and in Motion's UI code: `dp`/`sp`
+     literals, `Color(0x…)`, `spring(`, `tween(`, `delay(`. Today's occurrences go into a baseline
+     allowlist that can only shrink; **show the allowlist to Marco** before merging.
+   - Run the app's unit tests in CI too (`SummaryTest`, `FreshnessTest`, `SkyVisibilityTest` never
+     run there today).
+3. **Motion clean-up, no visible change:**
+   - One Motion Lab: the copy in Solstice (`ui/expressive/lab/`, identical to `motion/lab/`) goes once
+     the lab runs as Motion's own app (MOTION_REPO_PLAN phase 2, adjusted by point 2 above).
+   - Remove the old `Morph` composable if only the lab uses it (the app uses `SpringMorph`).
+   - Motion's README up to date: `SpringMorph`, `BlurCrossfade`, `MorphSettings`, all spring tokens.
+4. **UI kit, first pieces (if point 1 is agreed):** create the module; move the token theme, then
+   `Glass`, the card, and the page frame pieces (`FrameHeader`, `FrameAction`, `FrameButton`,
+   `PageScaffold`, the top edge), each with a lab page. Solstice imports them and passes its values.
+   Check: screenshots of every page before and after must match.
+5. **Docs:** UI_SYSTEMS.md refreshed (it describes files that no longer exist), LOG.md entries,
+   ROADMAP.md ticks.
+6. **Phone pass**, if the Pixel is connected: the "built, not checked" items further down this file.
+
+**Not this Saturday** (proposals to Marco first, in chat): the new app layout (not an endless list),
+the postcards' standard look, proactive alerts the Gradient way (PLAN.md Direction 4), the spring
+token grid and Reduce Motion unless decided, interactive glass.
 
 ## Where we are (2026-11-21, midday)
 

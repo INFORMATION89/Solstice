@@ -61,6 +61,19 @@ neighbouring glass buttons merging into one shape (most ambitious); haptics from
 Rules: never blocks input, values from Motion tokens only, Reduce Motion keeps light and haptics but drops
 stretch and scale.
 
+## 🗓 Saturday 2026-11-28, 1:00 AM
+
+Plan in CONTINUE.md "Next session": guardrails (no-hardcoding CI check, app tests in CI), one Motion
+Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed), docs, phone pass.
+
+## 💬 Proposals to bring to Marco (from chat 2026-11-22)
+
+- [ ] 💬⭐ **New app layout** that isn't an endless list (PLAN.md Direction 2).
+- [ ] 💬 **Postcards in a standard look**, the physical feel kept in the interaction (Direction 3).
+- [ ] 💬⭐ **Proactive alerts the Gradient Weather way** (Direction 4): alerts you choose to watch, rain or
+  snow countdown as a Live Update, cooldowns, official warnings in full, evening summary, what to wear.
+- [ ] 💬 Spring tokens as speed × bounce; Reduce Motion behaviour; glass on cards (PLAN.md open questions).
+
 ## ⭐ Next session priorities
 
 1. Rework what needs redoing and make everything consistent (spacing, materials, components).
