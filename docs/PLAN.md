@@ -152,6 +152,20 @@ Values follow the unit settings; a card is skipped when the source has no data f
 - **Accessibility:** follows Android's "Time to take action" timeout; a message with an action waits
   until dismissed when TalkBack is on.
 
+### Weather engine (decided 2026-11-23; design in SOURCES.md)
+- **Its own library repo**, like Motion: works on the phone, has no UI, any Android app can include
+  it. Solstice imports and configures it, and shares its results with other apps on the phone
+  (Breezy's data sharing). Code taken from Breezy stays LGPL-3.0.
+- **No Rainbow.ai** (Marco: signing up asks for a card even for free use). Next-hour rain is phased:
+  Open-Meteo's 15-minute data and the blend first; our own radar nowcast later, where public radar
+  exists (optical flow, as in pysteps and LibreWXR).
+- **Learns from public data first** (past forecast archives and station observations); the local
+  correction runs on the phone.
+- **Sharing data is opt-in, always.** Asked during onboarding, never on by default, and the screen
+  shows exactly what would be sent and visualizes how it travels to us. Later: anonymized forecast
+  errors per area, which needs a server. Rules in SOURCES.md "Engine guardrails".
+- Coding starts after Saturday's session; Saturday stays as planned (guardrails, then Motion).
+
 ### Rain and alerts (decided 2026-11-22)
 - **One "precipitation is likely" rule** for the rain card, notifications and Live Updates: hourly at
   least 40 % chance and 0.2 mm; minute by minute at least 0.1 mm/h for two steps in a row; snow counts;
@@ -226,7 +240,7 @@ review): `docs/SOURCES.md`, proposal awaiting Marco.
 4. Proactive channels: Live Updates, daily brief, clothing.
 5. Card explainers (swipe up past the details): short Solstice texts, with "Read more" from Wikipedia
    (CC BY-SA: credit and link, never silently edited).
-6. **Rainbow.ai nowcast** (checked 2026-11-23): fits Breezy's keyed-source pattern (like AccuWeather: own
+6. **Rainbow.ai nowcast** (checked 2026-11-23; **dropped** the same day, see Weather engine): fits Breezy's keyed-source pattern (like AccuWeather: own
    key in the source's settings, per-feature choice, attribution). Gives minute-by-minute precipitation
    for 4 hours at 1 km (updated every 10 min), an hourly/daily Weather API and precipitation/cloud map
    tiles. Free tier is per account (5,000 requests a month per API on the pricing table), so each user
@@ -259,7 +273,7 @@ review): `docs/SOURCES.md`, proposal awaiting Marco.
    steps, each verified before the next:
    1. **Consensus:** several models from Open-Meteo (ECMWF, GFS, ICON, GEM…) blended, with their spread
       shown ("the models disagree today"), like Acme and meteoblue's multi-model view.
-   2. **Nowcast first:** Rainbow.ai for the first hours when the user has a key.
+   2. **Nowcast first:** our own next-hour rain (Open-Meteo 15-minute data, then radar nowcast; Rainbow.ai dropped).
    3. **Learn locally:** keep a log of each source's forecast against what was observed at your place,
       and weight sources by their recent error there (what Gradient's "localized accuracy" implies);
       nudge the next hours by the current error.
