@@ -167,6 +167,7 @@ agreed with Marco.
 
 ## Open questions for Marco
 
+None right now.
 
 ## Consulted (public sources only)
 
