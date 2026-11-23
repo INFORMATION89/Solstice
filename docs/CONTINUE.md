@@ -1,7 +1,98 @@
 # Continuing on another computer
 
-Where things stand and how to pick the work up anywhere. The plan, decisions and log are in
-[PLAN.md](PLAN.md).
+Where things stand and how to pick the work up anywhere. Read [RULES.md](RULES.md) first; decisions
+are in [PLAN.md](PLAN.md), history in [LOG.md](LOG.md).
+
+## Next session: Saturday 2026-11-28, 1:00 AM (planned in chat 2026-11-22)
+
+Theme: **guardrails and the start of Motion as the UI framework.** Nothing on screen should change
+this session except where Marco agreed to a change beforehand. RULES.md applies throughout: anything
+not listed here, or any surprise, goes back to Marco before it's built.
+
+**Decided in chat (2026-11-22, Marco):**
+1. **Motion splits into two modules** in the same repo: `motion` (springs, gestures, morphs, haptics;
+   Compose only) and `motion-ui`, the UI kit (theme, page frame, card, sheet pieces, header buttons,
+   glass; adds Material 3 and Haze). `motion-ui` depends on `motion`, never the other way.
+2. **Tokens: names in the kit, values from the app.** The kit defines the token names with neutral,
+   Material-based defaults and a theme (like `MaterialTheme`) that apps fill in; Solstice passes
+   today's values, so it looks the same.
+3. **First pieces to move:** theme and tokens; glass and card; the page frame (scaffold, header,
+   `FrameAction`, `FrameButton`, top edge); sheet pieces (handle, shape, screen corners, `SheetDialog`).
+   These have no weather code today (except a few string resources, which become parameters).
+4. **Springs become speed × bounce**, plus effects springs that never bounce (proposal below; confirm
+   the table before Saturday).
+5. **Reduce Motion ("Remove animations") follows Apple's list:** morphs and sheets become quick fades
+   in place, blur hand-offs become plain crossfades, no bounce, no recede; drags still follow the finger.
+   Built into every Motion piece.
+6. **Two materials:** glass for the toolbar, buttons and sheets; a thicker card material for cards. Both
+   are kit tokens. The card material's values get picked with Marco in the lab (that is the one visible
+   change this Saturday).
+7. **CI check: baseline, then shrink.** Today's typed-in values go on an allowlist Marco reviews; anything
+   new fails the build; the list only shrinks.
+8. **The Motion Lab becomes Motion's own app, built on the kit** (its first real user); Solstice's copy
+   and the "Solstice Lab" launcher icon go.
+
+**Spring tokens, proposed mapping (response in seconds / damping; to confirm):**
+
+**Opinion (Marco, 2026-11-22): movement always has some bounce.** The lowest level is "subtle", not
+none. The Motion Lab gets a switch to compare subtle against no bounce on every demo before it's final.
+
+| | Subtle (0.9) | Slight (0.8) | Playful (0.5) |
+|---|---|---|---|
+| **Fast** (0.2) | `snappy` | | |
+| **Default** (0.31) | `control`, `settle` (were 1.0) | `container` (0.78), `content` (0.85) | `playful` |
+| **Slow** (0.4) | `dismiss` (0.39, was 1.0), `smooth`, `gentle` (0.44, were 1.0) | `brisk` (0.78), `momentum` | |
+
+- **Effects** (opacity, colour, blur), Material's values: fast 0.10 s, default 0.16 s, slow 0.22 s,
+  no bounce: opacity and blur can't go past "fully shown", so a bounce there reads as a flicker.
+- **Reduce Motion** removes the bounce everywhere (Apple: tighten springs).
+- `wobble` (0.31 / 0.32) stays as a named special for the toolbar bud (its animation stays).
+- What changes in feel: closing, settling after a drag and controls gain a hint of bounce (MOTION.md's
+  "dismiss: no bounce" and "settle: no bounce" rules change with it); `gentle` gets a little quicker.
+  Old names stay as aliases until every use moves.
+
+**Order for Saturday** (each step: build, check, commit; stop and ask if a step doesn't go as planned):
+1. **Pull and read** RULES.md, PLAN.md, this file; `git submodule update --init`.
+2. **Motion Lab licence headers (first job, Marco 2026-11-23):** 7 files in Motion's `lab/` still carry
+   Breezy's LGPL header (`EdgeBlurDemo`, `MotionLabActivity`, `SettleDemo`, `ToolbarDemo`, `DialDemo`,
+   `SpringMorphDemo`, `HapticsDemo`). Check each holds no Breezy code (compare against upstream; this
+   is an audit, not building, so reading Breezy is fine here). Clean files get Motion's Apache 2.0
+   header (`Copyright 2026 INFORMATION89`); anything Breezy-derived is reported to Marco, not fixed on
+   the spot (RULES.md section 5). Commit in Motion, then bump the submodule in Solstice.
+3. **Model spread test for Mexico City (Marco: asap, 2026-11-23):** a standalone research script, not
+   app code, in `tools/`. Compares each model's archived forecasts (Open-Meteo's Historical Forecast
+   API: GFS, ECMWF, ICON, GEM and others) with what the MMMX airport reported (Iowa State's METAR
+   archive; aviationweather.gov only keeps recent days), June to October 2026: temperature error and
+   whether rain was right, per model and by hour of day. These sessions can't reach those sites, so it
+   runs as a manual GitHub Actions workflow (or on Marco's computer) and commits a short report to
+   `docs/research/`. Results feed PLAN.md research queue 15 and the engine's starting weights.
+4. **Guardrails:** the CI check (decision 7) on `ui/expressive/` and Motion's UI code (`dp`/`sp`
+   literals, `Color(0x…)`, `spring(`, `tween(`, `delay(`); **show the allowlist to Marco** before
+   merging. Run the app's unit tests in CI too.
+   Then branch protection on `main` (Marco, 2026-11-23): block force pushes and deletion; once the
+   checks exist, require them to pass before merging (sessions work on a branch, merge by pull request).
+5. **Motion core clean-up:** spring tokens (decision 4, with aliases); effects springs; Reduce Motion in
+   `SpringMorph`, `BlurCrossfade`, `Dial`, page springs (decision 5); remove the old `Morph` composable
+   if only the lab uses it; tests for each.
+6. **`motion-ui` module:** theme and tokens → glass and card (two materials, decision 6) → page frame →
+   sheet pieces. Solstice imports each and passes its values. Check: screenshots of every page before
+   and after match, except the card material.
+7. **Motion Lab as its own app** on `motion-ui`, one page per piece (core and kit); remove Solstice's
+   copy.
+8. **Docs:** Motion README (all pieces, the new springs, the kit), UI_SYSTEMS.md, MOTION.md's token
+   table, LOG.md, ROADMAP.md.
+9. **Phone pass**, if the Pixel is connected: the "built, not checked" items further down this file,
+   and the spring changes above.
+
+If time runs short, stop after a finished step; the rest moves to the next session in this order.
+
+**Bug review (2026-11-22):** ROADMAP.md "Review 2026-11-22" (B1–B5, D1–D3, F1–F5, R1–R3, Q1–Q3).
+Its R3 findings shape step 5 (Motion core); B3 and B4 come from the same code. Ask Marco before adding any
+of them to this Saturday.
+
+**Not this Saturday** (proposals to Marco first, in chat): the new app layout (not an endless list),
+the postcards' standard look, proactive alerts the Gradient way (PLAN.md Direction 4), the spring
+token grid and Reduce Motion unless decided, interactive glass.
 
 ## Where we are (2026-11-21, midday)
 
@@ -204,7 +295,7 @@ unused; `unresist` caps at 99.9 %.
 
 **Research the chat environment is doing** (PLAN.md "Research queue"): the page recede done cheaply as a
 `:motion` piece, long press alongside drag to reorder, proactive channels (Live Updates, daily brief,
-clothing), what the summaries should say, Smartspacer's SDK license. Far future: native Smartspacer.
+clothing), what the summaries should say.
 
 Rules that still apply: propose and agree any new or changed motion before building it; keep the
 PLAN.md log and [ROADMAP.md](ROADMAP.md) up to date; new code in `ui/expressive/` or `:motion`; check on
