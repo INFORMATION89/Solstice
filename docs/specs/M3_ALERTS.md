@@ -1,9 +1,9 @@
 # Meridian M3: official alerts (CAP, WMO, FOSS Public Alert Server)
 
 Status: **spec, clean room step 1** (2026-11-23), from the OASIS CAP 1.2 standard, WMO's Severe Weather
-Information Centre pages and source list, Google's public CAP guidance, and KDE's public pages. One gap:
-the FOSS Public Alert Server's OpenAPI description couldn't be opened from here; its part is marked
-**to complete** and gets finished from that document before building.
+Information Centre pages and source list, Google's public CAP guidance, KDE's public pages, and the FOSS
+Public Alert Server's OpenAPI description (read from KDE's GitHub mirror; only the API description, not
+the server's code).
 
 ## Scope
 
@@ -47,13 +47,26 @@ Meridian's alert type keeps all of these, plus the source and provenance.
 - **Terms:** free to reuse; credit the issuing agency (`senderName`, for Mexico "Servicio Meteorológico
   Nacional"); WMO and the agencies give no warranty.
 
-### FOSS Public Alert Server (**to complete**)
+### FOSS Public Alert Server (completed 2026-11-23 from its OpenAPI description, version 1.0.0)
 - Aggregates hundreds of CAP feeds worldwide, including civil-protection feeds the WMO list doesn't
-  carry (6 providers in Germany, Taiwan's NCDR, Japan's typhoon centre).
-- **To complete from its OpenAPI document:** the endpoint that lists alerts for an area or point, its
-  parameters, the response shape, how to get each alert's CAP message, and any usage rules. Until then:
-  query by a small box around the place, fetch the CAP messages, run the same area test.
-- Upstream still calls it early testing, so it's always used together with WMO, never alone.
+  carry (6 providers in Germany, Taiwan's NCDR, Japan's typhoon centre). Server: `https://alerts.kde.org`.
+- **`GET /alert/area?min_lat=&max_lat=&min_lon=&max_lon=`**: all alerts for a bounding box (latitudes
+  −90 to 90, longitudes −180 to 180; max must be larger than min, so a box can't cross the antimeridian:
+  split it in two there). The box is the place plus a margin from configuration. Response: a JSON list
+  of alerts (the schema describes CAP fields; record a real response before building and map from that).
+- **`GET /alert/{UUID}`**: one alert as CAP 1.2 XML, for anything the list doesn't carry in full.
+- **`GET /source/area_status?country_codes=`**: which feeds the server has for ISO 3166-1 country codes,
+  with each feed's name and status. Used for the sources screen ("Alerts for Mexico: none on this
+  server").
+- **`GET /config/server_status`**: version, operator, links to its privacy policy and terms of service,
+  and a **congestion state**. Meridian checks it at most daily and backs off while the server reports
+  congestion.
+- Not used: the subscription endpoints (they register a push endpoint; Meridian polls instead, so no push
+  token ever leaves the phone).
+- **Terms:** a Terms of Service page on KDE's wiki, linked from the server status; read it before
+  building (it didn't open from here).
+- The API calls itself early testing and says it may change: the adapter checks `server_version` and
+  treats unknown shapes as problems. Always paired with WMO, never alone.
 
 ## Does it cover the place?
 
@@ -113,10 +126,11 @@ expired message; a Test message; one malformed file.
 ## Done when
 
 Recorded alerts for Mexico, the US and Germany come out merged, ordered and credited correctly; all tests
-pass on CI; the alert server part is completed from its OpenAPI document.
+pass on CI; the alert server's terms of service are read and recorded.
 
 ## Consulted
 
 OASIS CAP 1.2; WMO Severe Weather Information Centre (notes to users, source list, CAP feeds page); WMO
 Register of Alerting Authorities RSS; Google Public Alerts CAP requirements (alert and area entities); KDE's
-FOSS Public Alert Server pages and source status; Volker Krause's posts on the alert server.
+FOSS Public Alert Server pages, source status and OpenAPI description (`openAPI-docu.yaml`,
+version 1.0.0); Volker Krause's posts on the alert server.

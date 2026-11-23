@@ -74,15 +74,15 @@ none. The Motion Lab gets a switch to compare subtle against no bounce on every 
 5. **Motion core clean-up:** spring tokens (decision 4, with aliases); effects springs; Reduce Motion in
    `SpringMorph`, `BlurCrossfade`, `Dial`, page springs (decision 5); remove the old `Morph` composable
    if only the lab uses it; tests for each.
-6. **`motion-ui` module:** theme and tokens → glass and card (two materials, decision 6) → page frame →
+6. **`motion-ui` module** (sheet, message and settings rows: `docs/specs/MOTION_UI.md`): theme and tokens → glass and card (two materials, decision 6) → page frame →
    sheet pieces. Solstice imports each and passes its values. Check: screenshots of every page before
    and after match, except the card material.
 7. **Motion Lab as its own app** on `motion-ui`, one page per piece (core and kit); remove Solstice's
    copy.
 8. **Docs:** Motion README (all pieces, the new springs, the kit), UI_SYSTEMS.md, MOTION.md's token
    table, LOG.md, ROADMAP.md.
-9. **Phone pass**, if the Pixel is connected: the "built, not checked" items further down this file,
-   and the spring changes above.
+9. **Phone pass**, if the Pixel is connected: the checklist in `docs/research/PHONE_PASS.md` (the
+   "built, not checked" items further down this file, and the spring changes above).
 10. **Meridian M0, only if time is left (Marco, 2026-11-23):** create `INFORMATION89/Meridian`
     (Apache 2.0): an empty Kotlin Multiplatform project with the modules in MERIDIAN_PLAN.md section 3,
     the licence, a README, a copy of the clean-room rule, and CI building on Linux. No engine code yet:

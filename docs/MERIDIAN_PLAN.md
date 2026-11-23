@@ -158,7 +158,8 @@ All kept 30 days (decided), then deleted; cleared from Settings › Privacy.
 
 ## 9. Milestones
 
-Specs written so far: M1 in `docs/specs/M1_FORECAST.md`, M3 in `docs/specs/M3_ALERTS.md`.
+Specs written so far: M1 `docs/specs/M1_FORECAST.md`, M2 `M2_PROVENANCE.md`, M3 `M3_ALERTS.md`
+(complete, including the FOSS Public Alert Server), M4 `M4_OBSERVATIONS.md`, M5 `M5_BLEND.md`.
 
 Each one: a spec section written from public sources, a separate build session (clean room), then a
 check with real data. Nothing starts without Marco's OK.

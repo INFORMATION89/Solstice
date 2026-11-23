@@ -227,7 +227,7 @@ Values follow the unit settings; a card is skipped when the source has no data f
 2. **Outlook's content:** which proactive answers it gives (Direction 6); proposal in PROPOSALS.md.
 3. **The card material's values** (opacity, blur), picked in the lab on Saturday.
 4. **Proactive alerts (Direction 4):** which alerts at first, their defaults and wording, and where you
-   switch them on.
+   switch them on. Proposal and wording: PROPOSALS.md section 4, WRITING.md section 9 (2026-11-23).
 5. **Optional sources** (Marco, 2026-11-23: with very local sources, don't bundle everything). Facts:
    cutting 40 source packages saved 1.36 MB on the debug APK and less after R8 (release is 15.1 MB
    total, mostly libraries), so code size isn't the problem. Sources are never contacted unless
