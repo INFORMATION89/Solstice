@@ -150,8 +150,8 @@ Agreed 2026-11-23; they live in RULES.md, section 4 (Data, sources and privacy) 
 
 ## Sources to add or bring back
 
-- **Bring back upstream's cut national sources** (into the Solstice app, not the clean-room engine;
-  how they plug in is open, PLAN.md open question 8) (40 packages, 1.36 MB on the debug build): they
+- **Bring back upstream's cut national sources** (into the Solstice app as adapters
+  plugged into the clean engine, rewritten clean over time; PLAN.md, Weather engine) (40 packages, 1.36 MB on the debug build): they
   cost little and upstream maintains them. Japan, Taiwan and Türkiye need them for alerts; the
   rest add official forecasts where WMO only gives alerts.
 - **Mexico:** SMN municipal forecasts (official, per alcaldía, no key); airport reports from

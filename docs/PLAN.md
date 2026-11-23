@@ -164,6 +164,11 @@ Values follow the unit settings; a card is skipped when the source has no data f
 - **Sharing data is opt-in, always.** Asked during onboarding, never on by default, and the screen
   shows exactly what would be sent and visualizes how it travels to us. Later: anonymized forecast
   errors per area, which needs a server. Rules in RULES.md section 4.
+- **Licence: Apache 2.0**, like Motion (patent grant, any app can use it, works inside LGPL Solstice).
+- **Solstice leaves the Breezy fork gradually** (decided 2026-11-23): the clean engine replaces
+  Breezy's data layer and Motion UI its screens, part by part, so the app keeps working throughout;
+  ties are cut once no Breezy code is left. Until then, Breezy's source code stays in the app as
+  adapters plugged into the engine, and is rewritten clean over time, main sources first.
 - Coding starts after Saturday's session; Saturday stays as planned (guardrails, then Motion).
 
 ### Rain and alerts (decided 2026-11-22)
@@ -232,11 +237,8 @@ Values follow the unit settings; a card is skipped when the source has no data f
    until relevant where needed (SOURCES.md).
 7. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
 
-8. **Clean room follow-ups** (RULES.md section 5): the engine's licence (Apache 2.0 proposed, like
-   Motion); whether Solstice stops being a Breezy fork (engine replaces the data layer, Motion UI the
-   screens; about 88 % of today's Kotlin is Breezy's, and its 65 translations are LGPL too); how
-   sources plug into a clean engine. Motion Lab's 7 demo files still carry Breezy's LGPL header:
-   check they hold no Breezy code, then mark them Apache 2.0 like the rest of Motion.
+8. **Clean room leftovers:** Motion Lab's 7 demo files still carry Breezy's LGPL header: check they
+   hold no Breezy code, then mark them Apache 2.0 like the rest of Motion.
 
 ## Research queue
 Weather sources design (coverage, Automatic per refresh, merged alerts, transparency graphic, Gradient
