@@ -318,6 +318,44 @@ review): `docs/SOURCES.md`, proposal awaiting Marco.
     per-alcaldía colours stay the gap; ask SGIRPC whether a feed exists.
 11. **Mexico City air quality and UV:** SIMAT measures both per station; a local source would beat the
     global CAMS model there. Access is the same as REDMET above (site pages, best-effort).
+12. **The engine on macOS and Windows** (checked 2026-11-23; spec in ENGINE_SPEC.md section 2):
+    Kotlin Multiplatform is stable for Android, iOS and desktop JVM; Kotlin/Native builds a framework
+    a Swift menu bar app can import. Jetpack's KMP support rates macOS tier 2 and Windows tier 3. Ktor
+    has native HTTP engines for Apple (Darwin) and Windows (WinHttp). Windhawk mods are single C++
+    files loaded into Windows processes, so a Windows helper runs the engine and the mod reads its
+    result. Consequence now: the engine's core avoids Android-only code from day one.
+13. **Next-hour rain without Rainbow.ai** (checked 2026-11-23): RainViewer's free radar forecast ended
+    on 2026-01-01. Open-Meteo has real 15-minute data only for Central Europe and North America.
+    LibreWXR (AGPL, self-hostable) blends optical-flow radar nowcasts with models for 60 minutes, with
+    real radar for the US, Canada, Europe, Japan, Taiwan and a few more, but not Mexico. NOAA's
+    Enterprise Rain Rate (GOES-18/19, Himawari-9; 2 km, every 10 minutes, open data on AWS) covers
+    Mexico City from satellite; it replaced the GOES rain-rate product retired on 2026-09-01. SMN's
+    Cerro Catedral radar near CDMX publishes images only; ask SMN.
+14. **Privacy law and a server for opt-in sharing** (checked 2026-11-23; not legal advice):
+    - **Mexico:** a new LFPDPPP took effect 2025-03-21; the authority is now the Secretaría
+      Anticorrupción y Buen Gobierno (INAI is gone); a privacy notice (aviso de privacidad) is due when
+      data is collected.
+    - **EU:** truly anonymous data is outside the GDPR, but the EDPB's draft guidelines (2026-07)
+      treat the anonymizing itself as processing, and location data is hard to anonymize. So what
+      reaches the server (and its IP address) counts as personal data until it's aggregated: consent,
+      a privacy notice, no IP logging, raw contributions deleted once aggregated.
+    - **Hosting:** Cloudflare's free Workers plan allows 100,000 requests a day and its D1 database
+      100,000 row writes a day, enough for a start; paid Workers begin at $0.30 per million requests.
+15. **How much models disagree in Mexico City** (2026-11-23): meteoblue compares 12 models for CDMX
+    (IFS, ICON, GFS, NAM, UKMO, GEM, ARPEGE, AIFS and its own NEMS), but its numbers are only in
+    images. The hard season is the rainy one (June to early October, about 85 % of the year's rain);
+    in November meteoblue rates predictability "very high". Measuring it properly needs a small
+    script (Open-Meteo's archived forecasts against the MMMX airport reports, rainy season 2026): a
+    research job for a coding session, to schedule with Marco.
+16. **Leaving the Breezy fork, inventory** (2026-11-23; Kotlin lines today): screens 39,000 (main 12.2k,
+    common 8.8k, settings 7.3k, details 7.1k, theme, search, about, alert) → Motion UI; sources 8,700,
+    common utilities 8,100, domain models 5,200, units 5,500, storage 2,300, map geometry 1,800 → the
+    engine; widgets and the notification views 8,500 and background refresh and notifications 3,900
+    → rebuilt on the engine; the old animated weather view 3,000 → dropped or replaced (check what still uses it); 65 translations →
+    new strings, translated again. Proposed order: units and models (the engine's base), sources
+    and refresh (adapters first), screens (ongoing with Motion UI), background and notifications,
+    widgets and sharing, settings and the rest, then translations, then the package name
+    (`org.breezyweather`) and licence change last.
 
 ## Upstream files touched
 - `app/src/main/kotlin/org/breezyweather/ui/theme/compose/Theme.kt`: `BreezyWeatherTheme` delegates
