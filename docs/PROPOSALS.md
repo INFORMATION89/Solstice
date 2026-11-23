@@ -39,7 +39,7 @@ then Changes ahead; then Evenings for the sky. Outlook looks 10 days ahead (pick
 
 ## 2. Partial sheets per card
 
-Decided: every card opens a partial sheet first, then a full page (Marco, 2026-11-22); Apple's sheets
+Decided: every card opens one sheet with two heights, no separate page (Marco, 2026-11-22, refined 2026-11-23); Apple's sheets
 (a medium and a large height, a grabber, one sheet at a time). Pattern for every card:
 
 - **Partial (medium height):** the answer and its timeline. What the card says, bigger, plus the next

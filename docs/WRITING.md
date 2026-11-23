@@ -125,7 +125,7 @@ first one that matches.
 
 ## 9. Proactive alerts (proposal, PROPOSALS.md section 4)
 
-Mexican Spanish uses **tú** (to confirm with Marco). Titles say what's happening; the text says what to
+Mexican Spanish uses **tú** (Marco, 2026-11-23; to review later). Titles say what's happening; the text says what to
 do or when. No exclamation marks; official warnings use the agency's own title.
 
 | Alert | English | Español (México) |

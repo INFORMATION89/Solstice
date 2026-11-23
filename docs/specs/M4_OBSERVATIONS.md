@@ -6,7 +6,7 @@ the METAR format as published by WMO and ICAO. No other engine's code read.
 ## Scope
 
 Find the airports near a place, fetch their latest reports, and use them for current conditions when
-they're fresh and close enough. Keep observations for M6 (correcting forecasts) and verification.
+they're fresh and close enough. Keep observations for M7 (correcting forecasts) and verification.
 
 ## Stations
 
@@ -23,7 +23,7 @@ they're fresh and close enough. Keep observations for M6 (correcting forecasts) 
 
 - Only the chosen ids; a custom User-Agent with Meridian's name and a contact link.
 - `hours` from configuration (3 gives the last few reports, for trend and gaps).
-- History up to 30 days is available; M6 uses `hours` larger once a day, not every refresh.
+- History up to 30 days is available; M7 uses `hours` larger once a day, not every refresh.
 
 ## Mapping
 

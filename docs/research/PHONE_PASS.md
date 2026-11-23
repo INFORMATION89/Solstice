@@ -51,5 +51,5 @@ CONTINUE.md with what you saw; don't fix during the pass.
 
 ## Known bugs (don't fix in the pass, just confirm)
 
-From ROADMAP.md "Review 2026-11-22": B3 (tap swallowed after a swipe), B4 (toolbar colour flashes
-across pages), B5 (both texts blur at once). Note whether each still happens after the spring change.
+From ROADMAP.md "Review 2026-11-22": B3 (tapping after a swipe stops the tabs), B4 (jumping across the
+toolbar flashes Forecast), B5 (both texts blur at once on a text change). Note whether each still happens after the spring change.

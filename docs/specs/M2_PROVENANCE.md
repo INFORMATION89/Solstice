@@ -20,7 +20,7 @@ Every value Meridian returns can be traced to:
 | `issued` | When the source made it (model run, observation time, alert `sent`) |
 | `fetched` | When Meridian got it |
 | `weight` | Share in the blend, 0–1 (1 when it's the only one) |
-| `correction` | Applied correction id and amount, if any (M6) |
+| `correction` | Applied correction id and amount, if any (M7) |
 | `fallback` | `true` when the preferred source failed and this one stood in |
 
 `Provenance` on a result holds one entry per source and model used, plus per variable the list of
@@ -36,8 +36,10 @@ Open-Meteo: CC BY 4.0, credit with link. WMO feeds: credit the issuing agency na
 
 1. Start from the features asked for (`forecast`, `current`, `alerts`, `airQuality`, …).
 2. For each feature, take the sources that **cover the place** (coverage is data: a bounding box,
-   country list or "worldwide", from configuration) and are **turned on** (SOURCES.md, off until
-   relevant).
+   country list or "worldwide", from configuration), are **turned on** (SOURCES.md, off until
+   relevant) and have what they need (a key, consent for best-effort sources).
+   Order them by tier, then resolution, then recent health; a source picked by hand for this place
+   and feature wins while it covers the place (ENGINE_SPEC.md section 6).
 3. Drop sources still **fresh** for that feature (below their wait, from configuration; defaults:
    forecast 15 min, current 10 min, alerts 5 min, air quality 1 h).
 4. Drop sources **over their limit** (below).
@@ -84,6 +86,9 @@ interface MeridianStorage {
 }
 ```
 
+Settings and keys aren't part of it: the app passes key-value settings and secure key storage
+(DataStore and Android's keystore in Solstice), as ENGINE_SPEC.md section 9 says.
+
 `testing` ships an in-memory version; `storage-room` the Room one. Rows match MERIDIAN_PLAN.md section 7.
 A place is stored by rounded coordinates (configuration, default 3 decimals, about 100 m), never by name.
 
@@ -100,5 +105,5 @@ Results show their sources; no source is called more often than allowed (MERIDIA
 
 ## Consulted
 
-Meridian's docs; Open-Meteo's terms and API pages (limits, call weights); aviationweather.gov's Data
+Meridian's docs (ENGINE_SPEC.md sections 6 and 9); Open-Meteo's terms and API pages (limits, call weights); aviationweather.gov's Data
 API page (limits); the FPAS OpenAPI description (server status).
