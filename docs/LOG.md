@@ -1422,3 +1422,5 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
   that matter and the hours; everything essential at a glance; detail by tapping a card (it grows into
   its sheet); optional cards (automatic ones like rain, UV, air; added ones like wind or pressure). Kit
   components to build listed in ROADMAP.md. Wireframes: the "Solstice layout directions" design canvas.
+- **2026-11-22 (Marco): correction:** no one-liners at the top; Forecast keeps the temperature first, then
+  the summary, the cards and the hours.

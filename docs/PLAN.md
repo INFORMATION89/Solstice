@@ -22,8 +22,9 @@ logs, session notes or build reports here.
    Structure, names and order: to propose and agree (see "Open questions").
 2. **New layout: Direction A, "Glance"** (Marco, 2026-11-22; wireframes on the design canvas
    "Solstice layout directions", A1–A3). Not an endless list:
-   - Forecast opens with the **useful one-liners** (the summary engine), then the temperature, the
-     cards that matter and the hours. **Everything essential is visible at a glance.**
+   - Forecast keeps today's order: the temperature first, then the summary line, the cards that
+     matter and the hours (one-liners at the top were tried and dropped, 2026-11-22). **Everything
+     essential is visible at a glance.**
    - **More detail by tapping a card:** it grows into its own sheet (✕ at the end, pull down, back).
    - **Cards are optional:** some appear by themselves when they matter (rain, UV, air quality);
      others you add to always show (wind, pressure, humidity, sun and moon, pollen). Alerts always

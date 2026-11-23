@@ -71,7 +71,7 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 - [x] 💬⭐ **New app layout**: Direction A, Glance, chosen 2026-11-22 (PLAN.md Direction 2).
 - [ ] ⭐ **Kit components for the Glance layout**, in Motion's `motion-ui`, in this order (each with a lab
   page; app configures them afterwards; details to agree piece by piece):
-  1. One-liner text block (summary lines; text changes with the blur crossfade).
+  1. Summary text block (under the temperature; text changes with the blur crossfade).
   2. Tile: a small card with label, value and caption, sizes 1×1 and 2×1, a morph source.
   3. Tile grid: adaptive columns that wrap for small screens and 200 % text.
   4. Detail sheet: grows out of the tile that opened it (Sheet kind, ✕ at the end, pull down, back).
