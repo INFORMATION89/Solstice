@@ -21,7 +21,7 @@ milestones, each with a spec section first, then a build session, then a check a
 | JSON | kotlinx.serialization | Open-Meteo, aviationweather, WMO's source list | |
 | XML (CAP alerts) | xmlutil (`io.github.pdvrieze.xmlutil`, 1.0.x, Apache 2.0) | The XML format listed for kotlinx.serialization; multiplatform | Native was beta in older versions; test on each target |
 | Dates and times | kotlinx-datetime 0.7+ | Time zones on every target | Not 1.0 yet; `Instant` moved to the standard library in 0.7 |
-| Database (log, cache) | Room 2.7+ (KMP), behind our own interface | First stable Room with KMP; Android tier 1, macOS tier 2 | Keep it swappable (SQLDelight is the alternative) |
+| Database (log, cache) | **Room** 2.7+ (KMP), behind our own interface (decided 2026-11-23) | First stable Room with KMP; Android tier 1, macOS tier 2 | Keep it swappable (SQLDelight is the alternative) |
 | Settings | DataStore (KMP) | Jetpack, multiplatform | |
 | Geometry | Our own small point-in-polygon | CAP areas are polygons; a library is overkill | |
 
@@ -148,13 +148,12 @@ go in the pull request.
 
 All kept 30 days (decided), then deleted; cleared from Settings › Privacy.
 
-## 8. How it reaches Solstice
+## 8. How it reaches Solstice (decided 2026-11-23: switch directly)
 
-1. Meridian runs **next to** Breezy's data layer at first, behind a debug switch: same places, both
-   results side by side in a debug screen, so we can compare before switching anything.
-2. Then feature by feature (alerts first, since that's where Meridian adds the most), Solstice reads
-   from Meridian.
-3. Breezy's own source code stays in the app as adapters implementing Meridian's source interface,
+1. Solstice switches to Meridian **feature by feature**, with no side-by-side comparison step: alerts
+   first (where Meridian adds the most), then current conditions, then the forecast. Each switch is
+   checked on the phone and against the archives before the next.
+2. Breezy's own source code stays in the app as adapters implementing Meridian's source interface,
    rewritten clean over time (PLAN.md, Weather engine).
 
 ## 9. Milestones
@@ -170,7 +169,7 @@ check with real data. Nothing starts without Marco's OK.
 | M3 | Alerts: CAP parsing, WMO and FPAS, merging duplicates | Recorded real alerts (Mexico, US, Germany) merge correctly |
 | M4 | Observations: nearest airport, current conditions rule | Current conditions in CDMX come from MMMX when fresh |
 | M5 | Blend and spread: several models, ensemble spread | Blend beats or matches best match on the archive check |
-| M6 | Solstice side by side, behind a debug switch | Both results visible on the phone |
+| M6 | Solstice reads alerts from Meridian (first feature switched) | Alerts on the phone come from Meridian, checked against recorded real alerts |
 | M7 | Learning on the phone: log, decaying-average correction, skill weights | Error drops on the archive check; shown in the sources sheet |
 | M8 | macOS framework build (for the menu bar app) | A Swift sample prints a forecast |
 
@@ -186,12 +185,10 @@ check with real data. Nothing starts without Marco's OK.
 - **Clean-room discipline over many sessions:** the spec-then-build rule and "consulted" lists in each
   pull request.
 
-## Questions for Marco
+## Decided (Marco, 2026-11-23)
 
-1. Database: Room (Jetpack, familiar from Android) or SQLDelight (SQL first)? Proposal: Room, behind an
-   interface so it can change.
-2. Start Meridian side by side with Breezy behind a debug switch (section 8)?
-3. When does M0 start: the session after Saturday?
+Room for the database; switch directly, feature by feature; M0 starts at the end of Saturday's
+session if time is left (CONTINUE.md, step 10).
 
 ## Consulted
 

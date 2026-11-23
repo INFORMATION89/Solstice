@@ -173,7 +173,9 @@ Values follow the unit settings; a card is skipped when the source has no data f
   Breezy's data layer and Motion UI its screens, part by part, so the app keeps working throughout;
   ties are cut once no Breezy code is left. Until then, Breezy's source code stays in the app as
   adapters plugged into the engine, and is rewritten clean over time, main sources first.
-- Coding starts after Saturday's session; Saturday stays as planned (guardrails, then Motion).
+- **Room** for its database; Solstice **switches directly**, feature by feature (alerts first), no
+  side-by-side step; **M0** (empty repo) at the end of Saturday if time is left (2026-11-23).
+- Engine code starts after Saturday's session; Saturday stays as planned (guardrails, then Motion).
 
 ### Rain and alerts (decided 2026-11-22)
 - **One "precipitation is likely" rule** for the rain card, notifications and Live Updates: hourly at
