@@ -237,8 +237,8 @@ Values follow the unit settings; a card is skipped when the source has no data f
    until relevant where needed (SOURCES.md).
 7. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
 
-8. **Clean room leftovers:** Motion Lab's 7 demo files still carry Breezy's LGPL header: check they
-   hold no Breezy code, then mark them Apache 2.0 like the rest of Motion.
+8. **Clean room leftovers:** Motion Lab's 7 demo files still carry Breezy's LGPL header; first job on
+   Saturday (CONTINUE.md, step 2).
 
 ## Research queue
 Weather sources design (coverage, Automatic per refresh, merged alerts, transparency graphic, Gradient

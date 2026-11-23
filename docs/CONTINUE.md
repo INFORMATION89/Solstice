@@ -53,28 +53,34 @@ none. The Motion Lab gets a switch to compare subtle against no bounce on every 
 
 **Order for Saturday** (each step: build, check, commit; stop and ask if a step doesn't go as planned):
 1. **Pull and read** RULES.md, PLAN.md, this file; `git submodule update --init`.
-2. **Guardrails:** the CI check (decision 7) on `ui/expressive/` and Motion's UI code (`dp`/`sp`
+2. **Motion Lab licence headers (first job, Marco 2026-11-23):** 7 files in Motion's `lab/` still carry
+   Breezy's LGPL header (`EdgeBlurDemo`, `MotionLabActivity`, `SettleDemo`, `ToolbarDemo`, `DialDemo`,
+   `SpringMorphDemo`, `HapticsDemo`). Check each holds no Breezy code (compare against upstream; this
+   is an audit, not building, so reading Breezy is fine here). Clean files get Motion's Apache 2.0
+   header (`Copyright 2026 INFORMATION89`); anything Breezy-derived is reported to Marco, not fixed on
+   the spot (RULES.md section 5). Commit in Motion, then bump the submodule in Solstice.
+3. **Guardrails:** the CI check (decision 7) on `ui/expressive/` and Motion's UI code (`dp`/`sp`
    literals, `Color(0x…)`, `spring(`, `tween(`, `delay(`); **show the allowlist to Marco** before
    merging. Run the app's unit tests in CI too.
    Then branch protection on `main` (Marco, 2026-11-23): block force pushes and deletion; once the
    checks exist, require them to pass before merging (sessions work on a branch, merge by pull request).
-3. **Motion core clean-up:** spring tokens (decision 4, with aliases); effects springs; Reduce Motion in
+4. **Motion core clean-up:** spring tokens (decision 4, with aliases); effects springs; Reduce Motion in
    `SpringMorph`, `BlurCrossfade`, `Dial`, page springs (decision 5); remove the old `Morph` composable
    if only the lab uses it; tests for each.
-4. **`motion-ui` module:** theme and tokens → glass and card (two materials, decision 6) → page frame →
+5. **`motion-ui` module:** theme and tokens → glass and card (two materials, decision 6) → page frame →
    sheet pieces. Solstice imports each and passes its values. Check: screenshots of every page before
    and after match, except the card material.
-5. **Motion Lab as its own app** on `motion-ui`, one page per piece (core and kit); remove Solstice's
+6. **Motion Lab as its own app** on `motion-ui`, one page per piece (core and kit); remove Solstice's
    copy.
-6. **Docs:** Motion README (all pieces, the new springs, the kit), UI_SYSTEMS.md, MOTION.md's token
+7. **Docs:** Motion README (all pieces, the new springs, the kit), UI_SYSTEMS.md, MOTION.md's token
    table, LOG.md, ROADMAP.md.
-7. **Phone pass**, if the Pixel is connected: the "built, not checked" items further down this file,
+8. **Phone pass**, if the Pixel is connected: the "built, not checked" items further down this file,
    and the spring changes above.
 
 If time runs short, stop after a finished step; the rest moves to the next session in this order.
 
 **Bug review (2026-11-22):** ROADMAP.md "Review 2026-11-22" (B1–B5, D1–D3, F1–F5, R1–R3, Q1–Q3).
-Its R3 findings shape step 3 (Motion core); B3 and B4 come from the same code. Ask Marco before adding any
+Its R3 findings shape step 4 (Motion core); B3 and B4 come from the same code. Ask Marco before adding any
 of them to this Saturday.
 
 **Not this Saturday** (proposals to Marco first, in chat): the new app layout (not an endless list),
