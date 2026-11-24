@@ -63,8 +63,12 @@ Meridian's alert type keeps all of these, plus the source and provenance.
   congestion.
 - Not used: the subscription endpoints (they register a push endpoint; Meridian polls instead, so no push
   token ever leaves the phone).
-- **Terms:** a Terms of Service page on KDE's wiki, linked from the server status; read it before
-  building (it didn't open from here).
+- **Terms:** a Terms of Service page on KDE's wiki, linked from the server status. Still not found from
+  here (searched 2026-11-24); read it from the app's first `/config/server_status` response on Saturday
+  before the adapter is merged. The project's README says it's still in development and not ready for
+  production; KDE's 2025 CAP workshop slides list Breezy Weather among the apps already using it.
+- **Clean room:** Breezy Weather's own FPAS source code is in this repo; don't open it while building
+  Meridian's adapter (RULES.md section 5).
 - The API calls itself early testing and says it may change: the adapter checks `server_version` and
   treats unknown shapes as problems. Always paired with WMO, never alone.
 
