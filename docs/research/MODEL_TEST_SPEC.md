@@ -45,7 +45,8 @@ for comparison.
 - Temperatures converted from °F as reported by the archive, to °C, rounded only at the end.
 - "Rain in the hour": the forecast says rain when `precipitation` ≥ 0.1 mm (the same threshold Open-Meteo
   uses for its rain chance); the observation says rain when any report in that hour has a rain or
-  thunderstorm code.
+  thunderstorm code **at the station**; codes with `VC` (in the vicinity) don't count, and are tallied
+  separately as "near misses".
 
 ## What it measures
 
