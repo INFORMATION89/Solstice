@@ -128,3 +128,37 @@ older Android versions get an ongoing notification with the same text.
 
 **Rules:** the same thing never notifies twice (cooldowns above); quiet hours follow the phone's Do
 Not Disturb, except extreme official warnings; every notification opens the matching card's sheet.
+
+## 5. A sky that means something (Marco's earlier ideas, added 2026-11-24)
+
+Marco's two notes: make the sun/moon light show the weather without numbers, and move only at
+meaningful moments instead of drifting all the time. Checked against the sky code
+(`ui/expressive/sky/`) and the 2026-11-18 decisions (archive: gradient field, calm drift, a soft
+sun light at the real position, "not a hard disc"; AGSL on Android 13+ at 30 fps, paused when hidden,
+in battery saver and with Remove animations).
+
+| Idea | Today | Viable? How |
+|---|---|---|
+| **Position:** the real sun or moon position | **Built:** the glow follows an arc from sunrise to sunset (and the moon's at night) and sways a little | Yes, small: use the sun's real height (the moon dial already computes the moon's), so the light matches the sun path curve on Forecast |
+| **Sharpness:** crisp when clear, hazy when cloudy, almost gone in fog | Partly: the glow's strength depends on the weather family (0.9 clear, 0.75 partly cloudy, 0.35 overcast) | Yes, small: size and softness from cloud cover (%) and visibility, continuous. **A crisp disc goes against "soft light, not a hard disc" (2026-11-18): question below** |
+| **Warmth:** warmer or cooler with how the temperature feels | No | Yes, but subtle: shift the glow's colour a little with feels-like; the approved palettes stay. Risk: confused with golden hour. Try in the Lab first |
+| **Drift speed follows the wind** | Always drifts (loops of 45–85 s) | Yes, small: drift speed from wind speed; still air is still. This also makes the drift a meaningful moment (idea 4) and saves battery when calm |
+| **Rain:** a fine vertical streak texture | Planned slot ("rain, snow, fog, lightning later", `SkyEffects`) | Yes, medium: streaks in the grain, amount from rain now; Android 13+, static streaks on older phones |
+| **Opening the app:** the light rises into place | No | Yes, small: once per cold start, a slow spring from the horizon; never delays content or taps; skipped with Remove animations |
+| **Pull to refresh:** a pulse | No | Yes, small: the glow pulses once **when new data arrives** (not when you pull), next to the existing refresh indicator |
+| **Changing conditions:** a slow colour change | **Gap:** new data with a new condition switches the colours at once | Yes, small, and it fixes a visible jump: blend to the new palette over a few seconds |
+| **Swiping between pages:** the light shifts a little, like a panorama | No | Yes, small: the light moves a few % against the swipe (Forecast, Outlook, Places, and between places) |
+
+**Fit with the plan:** the sky stays Solstice's own (ROADMAP: sky, sun path and moon renderer stay in
+the app, built from kit parts), so this comes after Saturday's motion-ui move. It uses the motion
+tokens (the rise and the panorama as springs, colour changes as effects springs) and the ambient clock
+already in Motion. Data (cloud cover, visibility, wind, feels-like, rain now) already exists in
+Breezy's current weather, so it doesn't wait for Meridian. Twinkling stars (still off) belong to the
+same "meaningful" question.
+
+**Suggested order:** condition change blend (fixes a jump) → drift follows wind → sharpness → rise on
+opening → panorama → refresh pulse → rain streaks → warmth (Lab test).
+
+**Questions for Marco:** crisp disc when clear, or a tighter soft glow (keeping the 2026-11-18
+"no hard disc")? Which of these, and in what order? Twinkling stars: same rule (only when it means
+something)?
