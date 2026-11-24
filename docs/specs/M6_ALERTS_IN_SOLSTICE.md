@@ -51,9 +51,9 @@ resource, English and Mexican Spanish).
 ## The switch
 
 - **New places:** Meridian is the default alert source wherever it covers the place.
-- **Existing places:** a one-time migration moves places whose alert source is `wmo` or `fpas` (the two
-  Meridian replaces) to `meridian`. A place where the person picked another alert source (a national
-  one) keeps it. **To confirm with Marco before building.**
+- **Existing places (decided by Marco, 2026-11-24):** a one-time migration moves places whose alert
+  source is `wmo` or `fpas` (the two Meridian replaces) to `meridian`, automatically. A place where the
+  person picked another alert source (a national one) keeps it.
 - Breezy's `wmo` and `fpas` sources stay in the app as choices until M6 has been checked on the phone
   for a while; removing them is a separate decision.
 - Settings › Data and sources shows Meridian with its own sources and credits (`credits(result)`).

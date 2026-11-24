@@ -60,14 +60,21 @@ Today `rememberReducedMotion()` lives in `Morph.kt`, reads `ANIMATOR_DURATION_SC
   page recede; drags still follow the finger; haptics stay.
 - Each piece reads `LocalReducedMotion` itself; apps pass nothing.
 
-## 4. The old `Morph`
+## 4. The old `Morph` (decided 2026-11-24: remove it on Saturday)
 
-`Morph.kt` (404 lines) is still used by **the moon card** (`shell/MoonCard.kt`) and both labs'
-`MorphDemo`. Removing it means moving the moon card to `SpringMorph` first, and the moon card's rework
-(F5) is planned for later. **Choice for Marco:**
-- (a) **mark `Morph` deprecated** on Saturday, move `rememberReducedMotion` out, and delete it with
-  the moon card rework; or
-- (b) port the moon card to `SpringMorph` on Saturday (one call site), then delete `Morph`.
+Checked 2026-11-24: the moon card **already opens with `SpringMorph`** (`MoonCard.kt` line 423); its
+`import io.github.information89.motion.Morph` is unused. The old `Morph(…)` composables are used only by
+the two Labs' `MorphDemo`. Marco chose to port the moon card; there's nothing to port, so Saturday:
+
+1. Split `Morph.kt` (404 lines). **Keep**, in a new `MorphAnchors.kt`: `MorphAnchor`, `MorphFrame`,
+   `MorphGeometry`, `MorphRegistry`, `MorphHost`, `morphAnchor`, `morphAnchorOf` (`SpringMorph`, the moon
+   card and the postcards use them).
+2. **Delete:** both `Morph(…)` overloads, `MorphContentScope`, `morphFrom`, `reveal`, `handOff` (no users
+   outside the file), and `rememberReducedMotion` (replaced by `LocalReducedMotion`, section 3).
+3. Delete `MorphDemo` from the Lab (the "Morph, iOS way" demo stays), and the unused import in
+   `MoonCard.kt`.
+4. Check: the moon card and a postcard window open, close, reopen while closing and drag closed, the same
+   as before (PHONE_PASS.md).
 
 ## 5. Only if Marco adds them: R3, B3, B4
 
@@ -98,6 +105,6 @@ one gets a token or a line on the CI allowlist (CONTINUE.md decision 7).
 
 ## Files
 
-`Motion.kt` (tokens), new `ReducedMotion.kt`, `Morph.kt` (deprecate or delete), `BlurCrossfade.kt`,
+`Motion.kt` (tokens), new `ReducedMotion.kt`, `Morph.kt` (split into `MorphAnchors.kt`, the rest deleted), `BlurCrossfade.kt`,
 `SpringMorph.kt` (effects springs, Reduce Motion), `PageSpring.kt` (only with B3/B4), tests in
 `motion/src/test`, MOTION.md.

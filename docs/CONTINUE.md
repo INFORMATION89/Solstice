@@ -71,7 +71,7 @@ none. The Motion Lab gets a switch to compare subtle against no bounce on every 
    merging. Run the app's unit tests in CI too.
    Then branch protection on `main` (Marco, 2026-11-23): block force pushes and deletion; once the
    checks exist, require them to pass before merging (sessions work on a branch, merge by pull request).
-5. **Motion core clean-up** (plan: `docs/specs/MOTION_CORE_CLEANUP.md`; old Morph: Marco picks (a) or (b)): spring tokens (decision 4, with aliases); effects springs; Reduce Motion in
+5. **Motion core clean-up** (plan: `docs/specs/MOTION_CORE_CLEANUP.md`; old Morph: removed, the moon card already uses `SpringMorph`): spring tokens (decision 4, with aliases); effects springs; Reduce Motion in
    `SpringMorph`, `BlurCrossfade`, `Dial`, page springs (decision 5); remove the old `Morph` composable
    if only the lab uses it; tests for each.
 6. **`motion-ui` module** (order of the move: `docs/specs/MOTION_UI_MOVE.md`; sheet, message and settings
