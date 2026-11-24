@@ -10,9 +10,10 @@ they're fresh and close enough. Keep observations for M7 (correcting forecasts) 
 
 ## Stations
 
-- Station list from aviationweather.gov's station info (worldwide; the bulk file updates once a day).
-  Meridian keeps a copy on the phone, refreshed weekly: id, name, latitude, longitude, elevation,
-  country.
+- Stations from aviationweather.gov's `GET /api/data/stationinfo?bbox=lat0,lon0,lat1,lon1&format=json`
+  (OpenAPI version 3.12): one call when a place is added, for a box around it, cached on the phone
+  and refreshed weekly. No worldwide list needed (the bulk `stations.cache.json.gz` updates once a
+  day and stays as a fallback). Kept: id, name, latitude, longitude, elevation, country.
 - For a place: the stations within the search radius (configuration, default 30 km), nearest first,
   at most 3. Distance is great-circle; an elevation difference over a limit (configuration, default
   300 m) counts against a station (temperature changes about 6.5 °C per km of height).
@@ -21,25 +22,40 @@ they're fresh and close enough. Keep observations for M7 (correcting forecasts) 
 
 `GET https://aviationweather.gov/api/data/metar?ids=MMMX,MMSM&format=json&hours=3`
 
-- Only the chosen ids; a custom User-Agent with Meridian's name and a contact link.
-- `hours` from configuration (3 gives the last few reports, for trend and gaps).
+- Only the chosen ids; a custom User-Agent with Meridian's name and a contact link (the API page asks
+  for one so valid traffic isn't blocked).
+- Parameters are only `ids`, `format`, `hours`, `bbox`, `date`, `taf` (documented in the OpenAPI
+  file). **Undocumented parameters cause an error**, and going over the limits blocks access, so the
+  adapter sends nothing else.
+- `hours` from configuration (3 gives the last few reports, for trend and gaps). Most endpoints return
+  at most 400 entries.
 - History up to 30 days is available; M7 uses `hours` larger once a day, not every refresh.
 
 ## Mapping
 
-Record a real JSON response for MMMX before building and map from that (fixture). Expected fields and
-our units:
+From the official JSON schema (`aviationweather.gov/data/schema/metar1_0.json`, read 2026-11-24). The
+response is an array of reports. Record a real MMMX response on Saturday as the fixture (it couldn't
+be fetched from here) and check it against this table.
 
-| METAR | Meridian | Unit change |
+| Field (type) | Meridian | Unit change |
 |---|---|---|
-| observation time | `time` (UTC) | |
-| temperature, dew point | `temperature`, `dewPoint` | °C, kept |
-| wind direction, speed, gust | `windDirection`, `windSpeed`, `windGust` | knots → m/s (× 0.514444); `VRB` → direction unknown |
-| visibility | `visibility` | statute miles → m; "10+" → at least 16 km |
-| altimeter | `pressureSeaLevel` | hPa (or inHg × 33.8639) |
-| clouds (cover, base) | `cloudCover` (0–8 oktas), `cloudBase` | feet → m |
-| present weather (`-RA`, `TSRA`, `BR`, `HZ`, …) | `condition` | table below |
-| raw report | `raw` | kept for "nearby observations" (SOURCES.md) |
+| `icaoId` (string) | `station` | |
+| `obsTime` (integer, Unix seconds) | `time` (UTC) | |
+| `metarType` (METAR, SPECI, …) | `special` when SPECI | |
+| `temp`, `dewp` (number, °C; `dewp` nullable) | `temperature`, `dewPoint` | kept |
+| `wdir` (integer degrees, or the string `"VRB"`) | `windDirection` | `VRB` → direction unknown |
+| `wspd`, `wgst` (integer knots, nullable) | `windSpeed`, `windGust` | × 0.514444 → m/s |
+| `visib` (number in statute miles, the string `"10+"`, or null) | `visibility` | × 1609.344 → m; `"10+"` → at least 16,093 m |
+| `slp` (hPa, nullable), else `altim` (hPa) | `pressureSeaLevel` | kept (both already hPa) |
+| `presTend` (hPa over 3 h, nullable) | `pressureTrend` | kept |
+| `clouds` (list of `cover`: CLR, CAVOK, FEW, SCT, BKN, OVC, OVX; `base` in feet) | `cloudCover` (oktas), `cloudBase` | FEW 2, SCT 4, BKN 6, OVC/OVX 8; feet × 0.3048 → m |
+| `wxString` (string, nullable) | `condition` | table below |
+| `precip` (inches, last hour, nullable) | `precipitationLastHour` | × 25.4 → mm |
+| `qcField` (bit flags) | `quality` | kept; a report flagged as sensor-off for a value drops that value |
+| `rawOb` (string) | `raw` | kept for "nearby observations" (SOURCES.md) |
+| `lat`, `lon`, `elev` (m) | station position | kept |
+
+The schema lists every field as required but many as nullable: a missing value is `null`, never zero.
 
 Present weather to condition (first match wins, intensity kept): `TS` → thunderstorm; `SN`, `SG` →
 snow; `PL`, `GR`, `GS` → hail/ice; `FZ` → freezing; `RA`, `SH` → rain or showers; `DZ` → drizzle;
@@ -74,5 +90,6 @@ Current conditions in CDMX come from MMMX when fresh (MERIDIAN_PLAN.md section 9
 
 ## Consulted
 
-aviationweather.gov Data API page (endpoints, limits, history, cache files); WMO Manual on Codes
+aviationweather.gov Data API page (endpoints, limits, history, cache files), its OpenAPI file (version
+3.12) and its METAR JSON schema (`metar1_0.json`); WMO Manual on Codes
 (FM 15 METAR) and ICAO Annex 3 for the report fields; the standard atmosphere lapse rate.

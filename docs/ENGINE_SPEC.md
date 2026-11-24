@@ -116,8 +116,8 @@ validity match. Updates replace what they reference; cancels remove it. The most
   observation later measured. Kept 30 days by default (configuration; decided 2026-11-23), then deleted.
 - From it: each source's recent error, used for weights, and a bias correction for the next hours
   that fades out with lead time.
-- Seeded from public data so it works from day one: archived past forecasts (Open-Meteo keeps them
-  from 2022) checked against station observations.
+- Seeded from public data so it works from day one: archived past forecasts (Open-Meteo's Previous Runs
+  API, from January 2024; see M7_LEARNING.md) checked against station observations.
 - **Opt-in sharing** (RULES.md section 4): only aggregated forecast errors, area-rounded and
   hour-rounded, computed on the phone. Not built until the server and the legal check exist.
 
