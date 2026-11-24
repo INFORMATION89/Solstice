@@ -238,7 +238,8 @@ Values follow the unit settings; a card is skipped when the source has no data f
    places it covers, starts off, and is offered once ("Mexico City has a local network, use it?").
    Revisit plugins only if the source list grows a lot. **Decided 2026-11-23:** all built in, off
    until relevant where needed (SOURCES.md).
-6. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
+6. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too). Twinkling stars:
+   on (Marco, 2026-11-24). Weblate: opens after the first public release (Marco, 2026-11-24).
    Sky ideas (the light shows the weather; motion only at meaningful moments): PROPOSALS.md section 5.
 
 7. **Clean room leftovers:** Motion Lab's 7 demo files still carry Breezy's LGPL header; first job on

@@ -165,6 +165,19 @@ foundations, then the kit pieces in R2's order. Each item still gets agreed befo
 Plan in CONTINUE.md "Next session": guardrails (no-hardcoding CI check, app tests in CI), one Motion
 Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed), docs, phone pass.
 
+## 🌤 Sky (Solstice work, agreed 2026-11-24; PROPOSALS.md section 5)
+
+After Saturday's motion-ui move, in this order:
+- [ ] Twinkling stars on (`SkyEffects.TWINKLE_AGREED`).
+- [ ] Blend to a new palette when the condition changes (today it switches at once).
+- [ ] Drift speed follows the wind; still air is still.
+- [ ] Light size and softness from cloud cover and visibility; a bit tighter and brighter when clear.
+- [ ] The light rises into place once per cold start.
+- [ ] Panorama: the light shifts a little against page swipes.
+- [ ] Pull to refresh: the picked interaction (A, B, C) plus a pulse and data transitions.
+- [ ] Rain streaks in the grain (Android 13+, static on older phones).
+- [ ] Warmth from feels-like: Lab test first.
+
 ## 💬 Proposals to bring to Marco (from chat 2026-11-22)
 
 - [x] 💬⭐ **App layout:** Forecast keeps today's layout (2026-11-22). A2 from the layout canvas is the

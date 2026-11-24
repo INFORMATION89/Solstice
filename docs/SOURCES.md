@@ -55,10 +55,10 @@ come from the tier, not from typed numbers. Upstream sources keep their code; we
 declaration beside it, so upstream syncs stay simple.
 
 ### 2. Automatic by default, chosen per refresh
-Every feature on every place is "Automatic" unless you pick a source by hand. Automatic resolves
-at each refresh from the current coordinates, so travelling just works: the current location in
-Mexico City uses the city network, and in Madrid it uses AEMET through WMO. A source you picked by
-hand stays put.
+Every feature on every place is **Automatic only** (Marco, 2026-11-24: no source picked by hand per
+feature). Automatic resolves at each refresh from the current coordinates, so travelling just works:
+the current location in Mexico City uses the city network, and in Madrid it uses AEMET through WMO.
+What you control is which sources are **on** (and their keys); Automatic chooses among those.
 
 ### 3. More than one source per feature, with rules per feature
 
@@ -88,8 +88,8 @@ CDMX"), and one Sources page lists everything with its terms and links, like App
 Required credits (Open-Meteo CC BY 4.0, Wikipedia CC BY-SA) shown where the terms ask.
 
 ### 7. Settings
-Per place: a Sources page showing, per feature, what Automatic picked and why, with a manual
-override. App-wide: keys, and the "offered once" answers. The source list only shows sources
+Per place: a Sources page showing, per feature, what Automatic picked and why (read only, no manual
+override). App-wide: keys, and the "offered once" answers. The source list only shows sources
 that cover the place (Breezy already filters this way).
 
 ## Gradient, looked at closely (2026-11-23)
@@ -169,10 +169,25 @@ Agreed 2026-11-23; they live in RULES.md, section 4 (Data, sources and privacy) 
 5. Mexico City local sources, offered once.
 6. Blend and spread, then local correction (research queue 8, steps 1 and 3).
 
-## Questions for Marco
+## Decided (Marco, 2026-11-24)
 
-1. Does "Automatic per refresh, manual override per feature" match how you want it to feel?
-2. Bring back all 40 cut sources, or only those that add something WMO doesn't?
-3. For best-effort sources (reading a website), offer them once, or keep them in settings only?
-4. How visible should the source be on the main screen: only in the sheets, or a small line on
-   each card?
+1. **Automatic only:** no per-feature pick; you turn sources on or off, Automatic chooses among them.
+2. **Cut sources:** bring back only those that add something WMO alerts and Open-Meteo don't already
+   cover (national forecasts; alerts for Japan, Taiwan, Türkiye).
+3. **Best-effort sources:** offered once (when you add a place they cover), then in Settings.
+4. **Where the source shows:** only in the sheets; the main screen stays clean.
+
+## AccuWeather, optional (Marco, 2026-11-24: the most reliable so far for him)
+
+- Breezy's AccuWeather source is still in the fork (`sources/accu/`), switched off in `SourceManager`
+  ("needs an API key and showed errors").
+- AccuWeather ended its permanent free tier in 2025: a 14-day trial (500 calls a day), then paid
+  packages from about $2 a month (developer.accuweather.com FAQ, checked 2026-11-24).
+- So: an **optional source with your own key**, off until a key is added in Settings › Data and
+  sources (the key stays on the phone, RULES.md section 4). With a key, Automatic uses it where it
+  covers the place, for forecast, current conditions, MinuteCast-style minutely rain where the package
+  includes it, and alerts. Credits in the sheets, as for every source.
+- Work: fix the errors it showed, check the calls per refresh against a small package's daily limit,
+  and show the key's state (valid, trial ended, over the limit) in Settings.
+- Meridian: not a blend input for now (its terms and a per-person key don't fit a shared library);
+  revisit after M5.

@@ -38,8 +38,8 @@ Open-Meteo: CC BY 4.0, credit with link. WMO feeds: credit the issuing agency na
 2. For each feature, take the sources that **cover the place** (coverage is data: a bounding box,
    country list or "worldwide", from configuration), are **turned on** (SOURCES.md, off until
    relevant) and have what they need (a key, consent for best-effort sources).
-   Order them by tier, then resolution, then recent health; a source picked by hand for this place
-   and feature wins while it covers the place (ENGINE_SPEC.md section 6).
+   Order them by tier, then resolution, then recent health (ENGINE_SPEC.md section 6). No source is
+   picked by hand per feature (Automatic only, Marco, 2026-11-24).
 3. Drop sources still **fresh** for that feature (below their wait, from configuration; defaults:
    forecast 15 min, current 10 min, alerts 5 min, air quality 1 h).
 4. Drop sources **over their limit** (below).

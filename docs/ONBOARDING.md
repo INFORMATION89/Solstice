@@ -27,7 +27,12 @@ slides: the app's name, one short line, and two choices, over Forecast's gradien
 - Once location is allowed or a place is picked, the screen morphs into Forecast (MOTION.md: things
   morph, never pop), already loading, so the next thing you see is the app working.
 
-**Step 2: Help improve forecasts** (only once sharing exists, see below). A sheet, after the forecast
+**Step 2: Rain heads-up** (Marco, 2026-11-24). A small sheet once the forecast has loaded: "Get a
+heads-up before it rains?" with "Turn on" and "Not now". "Turn on" switches on the rain countdown
+(15 minutes before, this place) and only then asks for notification permission. Wording in WRITING.md
+section 9 ("First-time hint", "Permission reason").
+
+**Step 3: Help improve forecasts** (only once sharing exists, see below). A sheet, after the forecast
 has loaded, so it never stands between you and the weather:
 - One line: "Share how far off our forecasts are where you are. Off unless you turn it on."
 - **The example card:** what this phone would send right now, in plain words: "Area about 4 km wide ·
@@ -39,7 +44,7 @@ has loaded, so it never stands between you and the weather:
   in Settings › Privacy.
 
 **Asked later, in context, never in onboarding:**
-- Notifications: when you first turn on a rain or alert notification.
+- Notifications: when you turn on the rain heads-up (step 2) or another alert.
 - Keys and best-effort sources: when you're in their area (SOURCES.md, "Off until relevant").
 - Evening time, units, sources: sensible defaults from the system and the place; changeable in
   Settings.

@@ -63,9 +63,11 @@ Meridian's alert type keeps all of these, plus the source and provenance.
   congestion.
 - Not used: the subscription endpoints (they register a push endpoint; Meridian polls instead, so no push
   token ever leaves the phone).
-- **Terms:** a Terms of Service page on KDE's wiki, linked from the server status. Still not found from
-  here (searched 2026-11-24); read it from the app's first `/config/server_status` response on Saturday
-  before the adapter is merged. The project's README says it's still in development and not ready for
+- **Terms:** `server_status` (read by Marco 2026-11-24: version 0.1.0, operator KDE, congestion state 1,
+  UnifiedPush only) links the terms at
+  `https://invent.kde.org/webapps/foss-public-alert-server/-/wikis/Terms-of-Service` and the privacy
+  notice at `…/-/wikis/Privacy`. KDE's wiki blocks automated reading; Marco reads the terms and records
+  what they say here before the adapter is merged. The project's README says it's still in development and not ready for
   production; KDE's 2025 CAP workshop slides list Breezy Weather among the apps already using it.
 - **Clean room:** Breezy Weather's own FPAS source code is in this repo; don't open it while building
   Meridian's adapter (RULES.md section 5).

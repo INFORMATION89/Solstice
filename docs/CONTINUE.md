@@ -73,13 +73,16 @@ none. The Motion Lab gets a switch to compare subtle against no bounce on every 
    checks exist, require them to pass before merging (sessions work on a branch, merge by pull request).
 5. **Motion core clean-up** (plan: `docs/specs/MOTION_CORE_CLEANUP.md`; old Morph: removed, the moon card already uses `SpringMorph`): spring tokens (decision 4, with aliases); effects springs; Reduce Motion in
    `SpringMorph`, `BlurCrossfade`, `Dial`, page springs (decision 5); remove the old `Morph` composable
-   if only the lab uses it; tests for each.
+   (only the Labs use it); merge `control` and `settle`; **B3 and B4** (Marco added them 2026-11-24;
+   fixes and platform rules in MOTION_CORE_CLEANUP.md section 5); tests for each. **R3** (morph states)
+   is also added: do it last in this step, and if it doesn't fit, it's the first thing next session.
 6. **`motion-ui` module** (order of the move: `docs/specs/MOTION_UI_MOVE.md`; sheet, message and settings
    rows: `docs/specs/MOTION_UI.md`; card material options: `docs/research/CARD_MATERIAL.md`): theme and tokens → glass and card (two materials, decision 6) → page frame →
    sheet pieces. Solstice imports each and passes its values. Check: screenshots of every page before
    and after match, except the card material.
 7. **Motion Lab as its own app** (`docs/specs/MOTION_LAB_APP.md`) on `motion-ui`, one page per piece (core and kit); remove Solstice's
-   copy.
+   copy. The Lab redesign and toolbar plans are approved (2026-11-24); add the far-jump comparison
+   (slide vs fade through).
 8. **Docs:** Motion README (all pieces, the new springs, the kit), UI_SYSTEMS.md, MOTION.md's token
    table, LOG.md, ROADMAP.md.
 9. **Phone pass**, if the Pixel is connected: the checklist in `docs/research/PHONE_PASS.md` (the
@@ -278,10 +281,10 @@ PLAN.md log):
 1. **Two GitHub secrets** (`SOLSTICE_TEST_KEYSTORE_BASE64`, `SOLSTICE_TEST_KEY_PASSWORD`): until they're
    added, CI skips the rolling `testing` pre-release, so the user can't install builds without a
    computer. README has the steps.
-2. **Two plans to approve:** `MOTION_LAB_PLAN.md` (lab redesign, compare with Google's defaults) and
-   `TOOLBAR_MOTION_PLAN.md` (the toolbar on Apple's principles).
-3. **What the summaries should say at all** (the wording is agreed, see "Right now"): next talk in chat.
-4. Open questions: twinkling stars on or off, `Motion.control` vs `Motion.settle` (merge or tell apart).
+2. **Approved 2026-11-24:** `MOTION_LAB_PLAN.md` and `TOOLBAR_MOTION_PLAN.md`; summaries as planned
+   (PLAN.md "Content"); twinkling stars on; `Motion.control` and `Motion.settle` merged into one.
+3. Open: pull-to-refresh interaction (PROPOSALS.md section 5), postcards' standard look, the card
+   sheets card by card, the shared count in Settings › Privacy (ONBOARDING.md).
 
 **Next to build, in order** (each after the user agrees where it changes what they see or feel):
 1. **F5, the moon card, direction A** (PLAN.md "Moon card redesign and its foundations"): the whole sheet

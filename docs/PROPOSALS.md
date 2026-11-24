@@ -97,11 +97,15 @@ Units, Appearance stay; Debug hidden.
 
 **Decided (Marco, 2026-11-23):** Outlook keeps its own section.
 
-**Question for Marco:** search inside Settings, needed with nine sections?
+**Decided (Marco, 2026-11-24): search at the top of Settings.** Like Android's and iOS's: it finds
+every setting by its title and a few keywords per row (English and Mexican Spanish), lists matches
+with their section, and opening one scrolls to the row and highlights it briefly. Spec to write with
+the settings rows (MOTION_UI.md section 3).
 
 ## 4. Proactive alerts (PLAN.md Direction 4, open question 4)
 
-Proposed 2026-11-23. Wording in WRITING.md section 9.
+**Approved by Marco 2026-11-24**, with the rain countdown also offered in onboarding (ONBOARDING.md
+step 2). Wording in WRITING.md section 9.
 
 **First set** (the ones that answer "do I need to do something now?"):
 
@@ -117,8 +121,9 @@ Proposed 2026-11-23. Wording in WRITING.md section 9.
 changes, what to wear.
 
 **Where you switch them on:** in the card's own sheet (the rain card's sheet has the countdown switch,
-the UV card's the UV alert), and all together in Settings › Notifications. Not in onboarding: the first
-time you open a card that has an alert, a one-line hint under its title.
+the UV card's the UV alert), and all together in Settings › Notifications. The rain countdown is also
+offered in onboarding; for the others, the first time you open a card that has an alert, a one-line
+hint under its title.
 
 **How it runs** (from SOURCES.md, no server): the phone's scheduled refresh checks the minutely
 forecast more often only while a rain alert is armed and rain is possible in the next 2 hours
@@ -159,6 +164,30 @@ same "meaningful" question.
 **Suggested order:** condition change blend (fixes a jump) → drift follows wind → sharpness → rise on
 opening → panorama → refresh pulse → rain streaks → warmth (Lab test).
 
-**Questions for Marco:** crisp disc when clear, or a tighter soft glow (keeping the 2026-11-18
-"no hard disc")? Which of these, and in what order? Twinkling stars: same rule (only when it means
-something)?
+**Decided (Marco, 2026-11-24):**
+- The soft gradient light stays (no disc); it needs motion. When clear, **a bit tighter and brighter**.
+- **Every small addition is Solstice work** (ROADMAP.md "Sky"): condition-change blend, drift follows
+  wind, sharpness, rise on opening, panorama, refresh pulse. **Rain streaks: yes.** Warmth: a Lab test
+  first (on hot days a warmer light could be confused with sunrise and sunset colours).
+- **Twinkling stars: on.**
+- **Pull to refresh needs a new interaction** (the floating icon is dull) and **transitions when new
+  data arrives**: ideas below.
+
+### Pull to refresh: ideas (for Marco to pick, 2026-11-24)
+
+Rules from the platforms: the pull follows the finger with rubber-banding, a threshold you can feel
+(a haptic tick), release to refresh, and it never blocks scrolling or taps; TalkBack gets a "Refresh"
+action; Reduce Motion gets a plain fade.
+
+- **A. Pull the sky:** pulling down lowers the sun light towards the horizon, as if pulling the sky
+  down; past the threshold, a tick; on release it springs back up; while loading, the light breathes
+  slowly; when data arrives, one pulse and the sky blends to the new weather. No icon at all.
+- **B. Horizon line:** a thin arc at the top bends with the pull like a rubber band and fills as you
+  reach the threshold; while loading it shimmers; when done it flattens with a bounce.
+- **C. The temperature:** the big temperature stretches a little with the pull; while loading its
+  digits soften; when data arrives they roll to the new value.
+- Could combine A with C: the sky shows the pull, the numbers show the new data.
+
+**Transitions when new data arrives** (whichever is picked): numbers roll to new values; card texts
+cross-fade (effects springs); cards that appear or disappear (an alert, rain) grow or shrink in place;
+the sky blends; nothing jumps.

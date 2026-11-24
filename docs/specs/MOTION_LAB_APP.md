@@ -1,8 +1,7 @@
 # Motion Lab as Motion's own app (Saturday step 7)
 
-Status: **plan** (2026-11-24). Builds on MOTION_LAB_PLAN.md (the redesign, still waiting for Marco's
-OK); this file only covers making it an app on the kit. Nothing new on screen until that plan is
-approved: Saturday moves the existing demos as they are.
+Status: **plan** (2026-11-24). Builds on MOTION_LAB_PLAN.md (the redesign, **approved by Marco
+2026-11-24**, with TOOLBAR_MOTION_PLAN.md); this file covers making it an app on the kit.
 
 ## Today
 
@@ -25,7 +24,9 @@ approved: Saturday moves the existing demos as they are.
    switch (forces `LocalReducedMotion` on).
 5. A **card material** page: the candidates in research/CARD_MATERIAL.md on three backgrounds, for
    Marco to pick on the phone.
-6. Solstice's Toolbar demo stays until MOTION_LAB_PLAN.md step 1 makes it a generic tab bar.
+6. A **far jumps** page: tapping a tab two pages away, slide (skipping the middle) vs fade through,
+   for Marco to pick (B4).
+7. Solstice's Toolbar demo stays until MOTION_LAB_PLAN.md step 1 makes it a generic tab bar.
 
 ## Install
 

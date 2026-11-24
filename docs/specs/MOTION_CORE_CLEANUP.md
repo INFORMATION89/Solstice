@@ -22,7 +22,7 @@ fun motionSpring(speed: Float, bounce: Float) = MotionSpring(speed, bounce)
 |---|---|---|---|
 | `snappy` | 0.20 / 0.9 | Fast × Subtle, 0.20 / 0.9 | none |
 | `control` | 0.31 / 1.0 | Default × Subtle, 0.31 / 0.9 | a hint of bounce |
-| `settle` | 0.31 / 1.0 | Default × Subtle, 0.31 / 0.9 | a hint of bounce |
+| `settle` | 0.31 / 1.0 | **merged into `control`** (Marco, 2026-11-24); `settle` stays as an alias for a while | a hint of bounce |
 | `container` | 0.32 / 0.78 | Default, 0.31 / 0.78 | a touch quicker |
 | `content` | 0.31 / 0.85 | Default, 0.31 / 0.85 | none |
 | `playful` | 0.31 / 0.5 | Default × Playful, 0.31 / 0.5 | none |
@@ -76,20 +76,28 @@ the two Labs' `MorphDemo`. Marco chose to port the moon card; there's nothing to
 4. Check: the moon card and a postcard window open, close, reopen while closing and drag closed, the same
    as before (PHONE_PASS.md).
 
-## 5. Only if Marco adds them: R3, B3, B4
+## 5. R3, B3, B4 (added to Saturday by Marco, 2026-11-24)
 
 - **B3 (tap after a swipe stops the tabs):** `springPages` scrolls the pager through the whole bounce,
   so the pager reports "scrolling" until it settles and swallows the tap. Fix: scroll only to the target
   (no overshoot in the scroll), draw every bounce through `PageOvershoot` (today only at the ends), and
   count the pager as settled below a threshold token (`MotionThresholds.Settled`, px). Lab test:
   swipe, then tap within 100 ms, 20 times.
+  **Platform rule (checked 2026-11-24):** on iOS and Android, a tap while content is still visibly
+  moving stops it and is *not* a press (WebKit's tests check exactly this). So the fix only makes taps
+  work once the pages look settled; a tap during a real fling still just stops it.
 - **B4 (jumping across the toolbar flashes Forecast):** `springToPage` scrolls through every page in
   between. Fix: `PagerState.jumpToPage(target)`: snap to the page next to the target, then spring the
   last page; the toolbar's highlight follows the target tab, not the scroll position.
+  **Platform rule:** Material recommends a fade-through between navigation-bar destinations and
+  keeps sideways motion for neighbours. Marco (2026-11-24): build both for jumps of two or more
+  pages (slide skipping the middle, and fade through) as a Lab switch, and pick on the phone.
 - **R3 (explicit states):** `SpringMorph` runs five `Animatable`s (x, y, width, height, radius) in their
   own coroutines plus a press value; the fix drives them from one state (closed, opening, open,
   closing, dragging) and one progress value, with declared gesture rules instead of on/off flags.
-  Large; better as its own session after the kit move.
+  Added to Saturday by Marco; last in step 5, carried to the next session if it doesn't fit.
+  **Platform rule:** Apple's "Designing Fluid Interfaces" (WWDC 2018): responsive, interruptible and
+  redirectable at any moment; the explicit states must keep all three.
 
 ## 6. Tokens that are still typed in
 

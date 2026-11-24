@@ -86,7 +86,8 @@ For each feature of each place:
 1. Candidates: sources whose coverage contains the place, that the person hasn't turned off, and that
    have what they need (a key, consent for best-effort sources).
 2. Order by tier, then by resolution, then by recent health (failures, staleness).
-3. A source picked by hand for this place and feature wins while it covers the place.
+3. No source is picked by hand per feature (Marco, 2026-11-24: Automatic only); the app turns sources
+   on or off.
 4. Call the chosen sources in parallel, within each source's rate limit and minimum interval.
 5. If a call fails or returns stale data, use the next candidate and record the fallback.
 
