@@ -289,3 +289,93 @@ Solstice should implement its own weather presentation, place-management behavio
 7. Only after the replacement compiles and is verified, remove the corresponding Breezy imports and compatibility adapters.
 
 **Initial conclusion:** preserve the Solstice experience and design decisions; replace the Breezy data/search contracts beneath them; extract reusable interaction primitives to Motion; keep weather-specific visualizations and product behavior in Solstice. This is a responsibility-level audit, not a legal provenance clearance.
+
+## 13. File-by-file provenance audit: `ui/expressive/` (pass 1)
+
+**Baseline fixed:** `breezy-weather/breezy-weather` commit `5ec3b9bcb` (2026-11-17), as recorded in `UPSTREAM_BASE`. The upstream recursive Git tree at that commit contains 2,308 blobs and is not truncated.
+
+### 13.1 What the comparison establishes — and what it does not
+
+- None of the **59 Kotlin files** currently listed under `app/src/main/kotlin/org/breezyweather/ui/expressive/` has an exact matching path or basename in the upstream tree at the pinned base commit.
+- The upstream UI is organized under `ui/main`, `ui/common`, `ui/search`, `ui/details`, etc.; its main UI uses legacy activity/fragment/layout/widget structures. The Solstice expressive package is a distinct Compose-based UI layer.
+- Solstice history records the expressive package being developed from 2026-11-18 onward. Examples: the initial shell/page/card work, the theme tokens, the glass implementation, the Motion system, and later page/morph behavior have dedicated Solstice commits. Relevant history includes `d2c787a` (component catalog), `98647ef` (design tokens), `bdd587c` (Solstice Motion system), `0b84c43` (Haze glass), `1ac2033` (forecast card experience), and `8162bff` (page/window motion).
+- These facts support the conclusion that this is a **Solstice-created Compose UI layer**, not a renamed copy of an upstream expressive package. They do **not** prove that every algorithm, visual design, vector path, asset, or code fragment was independently authored. A file can be new while containing adapted logic or resources from another upstream file or third party.
+- All inspected files carry the repository's generic “Solstice, a fork of Breezy Weather” LGPL header. That header is a repository-level notice, not per-file proof of authorship or derivation. Do not remove or rewrite copyright/licence notices as part of this audit.
+- The current repository is a source snapshot without shared Git history with Breezy. A normal Git ancestry/diff cannot establish provenance; the audit uses the pinned upstream tree, source comparison, Solstice commit history, and dependency tracing. Record the limitation.
+
+### 13.2 Current file inventory (all 59 Kotlin files)
+
+The following list is the complete current inventory of the package at the time of this pass. “No same-name upstream file” is a structural observation only; it is not a legal clearance.
+
+| Subdirectory | Files | Initial file-level decision |
+|---|---|---|
+| `components/` | `ClockIcon.kt`, `CollapsingTopBar.kt`, `ExpressiveChoices.kt`, `Glass.kt`, `IconBadge.kt`, `PressMorph.kt`, `ScreenCorners.kt`, `ScreenPush.kt`, `SheetDialog.kt`, `SheetHandle.kt`, `SheetShape.kt`, `SolsticeCard.kt`, `SolsticeIcons.kt`, `SolsticeMotion.kt`, `SolsticeSheetState.kt` | Preserve Solstice UI intent; review each primitive for generic Motion UI extraction, asset origin, and resource coupling. `SolsticeMotion.kt` is a compatibility facade to remove after callers use Motion directly. |
+| `lab/` | `DialDemo.kt`, `EdgeBlurDemo.kt`, `HapticsDemo.kt`, `MotionLabActivity.kt`, `SettleDemo.kt`, `SpringMorphDemo.kt`, `ToolbarDemo.kt` | Move Motion demonstrations to Motion Lab. `MotionLabActivity.kt` currently extends Breezy's `BreezyActivity` and uses the Breezy theme/resource namespace; replace that host integration before moving. |
+| `reorder/` | `ReorderActivity.kt`, `ReorderList.kt` | Separate generic reorder mechanics from Solstice settings integration. `ReorderActivity.kt` directly depends on Breezy activity, EventBus, SettingsManager, enum settings, widgets, and theme; rebuild app integration. `ReorderList.kt` uses the external Calvin Reorderable library and Motion haptics; review API/licence and extract generic UI only if another consumer exists. |
+| `search/` | `Cities.kt`, `SearchOverlay.kt` | Keep search behavior and UI requirements in Solstice; replace Breezy `Location`, `SearchViewModel`, and `LoadableLocationStatus` contracts. Review the bundled city dataset and recent-search persistence separately. |
+| `shell/` | `ForecastPage.kt`, `Format.kt`, `Freshness.kt`, `Messages.kt`, `MoonCard.kt`, `MoonPhaseIcons.kt`, `MoonRenderer.kt`, `MoonSky.kt`, `MoonVisibility.kt`, `PageFrame.kt`, `PlaceTime.kt`, `PlaceWindow.kt`, `PlacesPage.kt`, `Postcard.kt`, `RainCard.kt`, `ShellNavigation.kt`, `ShellPrefs.kt`, `SolsticeShell.kt`, `Summary.kt`, `Toolbar.kt`, `ToolbarMotion.kt`, `Visits.kt` | Preserve product experience and behavior; rebuild inherited data/service/persistence integration. Extract generic frame/toolbar/motion primitives only after Motion UI accepts their contracts. |
+| `sky/` | `AnimatedSkyBackground.kt`, `SkyBackground.kt`, `SkyEffects.kt`, `SkyPalette.kt`, `SkySystemBars.kt`, `SkyVisibility.kt` | Keep weather-aware sky presentation in Solstice. Audit graphics algorithms, shaders, and third-party inspiration/assets. Replace the inherited weather-code mapping and hourly forecast model with Meridian-facing Solstice models. |
+| `theme/` | `ExpressiveTheme.kt`, `ExpressiveType.kt`, `SolsticeMotionScheme.kt`, `Tokens.kt` | Preserve the Solstice visual system. Replace Breezy resource/theme dependencies; split generic tokens for Motion UI only by explicit design-system agreement. Audit font binaries/licence and exact source. |
+
+### 13.3 File-level coupling observed
+
+The following are confirmed from current imports and code references:
+
+**Weather and location domain (must be replaced by Solstice-owned presentation models fed by Meridian):**
+- `ForecastPage.kt`, `PlacesPage.kt`, `PlaceWindow.kt`, `Postcard.kt`, `MoonCard.kt`, `MoonVisibility.kt`, `SkyPalette.kt`, `SolsticeShell.kt`, `SearchOverlay.kt`, and `Cities.kt` use Breezy location/weather types or behavior.
+- `Summary.kt` uses Breezy `WeatherCode` definitions.
+- `MoonVisibility.kt` consumes Breezy hourly forecast objects.
+- `SolsticeShell.kt` still invokes `SourceManager`, `applyDefaultPreset`, Breezy location methods, and legacy ViewModels. These source selection/provider actions must move to Meridian and app-owned use cases.
+
+**Search and app orchestration:**
+- `SearchOverlay.kt` consumes `SearchViewModel` and `LoadableLocationStatus`.
+- `SolsticeShell.kt` consumes `MainActivityViewModel`, `SearchViewModel`, and legacy dialog/source state.
+- `Cities.kt` converts its own city data to Breezy `Location` and stores recent searches in SharedPreferences.
+- `Visits.kt` and `ShellPrefs.kt` store app state using SharedPreferences; decide which state belongs in DataStore or a Solstice-owned repository.
+
+**Resource, theme, and activity infrastructure:**
+- Many files import `org.breezyweather.R`; resource namespace migration must be coordinated with Gradle/package migration.
+- `ExpressiveTheme.kt` reads Breezy color resources; `ExpressiveType.kt` reads Breezy font resources.
+- `MotionLabActivity.kt` and `ReorderActivity.kt` extend `BreezyActivity`.
+- `PlaceWindow.kt` applies `BreezyWeatherTheme`.
+- `ReorderActivity.kt` is coupled to Breezy settings, EventBus, activity and widget UI classes.
+
+**Motion and reusable library boundaries:**
+- `ScreenPush.kt`, `SolsticeMotion.kt`, `SolsticeSheetState.kt`, `PageFrame.kt`, `PlaceWindow.kt`, `Toolbar.kt`, and the demos use Motion public APIs.
+- `Glass.kt` uses Haze. `ReorderList.kt` uses Calvin Reorderable. `MoonCard.kt` / `MoonSky.kt` use SunCalc. Keep these as reviewed dependencies through public APIs; do not copy their implementations.
+- `AnimatedSkyBackground.kt` uses Android `RuntimeShader`, lifecycle APIs, and Motion ambient-clock/low-power APIs. Keep Android platform behavior in the app/Android adapter; do not imply this code is cross-platform.
+
+### 13.4 Important distinction: preserve vs. rebuild
+
+**Preserve as Solstice product requirements and visual behavior:**
+- The expressive forecast, places, search, postcard/place-window, weekly outlook, rain and moon experiences.
+- Solstice's sky palette and sky/astronomical visualization behavior.
+- The design tokens, typography direction, glass treatment, cards, toolbar, page transitions, and interaction decisions.
+- Product-specific text, weather summaries, place labels, and empty/loading/error states — after checking their wording and resource provenance.
+
+**Rebuild or decouple before Breezy removal:**
+- Every direct Breezy domain type, ViewModel, source manager, settings manager, EventBus, activity base, theme, and resource reference.
+- Persistence and city/recent/visit/preference storage where it currently depends on legacy data models or preferences.
+- Weather-code and forecast calculations that assume Breezy domain classes; define Meridian-to-Solstice mapping and test it.
+- The current debug/demo Activity host and any settings/reorder screens tied to Breezy internals.
+
+**Do not move to Motion just because code is reusable in theory.** Motion UI should accept only generic, independently specified components with a stable API and a real second consumer. Weather cards, sky rendering, moon/solar content, forecast summaries, and Solstice-specific navigation remain in Solstice.
+
+### 13.5 Not yet cleared
+
+This pass does not yet compare every expressive algorithm against differently named Breezy source files, inspect every resource used by the package, or identify the origin/licence of all icon vector paths and font files. In particular:
+- `SolsticeIcons.kt` contains a large set of embedded vector path definitions. Determine whether each path is from Material Symbols, another icon set, or original work; record the exact upstream source and licence. Prefer a maintained icon package or official asset distribution where appropriate.
+- `ExpressiveType.kt` references Google Sans Flex font resources. Audit the actual font files and licence/redistribution terms.
+- `MoonRenderer.kt` references an app resource texture and Android RuntimeShader code. Audit the texture's source/licence and the shader's provenance.
+- `SkyBackground.kt` and `AnimatedSkyBackground.kt` contain custom drawing/shader logic. Compare behavior and code against any external inspiration or references recorded in commits/docs.
+- The bundled city list and all localized strings used by this package require independent provenance review.
+- The LGPL notice and existing repository licence obligations remain unchanged; no legal conclusion is made here.
+
+### 13.6 Next file-level work
+
+1. Compare the Solstice shell and expressive screens against the differently named upstream main-screen, widget, and detail-screen implementations, looking for adapted algorithms or copied expression rather than relying on filename matching.
+2. Inspect the full contents and origin of every referenced resource (fonts, icons, moon texture, strings, city data).
+3. Build a per-file dependency graph and list every Breezy import/call site with a planned Solstice replacement interface.
+4. Define the new Solstice presentation contracts and Meridian adapter before touching the UI implementation.
+5. Move Motion Lab demos and generic Motion UI primitives into their owning repositories through separate PRs and clean specifications.
+6. Update this audit with an explicit disposition for every file and resource before deleting or relocating anything.
