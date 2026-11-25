@@ -26,12 +26,12 @@ The current file is 714 lines. It combines the Compose page composition with app
 
 - Three-page navigation (Outlook, Forecast, Places), pager state and page transitions.
 - Sky background selection and system-bar appearance.
-- Main/starred place selection, visit/pin behavior, stale visit cleanup.
+- Legacy main/starred place selection, visit/pin behavior, and stale visit cleanup (migration-only behavior).
 - Search overlay presentation and selection handoff to a postcard window.
 - Postcard window lifecycle, refresh, pin/unpin, details navigation.
 - Place list deletion, undo, reorder, add-current-location and edit actions.
 - Weather-source selection dialog and duplicate-source/location handling.
-- Recent-search persistence and starred/visit persistence.
+- Recent-search persistence and legacy starred/visit persistence.
 
 Some of these are legitimate product/presentation responsibilities; others are application use cases or persistence and should move out.
 
@@ -151,8 +151,8 @@ interface ShellActions {
     fun onCloseSearch()
     fun onSelectMainPlace(placeId: PlaceId)
     fun onOpenPlace(placeId: PlaceId)
-    fun onPinPlace(placeId: PlaceId)
-    fun onUnpinPlace(placeId: PlaceId)
+    fun onAddPlace(previewId: PlacePreviewId)
+    fun onDismissPlacePreview()
     fun onRemovePlace(placeId: PlaceId)
     fun onUndoRemovePlace()
     fun onMovePlace(placeId: PlaceId, beforePlaceId: PlaceId?)
@@ -167,7 +167,7 @@ interface ShellActions {
 
 Implementation may consolidate related actions, but the contract must stay product-oriented. Do not pass `Context`, a Breezy `Location`, a source manager, repository, or provider object through these callbacks.
 
-The shell's local-only state (pager scroll, morph progress, sheet detent, measured bounds, temporary animation handoff) can remain in Compose. Durable product state (places, main place, visit/pin, refresh status, search results) comes from the state holder.
+The shell's local-only state (pager scroll, morph progress, sheet detent, measured bounds, temporary animation handoff) can remain in Compose. Durable product state (saved places, Home configuration, refresh status, search results) comes from the state holder. Search preview/“Visiting” state is ephemeral.
 
 ## 6. Meridian boundary
 
@@ -184,7 +184,7 @@ Responsibilities:
 
 Meridian responsibilities (per `docs/MERIDIAN_PLAN.md`): weather providers, normalized SI values/UTC time series, source selection, model blending/spread, alerts, provenance, source status, and weather cache/statistics.
 
-Solstice responsibilities: saved places, favorites/visits, app preferences, screen composition, place search UX, app navigation, permission UX, notifications/widgets policy, attribution presentation, and the UI mapping layer.
+Solstice responsibilities: saved places, Home configuration, app preferences, screen composition, place search UX/history, app navigation, permission UX, notifications/widgets policy, attribution presentation, and the UI mapping layer.
 
 **Do not call Meridian from composables.** No Ktor clients, provider IDs, API keys, source adapters, or engine storage objects enter the UI.
 
@@ -215,7 +215,7 @@ Target behavior:
 | Current device location permission and acquisition | Android platform adapter | Consent and lifecycle policy remain Solstice |
 | In-memory pager, animation, sheet, morph state | Compose UI | Save only the state that product behavior requires across recreation |
 
-Do not let the shell call SharedPreferences directly. Move existing starred/visit/recent state behind repositories and migrate keys/data before changing or deleting the old implementation.
+Do not let the shell call SharedPreferences directly. Migrate legacy starred/visit keys as compatibility inputs only; the target repositories expose saved places, Home configuration and recent search history, not stars or persisted visits.
 
 ## 9. Failure and lifecycle behavior
 
@@ -239,9 +239,9 @@ A stale/partial result should remain displayable when valid, with truthful fresh
 
 Do this in small, independently testable changes. Do not replace the entire shell in one PR.
 
-1. **Freeze behavior:** add tests/spec scenarios for main place, visit/pin, stale visit cleanup, search selection, postcard handoff, delete/undo, reorder, refresh and no-place states.
+1. **Freeze behavior:** add tests/spec scenarios for Home configuration, automatic travel swap, search preview/Cancel/Add, postcard handoff, delete/undo, reorder, refresh and no-place states.
 2. **Introduce Solstice models:** add `PlaceId`, `PlaceSummary`, `PlaceCardModel`, `ShellUiState`, `SearchUiState`, and refresh/freshness presentation types in a Solstice-owned package. Add mapping tests.
-3. **Extract repositories:** move starred/visit/recent-search SharedPreferences calls out of Compose and behind app-owned interfaces. Preserve and migrate existing data.
+3. **Extract repositories:** move saved-place, Home-configuration and recent-search persistence out of Compose behind app-owned interfaces. Read legacy starred/visit values only in the migration adapter; preserve ambiguous user data until its retention policy is approved.
 4. **Create application use cases:** move add/delete/reorder/select/pin/visit/refresh/search orchestration out of `SolsticeShell`.
 5. **Add Meridian gateway:** implement only against Meridian's approved public API; map result/provenance into Solstice models. Use fixtures/fakes until the engine API is ready.
 6. **Replace the source chooser:** use Meridian source status/configuration capabilities; if unsupported, write a Meridian API proposal rather than retaining Breezy source management.
