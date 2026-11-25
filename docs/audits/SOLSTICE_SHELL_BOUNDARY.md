@@ -53,10 +53,11 @@ These are not merely naming issues. They expose the UI to Breezy's domain model,
 
 The following behavior is product policy and must not be delegated to Meridian or Motion:
 
-- Exactly one starred/main place.
-- Visits are temporary places; they disappear when the user leaves unless pinned/starred.
-- A picked place that is not the main place opens as a postcard window.
-- The main place remains the default Forecast destination.
+- No star or favorites; Places is a plain reorderable saved list.
+- Home follows device location by default; a fixed Home is selected in Settings → Locations.
+- Travel swaps Forecast automatically between current location and Home; Home is marked in Places.
+- Search opens an ephemeral preview with Cancel and Add. “Visiting” marks only an unsaved preview.
+- A picked saved place opens as a place window/postcard according to the current navigation design.
 - Search-to-postcard morph, page ownership during the transition, and current navigation semantics.
 - Place ordering, deletion/undo UX, and user-facing messages.
 
@@ -71,10 +72,10 @@ SolsticeShell (Compose)
 SolsticeShellViewModel / state holder
     |  Solstice use cases
     +--> ObservePlaces
-    +--> SelectMainPlace
+    +--> SetHomeConfiguration
     +--> SearchPlaces
     +--> AddPlace / RemovePlace / RestorePlace / ReorderPlaces
-    +--> PinPlace / VisitPlace
+    +--> AddPlace / PreviewPlace / DismissPreview
     +--> RefreshPlace / RefreshMainPlace
     +--> ObserveWeather / ObserveRefreshStatus
     +--> ObserveSourceStatus / ExplainProvenance
@@ -207,8 +208,8 @@ Target behavior:
 | Data | Owner | Notes |
 |---|---|---|
 | Saved places and stable app place IDs | Solstice | App database/repository; migrate existing user places safely |
-| Main/starred place | Solstice | One-main-place invariant; atomic update |
-| Temporary visits and recent search history | Solstice | Expiration and privacy controls |
+| Home configuration | Solstice | Follow-device or fixed PlaceId; not a favorite/star flag |
+| Search preview and recent search history | Solstice | Preview is ephemeral; history is separate and clearable |
 | Place order and display preferences | Solstice | DataStore or app database according to consistency needs |
 | Weather responses, source cache, forecast history, model statistics | Meridian | Through Meridian's storage abstraction |
 | Current device location permission and acquisition | Android platform adapter | Consent and lifecycle policy remain Solstice |
@@ -269,6 +270,7 @@ The shell boundary is considered independent only when:
 These are not blockers for the boundary decision, but must be specified before their implementation:
 
 - Exact stable place identity and duplicate/merge rules.
+- Travel detection threshold/hysteresis and preview retention policy; see `PLACE_MODEL_CONTRACTS.md`.
 - Place-search provider and privacy/attribution requirements.
 - Whether Meridian will expose source configuration, or only status/selection policy.
 - App database vs DataStore split for places, visit history and display preferences.
