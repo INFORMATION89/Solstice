@@ -7,6 +7,7 @@ another doc disagree, this file wins, and the other doc gets fixed.
 - **What Solstice is for and the design checks:** [DESIGN.md](DESIGN.md). Motion: [MOTION.md](MOTION.md).
   Writing: [WRITING.md](WRITING.md).
 - **Outlook and adaptive preparation:** [OUTLOOK_AND_DATA_TRANSPARENCY.md](OUTLOOK_AND_DATA_TRANSPARENCY.md) records the agreed information hierarchy, adaptive routine learning, and data-transparency direction.
+- **UX evidence and follow-through:** [UX-RESEARCH.md](UX-RESEARCH.md) records the research; [UX-AUDIT.md](UX-AUDIT.md) evaluates the decisions; [UX-VALIDATION-PLAN.md](UX-VALIDATION-PLAN.md) defines the user tests still required.
 
 - **To-do list:** [ROADMAP.md](ROADMAP.md). **Where things stand right now:** [CONTINUE.md](CONTINUE.md).
 - **History:** [LOG.md](LOG.md) (every dated entry, unchanged). The old, long PLAN.md is in
@@ -128,12 +129,15 @@ Values follow the unit settings; a card is skipped when the source has no data f
 | UV | Index and "high until 4 PM" | Index 6 or above (WHO "high") | On, appears when it matters |
 | Air quality | Index and level | **Anything worse than "good"** | On, appears when it matters |
 | Wind | Speed, gusts, direction | Gusts of 50 km/h or more | On, appears when it matters |
-| Feels like | Feels-like temperature and why | 4° or more from the real temperature, or 35° and above | Off |
+| Hero temperature | Feels-like value, with actual air temperature always visible beside it | Always the primary temperature display when a reliable source value exists; explain only source-supported differences | Always shown when available |
 | Humidity and dew point | Humidity, dew point, "muggy" or "dry" | Dew point 20° or above | Off |
 | Pressure | Value and trend | 3 hPa or more change in 3 hours | Off |
 | Visibility | Distance | Under 1 km | Off |
 | Pollen | Main allergen and level | High for any allergen | Off |
 
+- The feels-like value is the primary temperature in the hero; actual air temperature is always visible
+  alongside it. This is not an optional card. Preserve the source's index/method and explain differences
+  only with inputs that the source actually uses.
 - Default order: Alerts, Rain, Hourly, then your own order. "Appears when it matters" cards are hidden
   on normal days; any card can be set to always show.
 - Several important at once: alerts, rain, wind, UV, air quality.
