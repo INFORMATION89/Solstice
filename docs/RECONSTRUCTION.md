@@ -104,7 +104,7 @@ These are product responsibilities and must not be delegated to Breezy or duplic
 
 1. Product identity, information architecture, navigation, onboarding, and app settings.
 2. Solstice's forecast presentation, cards, page composition, place switching, and unique interactions.
-3. User-owned place list, favorites, ordering, preferences, and widget configuration.
+3. User-owned saved-place list and ordering, Home configuration (follow device or fixed place), search history, preferences, and widget configuration. No star/favorites model.
 4. App-specific persistence and safe migration of existing user data.
 5. The bridge between Meridian public results and Solstice presentation models.
 6. App refresh orchestration, notification policy, widget refresh policy, and lifecycle integration.
@@ -195,6 +195,14 @@ Do not remove any of the following until its replacement and migration are verif
 - Third-party notices, licence files, copyright headers, or attribution data.
 - Assets, fonts, raw datasets, map/geographic data, and translations whose provenance is unresolved.
 - Existing signing and test-distribution behavior.
+
+## 9.1 Place model and product behavior
+
+The current product decisions in `docs/PLAN.md` (“Places and travel”) supersede the inherited star/pin/visit behavior. Solstice has no favorites: Places is a plain reorderable saved list; Home follows device location by default or can be fixed in Settings; travel changes Forecast automatically; search uses an ephemeral preview with Cancel/Add.
+
+See [`docs/audits/PLACE_MODEL_CONTRACTS.md`](audits/PLACE_MODEL_CONTRACTS.md) for the Solstice-owned `PlaceId`, `SavedPlace`, Home configuration, preview, repository contracts, Meridian boundary, and legacy migration mapping. The place-data audit describes inherited storage only and must not be treated as a product specification.
+
+The travel detection threshold/hysteresis, duplicate matching policy, fixed-Home deletion behavior, and treatment of ambiguous legacy visit rows remain open. Do not implement those behaviors by assumption.
 
 ## 10. Open audit items
 
