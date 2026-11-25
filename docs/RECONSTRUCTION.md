@@ -222,3 +222,70 @@ Repository evidence inspected for this initial audit:
 - `README.md`, `LICENSE`, `LICENSE_ADDITIONAL`, `3RD_PARTY.md`, and `UPSTREAM_BASE`.
 
 This audit must be updated as source-level reviews are completed. Do not treat the initial classifications as a completed legal or provenance determination.
+
+## 12. Focused audit: `ui/expressive/` (2026-11-25)
+
+This package contains a substantial amount of Solstice-specific product/UI work, but it is **not yet independent of Breezy**. It is the strongest preservation candidate in the current application, not a clean standalone module. Its source files still carry the fork's LGPL header and Breezy package path; those facts do not establish the origin of each implementation.
+
+### 12.1 Solstice work to preserve
+
+The following areas show clear Solstice product intent and should be preserved as behavior/design requirements while their implementations are reviewed:
+
+- **App shell and page composition:** `shell/SolsticeShell.kt`, `PageFrame.kt`, `Toolbar.kt`, `ToolbarMotion.kt`, `ShellNavigation.kt`, `PlaceWindow.kt`, `Postcard.kt`.
+- **Forecast experience:** `ForecastPage.kt`, `RainCard.kt`, `Summary.kt`, `WeekPage.kt`, `MoonCard.kt`, `MoonRenderer.kt`, `MoonSky.kt`, `MoonVisibility.kt`, `MoonPhaseIcons.kt`.
+- **Places and search experience:** `PlacesPage.kt`, `Visits.kt`, `SearchOverlay.kt`, `Cities.kt`, and the reorder UI.
+- **Solstice visual language:** `theme/Tokens.kt`, `ExpressiveTheme.kt`, `ExpressiveType.kt`, `SolsticeMotionScheme.kt`, `sky/SkyPalette.kt`, `SkyBackground.kt`, `SkyEffects.kt`, and `SolsticeIcons.kt`.
+- **Product-specific components:** weather cards, sky rendering/effects, moon/sun visualization, place time, weather summaries, and forecast presentation.
+
+Preserve the requirements, interaction decisions, and visual intent even when the implementation must be rewritten. Do not assume every line or asset in these files is independently authored; inspect Git history/diffs and resource provenance.
+
+### 12.2 Breezy coupling that must be removed
+
+The focused source review found direct dependencies that prevent this UI from being considered independent:
+
+- `ForecastPage.kt`, `PlacesPage.kt`, `WeekPage.kt`, `SearchOverlay.kt`, and `Cities.kt` import `breezyweather.domain.location.model.Location`.
+- Several screens read the legacy weather graph directly (for example `location.weather`, daily forecasts, sun/moon values, and weather codes). These must be mapped from Meridian's public contracts into Solstice-owned presentation models.
+- `SearchOverlay.kt` imports legacy `ui.search.SearchViewModel` and `LoadableLocationStatus`; search orchestration must move behind Solstice-owned search/place interfaces.
+- Many files reference `org.breezyweather.R`, so resource ownership and namespace migration must be handled as a coordinated build/resource task.
+- `Cities.kt` converts its own `City` model into Breezy's `Location`, and stores recents using Android SharedPreferences. Replace the conversion with a Solstice-owned place model; decide on DataStore or another supported persistence abstraction for search recents.
+- `SheetDialog.kt` explicitly documents matching upstream `AlertDialogNoPadding` call-site slots to make a dialog-to-sheet substitution. This compatibility-shaped API must be reviewed and specified independently; do not preserve it solely to keep inherited call sites working.
+- The theme imports app resources and Android runtime APIs. It can remain app-owned until its reusable contract is extracted.
+
+### 12.3 Destination by responsibility
+
+| Files / responsibility | Destination | Notes |
+|---|---|---|
+| `theme/Tokens.kt`, generic type/shape/spacing tokens | MOTION (kit contract) + REVIEW | Extract only reusable tokens. Solstice-specific weather palettes and product semantic tokens remain in Solstice. |
+| `components/Glass.kt`, `IconBadge.kt`, `PressMorph.kt`, `ScreenCorners.kt`, `ScreenPush.kt`, `SheetHandle.kt`, `SheetShape.kt`, `SheetDialog.kt`, `SolsticeSheetState.kt` | MOTION / Motion UI + REVIEW | Candidate reusable interaction/UI primitives. Re-specify against Motion's API and check licensing/provenance before moving. |
+| `components/SolsticeCard.kt` | MOTION UI primitive + Solstice weather-card composition | Separate generic card/material behavior from its sky/weather-specific parameters. |
+| `components/SolsticeIcons.kt` | REVIEW; likely split | Identify source icon set and licence. Generic approved icons can use a maintained icon library; Solstice-specific weather glyphs remain product assets. |
+| `components/SolsticeMotion.kt` | MOTION | Compatibility facade only; remove after call sites use Motion's public API. |
+| `shell/*` weather pages, cards, summaries, moon/sun and sky | SOLSTICE | Product UI and domain-specific visualizations; rebuild against Solstice models and Meridian data. |
+| `shell/PageFrame.kt`, generic toolbar, messages, place/window shell mechanics | MOTION UI + Solstice adapters | Extract only generic frame and interaction primitives; app navigation and product behavior remain in Solstice. |
+| `search/SearchOverlay.kt`, `Cities.kt` | SOLSTICE | Keep search UX and city selection as product features; replace Breezy types/ViewModel and move to app-owned interfaces. |
+| `reorder/*` | MOTION UI or maintained library + SOLSTICE policy | Generic drag/reorder mechanics may be reusable; card ordering rules and persistence belong to Solstice. |
+| `lab/*` | MOTION Lab or remove after migration | These demos belong to the Motion development tool, not the shipped weather product. Audit each file's origin first. |
+| `sky/*` | SOLSTICE initially | Weather-aware sky rendering is product-specific. Extract only generic graphics primitives if another consumer is demonstrated. |
+
+### 12.4 Platform/library capabilities already available
+
+- Jetpack Compose supplies layout, drawing, gestures, text, animation primitives, accessibility semantics, and state handling.
+- Material 3 supplies theme, typography, shapes, common controls, and bottom-sheet/dialog primitives.
+- AndroidX provides navigation, lifecycle, saved state, and supported persistence options.
+- Motion supplies the independent motion/gesture/haptic APIs already used by this code.
+- Haze is already integrated for backdrop blur; retain it through its public API if its licence, performance, and supported Android versions remain acceptable.
+- Android/ICU locale APIs can handle many date, time, and text normalization needs; keep custom logic only where Solstice's product behavior requires it.
+
+Solstice should implement its own weather presentation, place-management behavior, forecast summaries, sky/moon/sun visualization, search product experience, and app-specific state. It should not reimplement Compose, Material controls, platform lifecycle, or generic animation/gesture primitives that Motion already provides.
+
+### 12.5 Required next audit actions
+
+1. Compare the expressive package against the upstream base commit and repository history, file by file. Record which files were newly added, copied then modified, or substantially derived.
+2. Audit every drawable, font, vector path, raw data file, and string resource used by this package. The package alone does not prove asset provenance.
+3. Build a dependency map from each expressive file to Breezy models, ViewModels, resources, and services.
+4. Define Solstice-owned presentation models and repository/use-case interfaces before changing the UI imports.
+5. Agree with the Motion and Motion UI repositories on which generic primitives are accepted, then move them via their own specifications and tests.
+6. Migrate one vertical slice at a time (for example Forecast data → Solstice model → Forecast UI) and keep the app buildable.
+7. Only after the replacement compiles and is verified, remove the corresponding Breezy imports and compatibility adapters.
+
+**Initial conclusion:** preserve the Solstice experience and design decisions; replace the Breezy data/search contracts beneath them; extract reusable interaction primitives to Motion; keep weather-specific visualizations and product behavior in Solstice. This is a responsibility-level audit, not a legal provenance clearance.
