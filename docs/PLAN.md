@@ -406,3 +406,20 @@ review): `docs/SOURCES.md`, proposal awaiting Marco.
 - Added (no upstream equivalent): `.gitattributes` (LF, so Spotless passes on Windows),
   `app/src/main/res/font/google_sans_flex.ttf`, `third_party/fonts/GoogleSansFlex-OFL.txt`,
   `tools/make_icon.py`, `tools/make_symbols.py`, `app/src/main/kotlin/org/breezyweather/ui/expressive/**`.
+
+## Breezy exit (decision 2026-11-25)
+
+Solstice is to become an independent application and must progressively remove its dependency on
+Breezy Weather. Breezy was a temporary experimental base, not the intended long-term architecture.
+
+**Migration strategy: gradual replacement (Marco, 2026-11-25).** Keep the application usable while
+each inherited subsystem is specified independently, rebuilt, tested, migrated, and only then removed.
+Do not attempt a big-bang rewrite or delete inherited functionality before its replacement is verified.
+
+The subsystem inventory, platform capabilities, Solstice-owned responsibilities, clean-room protocol,
+and migration sequence live in [RECONSTRUCTION.md](RECONSTRUCTION.md). That document is the working
+migration map; update it as file-level provenance and dependency audits are completed.
+
+The existing LGPL-3.0 licence, additional terms, third-party notices, and copyright headers are not
+changed by this architectural decision. Their scope and any future licensing transition require a
+separate provenance and legal review.
