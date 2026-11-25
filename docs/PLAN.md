@@ -6,6 +6,8 @@ another doc disagree, this file wins, and the other doc gets fixed.
 - **How we work:** [RULES.md](RULES.md) (read first, every session).
 - **What Solstice is for and the design checks:** [DESIGN.md](DESIGN.md). Motion: [MOTION.md](MOTION.md).
   Writing: [WRITING.md](WRITING.md).
+- **Outlook and adaptive preparation:** [OUTLOOK_AND_DATA_TRANSPARENCY.md](OUTLOOK_AND_DATA_TRANSPARENCY.md) records the agreed information hierarchy, adaptive routine learning, and data-transparency direction.
+
 - **To-do list:** [ROADMAP.md](ROADMAP.md). **Where things stand right now:** [CONTINUE.md](CONTINUE.md).
 - **History:** [LOG.md](LOG.md) (every dated entry, unchanged). The old, long PLAN.md is in
   [archive/PLAN_until_2026-11-22.md](archive/PLAN_until_2026-11-22.md) (reference only, not instructions).
@@ -56,10 +58,7 @@ logs, session notes or build reports here.
    - Official warnings open in full inside Solstice, coloured by severity.
    - Which alerts, their wording, defaults and where you set them up: to propose and agree. Source:
      gradientweather.app and its Play Store listing (2026-11-22).
-6. **This week becomes "Outlook"** (Marco, 2026-11-23): a proactive planning page, like Acme Weather's
-   approach, not just a list of days. Examples: the best weekend day to be outside, notable days ahead
-   (heat, a cold front, a rainy stretch), good evenings for the sky. The day list stays. What it answers,
-   and how, to propose to Marco.
+6. **This week becomes "Outlook".** Outlook is a readable weather timeline: first the immediate hours not covered by Forecast in a compact form, then the rest of the week. Weekly content combines daily summaries with distinct event cards for relevant weather developments. Significant phenomena and everyday changes are prioritised by importance. Contextual explanations and practical recommendations appear at useful preparation times, not continuously. Cards are connected by a vertical line; visual design awaits the user's references. Full adaptive routine learning and the data-transparency direction are specified in [OUTLOOK_AND_DATA_TRANSPARENCY.md](OUTLOOK_AND_DATA_TRANSPARENCY.md).
 5. **No coding until the next session (Saturday 1:00 AM)**; this week is research, rules and planning.
    Saturday's plan: [CONTINUE.md](CONTINUE.md), "Next session".
 
@@ -103,13 +102,16 @@ logs, session notes or build reports here.
 - **Motion Lab:** Motion's own app, built on the kit.
 - **No typed-in values:** CI check with a reviewed allowlist that only shrinks.
 
-### Places and travel (decided 2026-11-22)
+### Places and travel (decisions through 2026-11-25)
 - **Home is your current location** by default. Without location access, onboarding asks you to
   choose a place, which becomes home. Using a fixed place instead lives in Settings › Locations.
 - **No star.** Places is a plain saved list (reorderable).
-- **Travel swaps automatically:** away from home (e.g. home Mexico City, you're in Tijuana), Forecast
-  shows where you are and your home place moves to the top of Places marked "Home" with its time;
-  it swaps back when you return.
+- **Forecast target and travel presentation are separate.** In FollowDeviceLocation mode, Forecast follows the current device location independently of travel detection. In FixedPlace mode, Forecast remains at the selected Home regardless of device location.
+- **Travel presentation is temporary.** When away from Home, the current location appears temporarily at the top of Places; Home remains in the list marked "Home" with its local time; other saved places retain their relative order. This derived presentation does not mutate persisted order. On return, the temporary location disappears.
+- The current travel location is not saved automatically. The user can explicitly choose **Add to Places**; if an equivalent saved place already exists, open that place rather than creating a duplicate.
+- If a reliable locality name is unavailable, display **Current location** rather than guessing or exposing coordinates.
+- If location permission is denied or revoked, retain the Home configuration and last known forecast where available, and explain that location is not updating. Do not silently convert FollowDeviceLocation to FixedPlace. Resume following automatically when permission and a reliable location return. If no known place exists, ask the user to choose one manually.
+- Travel detection changes Places presentation only; it does not gate the Forecast target. Distance/time thresholds and hysteresis for travel presentation remain open and must be researched and agreed before implementation.
 - **Search opens a preview** with Cancel and Add (Apple Weather's pattern). **"Visiting" only marks a
   preview** of a place you haven't added.
 - **A place's local time** shows wherever its time differs from your phone's (saved or previewed),
@@ -165,9 +167,7 @@ Values follow the unit settings; a card is skipped when the source has no data f
   exists (optical flow, as in pysteps and LibreWXR).
 - **Learns from public data first** (past forecast archives and station observations); the local
   correction runs on the phone.
-- **Sharing data is opt-in, always.** Asked during onboarding, never on by default, and the screen
-  shows exactly what would be sent and visualizes how it travels to us. Later: anonymized forecast
-  errors per area, which needs a server. Rules in RULES.md section 4.
+- **Data contribution is off by default and optional.** Users may opt in during onboarding; declining does not affect core functionality. Solstice and Meridian maintain independent consent boundaries. The shared transparency model includes recipients, destinations, purposes, examples and a technical transmission history. Do not claim anonymity without technical substantiation. See [OUTLOOK_AND_DATA_TRANSPARENCY.md](OUTLOOK_AND_DATA_TRANSPARENCY.md) and RULES.md section 4.
 - **Licence: Apache 2.0**, like Motion (patent grant, any app can use it, works inside LGPL Solstice).
 - **Solstice leaves the Breezy fork gradually** (decided 2026-11-23): the clean engine replaces
   Breezy's data layer and Motion UI its screens, part by part, so the app keeps working throughout;
