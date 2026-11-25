@@ -73,18 +73,19 @@ Consequences:
 
 Do not use `formattedId` as the new Solstice `PlaceId`.
 
-## 4. Confirmed behavioral rules to preserve
+## 4. Legacy behavior vs current product decisions
 
-1. There is exactly one main/starred place whenever the saved-place list is non-empty.
-2. The main place is the default Forecast destination and the shell returns to it.
-3. A search-selected place can be added as a temporary visit and shown immediately.
-4. A visit is removed when the user leaves it unless it is pinned/starred.
-5. Pinning a place makes it the main place; the current implementation stores one starred ID.
-6. Places can be reordered, removed, restored through the shell's undo flow, and refreshed independently.
-7. Search history is separate from saved places; adding a recent search does not by itself make it a permanent favorite.
-8. A current-position place is a saved place row with a special flag/legacy ID; permission and last-known device coordinates are stored separately.
+The legacy implementation has one starred/main place, temporary persisted visits, pin/unpin behavior, and a postcard opened for a picked place. Those are **not** the target product rules.
 
-These are Solstice product behaviors, not Meridian responsibilities.
+The authoritative decisions are in `docs/PLAN.md` → “Places and travel”:
+- No star or favorites; Places is a plain reorderable saved list.
+- Home follows device location by default; onboarding can choose a fixed place when location is unavailable.
+- Travel swaps Forecast automatically between current location and Home; Home is marked in Places.
+- Search opens an ephemeral preview with Cancel and Add. “Visiting” marks only an unsaved preview.
+
+Do not preserve star/pin/temporary-visit semantics as product requirements. Preserve legacy data safely, then map it to the new model according to `PLACE_MODEL_CONTRACTS.md`. Old `starred` values are migration hints, not a new favorite feature. Old `visiting` rows need a retention decision rather than automatic conversion into persistent visits.
+
+Saved-place ordering, safe removal/undo, recent search history being separate from saved places, and separation of device-location permission/cache from saved-place identity remain valid requirements.
 
 ## 5. Risks and defects to address before migration
 
