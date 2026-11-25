@@ -75,21 +75,39 @@ Design in [SOURCES.md](SOURCES.md).
 5. Sources are tested offline with recorded responses, and changes to the blend are verified against
    public archives before they ship.
 
-## 5. Clean room (agreed 2026-11-23)
+## 5. Clean room and Breezy exit
 
-Applies to the weather engine, Motion and future apps; the Solstice app itself stays a Breezy fork
-until Marco decides otherwise.
-1. **Never copy, translate or closely paraphrase another project's code**, Breezy included, into
-   these projects. Ideas, algorithms, public standards and data formats are fine.
-2. **Allowed sources:** public specs and standards (CAP, METAR, WMO), each service's own API docs and
-   terms, published papers, platform docs and guidelines, our own docs, and how things behave from
-   the outside. Libraries are used through their API, under their licence, never pasted in.
-3. **Spec, then build:** one session writes a spec in our own words from allowed sources and saves it
-   in the project's docs; a separate session builds only from that spec and never opens the original
-   code for that part.
-4. Each pull request lists what was consulted. Code that looks close to an existing project gets
-   rewritten, not justified.
-5. Honest limit: AI models have seen public code, so this lowers the risk rather than removing it.
+Applies to **the entire Solstice application**, Meridian, Motion, and future projects. Solstice is
+being rebuilt gradually as an independent application; Breezy Weather was a temporary experimental
+base, not a permanent dependency. The migration inventory and order are in
+[RECONSTRUCTION.md](RECONSTRUCTION.md).
+
+1. **Never copy, translate, closely paraphrase, or port another project's implementation** into
+   Solstice, Meridian, or Motion. This includes Breezy source, architecture-specific code structure,
+   comments, identifiers, assets, and translations unless their provenance and licence have been
+   explicitly reviewed and their use approved. Ideas, independently specified behavior, public
+   standards, and data formats may be used subject to applicable law and terms.
+2. **Allowed research sources:** public standards (CAP, METAR, WMO), official provider API docs and
+   terms, published papers, Android/Kotlin/Apple platform documentation, our own independently written
+   requirements, and behavior observable without accessing protected implementation details.
+   Third-party libraries are integrated through their public APIs under reviewed licences.
+3. **Spec, review, then build:** document the required behavior in our own words using permitted
+   sources; review the specification for copied expression and licensing concerns; then implement
+   from that specification. Do not use Breezy source as the implementation reference for a subsystem
+   being rebuilt.
+4. **Gradual replacement:** do not delete inherited code until its Solstice-owned replacement,
+   tests, data migration (if applicable), and rollback path are verified. Preserve required notices and
+   attributions until reviewed.
+5. **Provenance:** every reconstruction pull request records the subsystem, specification, consulted
+   sources, dependencies/licences, tests, and inherited components removed. If origin is uncertain,
+   mark it REVIEW and stop before reuse or deletion.
+6. **AI limitation:** different chats or prompts do not establish clean-room isolation. AI models may
+   have encountered public code during training, and agents with prior source exposure must not be
+   represented as unexposed clean-room implementers. Record this limitation honestly; AI assistance
+   does not certify legal compliance.
+7. Clean-room practices reduce risk and document independent work; they do not guarantee legality.
+   Obtain qualified legal review for copyright, licences, trademarks, patents, and applicable
+   jurisdictional requirements.
 
 ## 6. Platform guidelines
 
