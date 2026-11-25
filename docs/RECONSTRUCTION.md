@@ -394,3 +394,5 @@ The upstream base confirms that the expressive layer is a new Compose presentati
 This comparison used upstream files at commit `5ec3b9bcb`: `ui/main/MainActivity.kt`, `ui/main/MainActivityViewModel.kt`, `ui/main/MainActivityModels.kt`, `ui/search/SearchViewModel.kt`, and `domain/location/model/Location.kt`. These are audit references only; new implementation must be based on independently written specifications and official platform/Meridian contracts, not by porting these implementations.
 
 The detailed 59-file disposition matrix is maintained separately in [audits/EXPRESSIVE_FILE_AUDIT.md](audits/EXPRESSIVE_FILE_AUDIT.md). Update that matrix as each file receives a deeper source/resource comparison; keep this document as the high-level migration map.
+
+The shell-specific boundary and extraction specification is documented in [audits/SOLSTICE_SHELL_BOUNDARY.md](audits/SOLSTICE_SHELL_BOUNDARY.md). It defines the Solstice presentation contract, Meridian adapter boundary, persistence ownership, failure states, and incremental removal criteria for Breezy integration.
