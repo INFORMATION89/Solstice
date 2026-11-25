@@ -423,3 +423,17 @@ migration map; update it as file-level provenance and dependency audits are comp
 The existing LGPL-3.0 licence, additional terms, third-party notices, and copyright headers are not
 changed by this architectural decision. Their scope and any future licensing transition require a
 separate provenance and legal review.
+
+## Productization and documentation consolidation (decision 2026-11-25)
+
+After the Breezy reconstruction and independence work, complete a dedicated productization pass. Solstice's repository and public-facing documentation must describe a real weather application intended for users, not a personal experiment, prototype, hobby project, or temporary fork.
+
+This work is intentionally sequenced **after the technical and provenance audit**, so product claims describe capabilities that actually exist.
+
+1. **Documentation inventory:** classify every document as current product documentation, contributor/agent guidance, architecture/specification, operational runbook, historical record, or obsolete.
+2. **Consolidation:** merge duplicated guidance, resolve contradictions, remove stale session instructions and abandoned proposals, and update every link. Keep useful decision history in a clearly labelled archive or changelog.
+3. **Product narrative:** rewrite README, repository description, app summary, feature descriptions, screenshots/captions, and store-facing copy around user benefits, supported capabilities, platform requirements, privacy, data sources, and limitations.
+4. **Technical documentation:** retain accurate architecture, Meridian integration, Motion integration, setup, build, testing, release, and contribution instructions for maintainers.
+5. **Release readiness:** ensure public claims match shipped behavior; distinguish available, in-development, and planned capabilities. Do not market roadmap ideas as existing features.
+
+The result should be a professional product repository: concise user-facing information at the top level, complete internal engineering documentation where needed, and no outdated Breezy-fork language once the migration is complete. Historical records must remain clearly historical rather than silently rewritten.
