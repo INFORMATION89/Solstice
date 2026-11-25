@@ -6,14 +6,14 @@ Scope: saved places, main/starred place, temporary visits, recent searches, shel
 
 ## 1. Decision
 
-Solstice must own all user-facing place identity and place lifecycle state. Meridian owns weather data/cache/statistics only; it must not become the owner of a user's saved places, favorites, visit history, or search history.
+Solstice must own all user-facing place identity and place lifecycle state. Meridian owns weather data/cache/statistics only; it must not become the owner of a user's saved places, Home configuration, search preview/history.
 
 Keep the current database and preference stores intact until a Solstice-owned replacement has been implemented, migrated, and verified on upgrade installs. Do not reset the database or collapse all data into Meridian storage.
 
 Recommended target:
 - A Solstice-owned place repository with a stable, app-generated `PlaceId` independent of coordinates, display name, and weather source.
 - A Solstice-owned database for saved place records and ordering.
-- A transactional app-state store for the single main place and temporary visit lifecycle.
+- A Solstice-owned Home configuration and saved-place store; search preview remains ephemeral.
 - A small preference store for display settings; use the database only where atomic consistency with place state is required.
 - Meridian receives a weather query location through an adapter; it never receives Solstice persistence IDs as its own identity.
 
@@ -106,40 +106,16 @@ Saved-place ordering, safe removal/undo, recent search history being separate fr
 - `ShellPrefs` uses a process-local mutable-state cache for one preference. Replace it with a repository/observable state source rather than letting composables own persistence.
 - Existing database code contains inherited Breezy models, source identifiers, and storage implementation. The data is valuable and must be migrated, but the implementation must be rebuilt from this specification and public platform/database documentation, not copied.
 
-## 6. Recommended target data model
+## 6. Target data model
 
-These are design recommendations, not existing APIs.
+The authoritative Solstice-owned model is specified in [`PLACE_MODEL_CONTRACTS.md`](PLACE_MODEL_CONTRACTS.md). It defines:
+- Stable opaque `PlaceId` and `SavedPlace`, independent of coordinates, display names, geocoder IDs, and weather sources.
+- Separate `HomeConfiguration` (`FollowDeviceLocation` or `FixedPlace`), not a star/favorite flag.
+- An ephemeral search `PlacePreview`; “Visiting” does not persist a visit.
+- App-owned `PlaceRepository`, `HomeConfigurationRepository`, `PlaceSearchGateway`, and recent-search contracts.
+- Meridian mapping at the Solstice adapter boundary; no Meridian result/provider types in saved-place records.
 
-### Place record (Solstice-owned)
-
-Minimum conceptual fields:
-- `placeId: PlaceId` — generated once by Solstice (UUID or equivalent opaque ID), persisted permanently.
-- `latitude`, `longitude` — validated coordinates.
-- `timeZoneId` — IANA time-zone identifier.
-- `countryCode`, localized/display names and administrative labels.
-- `customName` — optional user override, distinct from provider/geocoder name.
-- `isCurrentLocation` — whether this row represents the device-current-place role; device permission state is not stored here.
-- `createdAt`, `updatedAt` — for deterministic migration/debugging, not user-visible identity.
-- `sortOrder` — stable ordered-list position, maintained transactionally.
-- Any future geocoder/provider reference should be optional metadata, never the primary key.
-
-Do not persist Meridian `MeridianResult`, provider clients, or weather-source configuration inside the Place entity. Meridian's public `Place` input is constructed at the gateway boundary from coordinates and time zone.
-
-### Main place and visit state
-
-- Store `mainPlaceId` as one nullable scalar, not a set.
-- Enforce: if there are saved places, mainPlaceId references exactly one existing place; if there are none, it is null.
-- Store visit state as explicit rows/records with `placeId`, `createdAt`, and a lifecycle status (temporary/kept) or equivalent transactionally consistent representation.
-- Pinning should atomically set the main place and convert the visit to a kept/saved place.
-- Removing the main place must atomically choose a deterministic replacement (current-location place if valid, otherwise first remaining place), or null if empty.
-- Undo must restore the removed place and the relevant main/visit/order metadata as one app-level operation.
-
-### Search history and preferences
-
-- Recent searches remain a bounded, separate history (initial limit 8 can be preserved), with a versioned structured encoding and stable result identity where available.
-- Search history must be clearable independently from saved places.
-- Display preferences remain in Solstice. Use DataStore for simple independent preferences; use the app database for state that must change atomically with place records.
-- Keep the current device-location cache behind an Android platform adapter. Never confuse it with the user's selected main place.
+The old starred and visiting preferences are migration inputs only. Do not recreate them as target tables or repository APIs. The handling of ambiguous legacy visit rows is intentionally unresolved pending a retention policy.
 
 ## 7. Storage technology boundary
 
