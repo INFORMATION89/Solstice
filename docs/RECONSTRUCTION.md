@@ -210,6 +210,19 @@ These require source-level review before the inventory can be considered complet
 - Compatibility of the current Motion submodule with the planned Motion UI extraction.
 - Legal review of the current LGPL-3.0 text, additional terms, notices, and any future licence transition.
 
+## 10.1 Place data and migration audit
+
+The source-level audit of saved places, main/starred place, temporary visits, recent searches, and preferences is documented in [`docs/audits/PLACE_DATA_AND_MIGRATION_AUDIT.md`](audits/PLACE_DATA_AND_MIGRATION_AUDIT.md).
+
+Key findings:
+- Saved places and ordering currently live in SQLDelight; main place, visits, recent searches, and Solstice display preferences are in SharedPreferences.
+- The legacy place ID includes the forecast source ID, so it is not suitable as Solstice's durable identity.
+- Visit cleanup and asynchronous list writes need restart-safe, serialized replacements.
+- Solstice must own stable place IDs and user place state; Meridian owns weather cache/results only.
+- Preserve the existing SQLDelight schema/migrations and preference keys until a tested, restart-safe migration has been verified on upgrade installs.
+
+This audit is a specification only. No app code, database, or user data was changed.
+
 ## 11. Source references
 
 Repository evidence inspected for this initial audit:
