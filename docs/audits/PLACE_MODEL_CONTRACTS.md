@@ -1,7 +1,7 @@
 # Solstice place model and repository contracts
 
 Status: **target contract specification; no implementation**
-Authority: `docs/PLAN.md` decisions under "Places and travel" (2026-11-22)
+Authority: `docs/PLAN.md` decisions under "Places and travel" (2026-11-22 through 2026-11-25)
 Related audits: `PLACE_DATA_AND_MIGRATION_AUDIT.md`, `SOLSTICE_SHELL_BOUNDARY.md`
 
 ## 1. Product rules (authoritative)
@@ -9,9 +9,12 @@ Related audits: `PLACE_DATA_AND_MIGRATION_AUDIT.md`, `SOLSTICE_SHELL_BOUNDARY.md
 The existing app behavior is not the target product behavior. Follow the current product decisions:
 
 1. **No star and no favorites.** Places is a plain, reorderable saved list.
-2. **Home follows the device location by default.** If location permission is unavailable during onboarding, the user chooses a place and that becomes Home.
-3. **Fixed Home is a user setting** under Settings → Locations.
-4. **Travel changes Forecast automatically.** When away from Home, Forecast shows the current location; the Home place is moved to the top of Places and marked "Home", with its local time. When the user returns, the display swaps back.
+2. **Home follows the device location by default.** If location permission is unavailable during onboarding and no known place exists, the user chooses a place and that becomes Home.
+3. **Fixed Home is a user setting** under Settings → Locations. In FixedPlace mode, Forecast remains on that place regardless of device location.
+4. **Forecast target and travel presentation are separate.** In FollowDeviceLocation mode, Forecast follows the current device location as soon as a reliable location is available; it does not wait for travel detection. Travel detection only changes Places presentation.
+5. **Travel presentation is temporary.** While away, the current location appears temporarily at the top of Places; Home remains in the list marked "Home" with its local time; other saved places keep their relative order. This does not mutate persisted order. On return, the temporary location disappears.
+6. **Current location is not saved automatically.** The user can explicitly choose "Add to Places". If an equivalent saved place already exists, open it instead of creating a duplicate. If no reliable locality name is available, display "Current location".
+7. **Permission loss does not rewrite preference.** If location permission is denied or revoked, retain FollowDeviceLocation and show the last known forecast where available, with a clear indication that location is not updating. Resume automatically when permission and a reliable location return. If no known place exists, ask the user to choose one.
 5. **Search opens a preview** with Cancel and Add. A preview can be marked "Visiting", but this does not save it. Add makes it a saved place.
 6. Saved places can be reordered. Home is a role/configuration, not a favorite flag or a permanent list pin.
 
@@ -100,9 +103,10 @@ Rules:
 - If onboarding cannot obtain usable location, user selection creates a saved place and configures `FixedPlace(id)`.
 - Fixed Home must reference an existing saved place. Removing that place requires a deterministic user-facing fallback/confirmation; never leave a dangling ID.
 - In follow-device mode, current location is an observation from the platform location adapter, not automatically a saved place.
-- The active Forecast target is derived from HomeConfiguration + current device location + the approved travel-detection policy. It is not persisted as a second competing "main place".
-- When away, Home remains a saved place and is visually marked in Places; current travel location is displayed as the active Forecast target. Returning restores Home.
-- The exact distance/time threshold and hysteresis for "away" vs "returned" are not specified in PLAN.md. Do not invent them; write a short behavior proposal and obtain approval before implementing automatic swap logic.
+- In FollowDeviceLocation mode, the active Forecast target is derived from HomeConfiguration + the latest reliable device location. Travel detection is not part of this selection.
+- Travel detection is a separate derived state used only to alter Places presentation. It must not mutate saved-place order or persist the temporary current location.
+- If permission is lost, retain the configuration and last known forecast; mark the location as stale/not updating. Do not silently switch to FixedPlace.
+- The exact distance/time threshold and hysteresis for travel presentation remain unspecified. Do not invent them; research and obtain approval before implementation.
 
 ### 2.3 Search preview
 
@@ -226,7 +230,7 @@ Migration must be additive, idempotent, restart-safe, and validated on upgrade i
 ## 8. Not yet decided
 
 Do not silently decide these in implementation:
-1. Travel detection distance/time threshold and hysteresis.
+1. Travel-presentation detection distance/time threshold and hysteresis.
 2. Duplicate-place matching radius and same-city/different-coordinate behavior.
 3. What to do when fixed Home is deleted (confirm new Home, choose another, or revert to FollowDeviceLocation).
 4. Whether a legacy unstarred saved row that was also in `visiting` was intentionally saved or only a temporary preview; define retention policy.
