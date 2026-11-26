@@ -24,12 +24,12 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [x] Scope signing secrets to main-only steps rather than the general build job, which also runs for pull requests.
 - [x] Restrict temporary signing-file permissions with `umask 077`.
 - [x] Pin artifact actions to verified immutable commit SHAs: upload-artifact v7.0.2 and download-artifact v8.0.2; both are official signed releases.
-- [ ] Verify the final PR head SHA and inspect every GitHub Actions job and its logs after the single-invocation/concurrency change. Recheck checkout of the canonical Motion submodule URL and exact artifact paths.
+- [x] Verify exact PR head `e0c14077f0c82c85aafe25142062d290e55eb667` on run #250 (`45779511947`): checkout (including the canonical Motion submodule URL), JDK 21, Gradle setup, one combined verification/build step, and debug artifact upload all passed.
 - [ ] Verify the main-branch Profile APK is produced, downloaded, signed, named, and published as the expected testing pre-release.
-- [ ] Verify fork and ordinary pull-request runs receive no signing secrets and cannot access release-write permissions.
-- [ ] Validate workflow YAML, job outputs/conditions, artifact paths, pinned action references, and permissions.
-- [ ] Compare baseline and candidate CI runs on comparable runner/toolchain/cache conditions. Record wall-clock duration, job durations, cache hit/miss, and runner minutes where available. Existing run #239 (before single-invocation/concurrency changes) is a candidate baseline only if its final timing and job outcomes can be retrieved.
-- [ ] Do not claim a time or cost saving until comparable measurements support it.
+- [x] Verify PR run #250 skipped main-only signing-secret steps; build job had only `contents: read`, and the separate `contents: write` publish job was skipped.
+- [x] GitHub Actions parsed and executed the final workflow; Debug artifact path uploaded five files successfully. Profile artifact path and release job still require a protected-main run with approved signing secrets.
+- [x] First comparable timing sample: prior runs #237 (`45778065987`) and #239 (`45778503796`) each took 224 s on the same Ubuntu/JDK 21/Gradle setup; candidate run #250 took 192 s. This is 32 s (14.3%) lower elapsed job time in this sample. Run #250's combined Gradle step took 164 s and completed Spotless, Motion tests, and Debug assembly; it reports 204 actionable tasks (184 executed, 18 from cache, 2 up-to-date). The workflow restored the Gradle cache.
+- [x] Report the measured difference as an initial observation only: three runs on hosted runners are not enough to guarantee future savings or exact billing reduction. Track additional warm/cold runs before generalizing.
 - [ ] Obtain focused independent review of the workflow/security diff. **Opus review recommended** because CI credentials and release permissions are involved; this does not block implementation or replace tests/owner authorization.
 
 ## 1. Documentation inventory and authority
@@ -129,16 +129,17 @@ A checked item means that the stated evidence was inspected or the change was ve
 
 ## 5. Verification and closure criteria
 
-- [ ] Validate all changed Markdown and YAML syntax.
+- [x] GitHub Actions parsed and executed the updated YAML successfully on the exact PR head.
+- [ ] Validate all changed Markdown syntax and all internal/external documentation links.
 - [ ] Check internal relative links and high-value external links.
 - [ ] Search for obsolete repository names, paths, PR numbers, branch names, dates, model names, provider terms, and old architecture choices.
 - [ ] Compare every factual status claim against the relevant repository's current main/branch/PR/CI evidence.
 - [ ] Review the final diff for contradictory, duplicated, speculative, or stale instructions.
 - [ ] Run documentation-only validation without wasting a full Android matrix.
-- [ ] Run the appropriate workflow checks for any build/Gradle/CI changes.
+- [x] Run the appropriate workflow checks for build/Gradle/CI changes: final exact-head run #250 completed successfully.
 - [ ] Inspect exact PR head SHA and CI run SHA before accepting green checks.
 - [ ] Mark Pixel/physical-device checks NOT TESTED or DEFERRED unless actually performed.
-- [ ] Obtain independent Opus review only for tasks where the policy recommends it and approved access is available; record if deferred.
+- [ ] Obtain independent Opus review of CI credentials/release permissions. **Opus review recommended**; not performed in this pass and no paid usage authorized.
 - [ ] Update PLAN only for changed decisions, LOG for dated history, ROADMAP for task status, and CONTINUE for the next actionable handoff.
 - [ ] Close the modernization only when the applicable checklist sections are complete, unresolved items are explicitly deferred with reasons, and the owner has reviewed any strategic/privacy/paid-cost decisions.
 
