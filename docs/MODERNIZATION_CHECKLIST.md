@@ -79,7 +79,7 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [x] Refresh `docs/MOTION_ADOPTION_PLAN.md` against the current Motion-UI main SHA, Solstice's pinned submodule SHA, merged PR #4 and #7, and exact-head CI results.
 - [x] Correct the submodule URL to canonical `INFORMATION89/Motion-UI.git` while deliberately preserving the existing submodule commit.
 - [x] Verify the canonical URL checkout, current `motion/` submodule commit, and recursive submodule checkout on the exact current PR head: run #260 checkout passed; the combined Gradle task also passed.
-- [x] Distinguish Motion Core MOT0.1 merged in Motion PR #4 from the standalone Motion Lab PR #7 still in Draft, and the planned but non-existent `:motion-ui` module.
+- [x] Distinguish Motion Core MOT0.1 and the standalone Motion Lab (PR #7) as merged, while the planned `:motion-ui` module remains non-existent.
 - [ ] Do not describe a planned UI kit, iOS, desktop, or cross-platform capability as currently available in Solstice.
 - [ ] Verify ownership boundaries: generic motion/framework behavior belongs in Motion; weather behavior, screens, identity, navigation policy, and Solstice configuration remain here.
 
