@@ -334,8 +334,16 @@ approved Solstice UI refinements. Each visible change still follows RULES.md.
 - [ ] Simplify settings (fewer trend options).
 - [ ] App drawer name: choose "Solstice" or "Weather".
 
+## Calendar-aware weather
+
+- [ ] **Weather for calendar events:** add an optional, read-only integration through Android's `CalendarContract` API and `READ_CALENDAR`. Use an event's own physical location and event time; show no event weather when the location is missing, ambiguous, or not a real place. Outlook works when its calendar is synced into Android's calendar provider. No Microsoft Graph, Outlook SDK, OAuth, or account sign-in. Scope and privacy rules: [CALENDAR_INTEGRATION.md](CALENDAR_INTEGRATION.md).
+
+## Post-MVP — future versions
+
+- [ ] **Wear OS companion (V2/V3+ candidate; explicitly outside MVP):** explore a focused weather Tile and a small set of watch-face complications for glanceable current conditions and relevant short-term weather. Validate usefulness and update/caching constraints before considering a full watch app.
+
 ## Release
 
 - [ ] Replace inherited `PRIVACY.md` only after the technical evidence in `docs/PRIVACY_DATA_MAP.md` is complete and the final wording is reviewed. Detailed audit and release gates are tracked in `MODERNIZATION_CHECKLIST.md`.
-- [ ] Tablets: rotation and layout.
+- [ ] **Adaptive-layout adoption:** once Motion UI provides a stable window-adaptive capability, compose Solstice's product layouts with it and validate phone/tablet/foldable, rotation, resizing, and split-screen behavior. Generic implementation remains owned by Motion UI.
 - [ ] App icon: the softer, rounder icon search.
