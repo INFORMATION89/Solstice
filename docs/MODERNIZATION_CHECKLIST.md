@@ -25,6 +25,7 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [x] Restrict temporary signing-file permissions with `umask 077`.
 - [x] Pin artifact actions to verified immutable commit SHAs: upload-artifact v7.0.2 and download-artifact v8.0.2; both are official signed releases.
 - [x] Verify PR head `e5a3f96784c5fbb403851014d968629d3afeb785` on run #260 (`45781291703`): checkout (including the canonical Motion submodule URL), JDK 21, Gradle setup, one combined verification/build step, and debug artifact upload all passed. The run produced artifact `solstice-basic-debug` (artifact ID `15097649394`).
+- [x] Verify final PR head `872c7a4450bcc93e899f0a970053f87d67d3cd0b` on run #262 (`45782022879`): `Build / build` passed, including checkout, JDK 21, Gradle setup, Spotless, Motion unit tests, Debug assembly, and Debug artifact upload. The main-only Profile/signing and publication jobs were skipped as expected for a pull request.
 - [ ] Verify the main-branch Profile APK is produced, downloaded, signed, named, and published as the expected testing pre-release.
 - [x] Verify PR run #260 skipped main-only signing-secret steps; build job had only `contents: read`, and the separate `contents: write` publish job was skipped.
 - [x] GitHub Actions parsed and executed the final workflow; Debug artifact path uploaded five files successfully. Profile artifact path and release job still require a protected-main run with approved signing secrets.
@@ -114,6 +115,7 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [ ] Verify cache keys and restore behavior for Gradle wrapper distributions, dependencies, transforms, and build outputs; never cache secrets or signing material.
 - [ ] Record cold and warm build measurements, cache hits, runner minutes, artifact size, and CI failure/retry rates where available.
 - [ ] Ensure a failed required check blocks merge; rerun only failed jobs after inspecting the cause.
+- [x] Verify active GitHub ruleset `Protect main` targets `refs/heads/main`, requires the `build` status check, requires PRs, requires review-thread resolution, blocks force pushes/deletion, and has no bypass actors.
 - [ ] Keep test APK publication limited to pushes to protected `main` and report missing secrets/build artifacts honestly.
 
 ## 4. AI assignment, task sizing, and cost controls
@@ -138,7 +140,7 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [ ] Review the final diff for contradictory, duplicated, speculative, or stale instructions.
 - [ ] Run documentation-only validation without wasting a full Android matrix.
 - [x] Run the appropriate workflow checks for build/Gradle/CI changes: final exact-head run #250 completed successfully.
-- [ ] Inspect exact PR head SHA and CI run SHA before accepting green checks.
+- [x] Inspect exact PR head SHA and CI run SHA before accepting green checks: PR head `872c7a4450bcc93e899f0a970053f87d67d3cd0b` matches successful run #262 (`45782022879`).
 - [ ] Mark Pixel/physical-device checks NOT TESTED or DEFERRED unless actually performed.
 - [ ] Obtain independent Opus review of CI credentials/release permissions. **Opus review recommended**; not performed in this pass and no paid usage authorized.
 - [ ] Update PLAN only for changed decisions, LOG for dated history, ROADMAP for task status, and CONTINUE for the next actionable handoff.
