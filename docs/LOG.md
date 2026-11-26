@@ -1500,3 +1500,8 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 
 
 - **2026-11-26:** Added `docs/PRIVACY_DATA_MAP.md` as an internal technical audit, separating active network/provider paths, local app-to-app sharing, the exported permission-protected weather provider, optional app-update requests, and outstanding evidence from the public privacy notice. It is not a public privacy policy or legal opinion. Root `PRIVACY.md` remains unchanged pending provider/SDK/retention and owner review.
+
+ 
+- **2026-11-26:** Added `docs/PRIVACY_DATA_MAP.md` as an internal, code-backed inventory, linked it from PLAN/CONTINUE/checklist, and kept root `PRIVACY.md` unchanged pending provider, dependency, retention, and owner review.
+- **2026-11-26:** Added a Solstice-owned Meridian integration section to `docs/ROADMAP.md`. Work is explicitly blocked on Meridian's MER-0.1 production-direction approval, M0.2 public API/storage contract, and M0.3 forecast/observation verification. The roadmap states that Solstice is a consumer and does not decide Meridian's architecture or distribution model.
+- **2026-11-26:** The privacy data map was briefly created on the default branch by mistake, then removed in a follow-up commit. GitHub's comparison of current `main` with its prior head reports zero changed files; the data map is now present only on the modernization PR branch.

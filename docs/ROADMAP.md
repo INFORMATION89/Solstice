@@ -436,7 +436,23 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 
 ## Release
 
-- [ ] Rewrite `PRIVACY.md` and `INSTALL.md`.
-- [ ] Re-check a release build end to end.
+- [ ] Replace inherited `PRIVACY.md` only after the technical evidence in `docs/PRIVACY_DATA_MAP.md` is complete and the final wording is reviewed.
+- [ ] Merge the Solstice-specific install, help, contribution, and third-party integration guides from PR #14 after exact-head CI and review.
+- [ ] Re-check a protected-main Profile build and testing-release publication end to end.
 - [ ] Tablets: rotation and layout.
 - [ ] App icon: the softer, rounder icon search.
+
+
+## Meridian-Engine integration (blocked by Meridian's own acceptance gates)
+
+**Status as of 2026-11-26:** blocked. Meridian-Engine is still completing MER-0.1 platform and production-stack evidence. Its KMP platform proof is a candidate, not final production-stack approval. Track the authoritative status in [Meridian-Engine/PLAN.md](https://github.com/INFORMATION89/Meridian-Engine/blob/main/PLAN.md); Solstice does not own or duplicate Meridian's implementation roadmap.
+
+- [ ] Wait for Meridian's MER-0.1 evidence and explicit owner approval of the production direction. Do not repeat the platform spike or select Kotlin Multiplatform, Rust, HTTP engines, storage, or packaging on Meridian's behalf.
+- [ ] Wait for Meridian M0.2 public API and storage contracts, with an independent consumer test. Solstice must remain one consumer, not a required dependency or the source of public contracts.
+- [ ] Wait for Meridian M0.3 reproducible forecast/observation verification and its acceptance evidence before planning production weather-feature adoption.
+- [ ] Once those gates pass, review the actual versioned consumer artifact, supported Android target, dependency/license notices, cancellation/error contract, refresh lifecycle, and distribution method. Do not assume the old Solstice submodule/composite-build proposal is the official integration path.
+- [ ] Write a Solstice-owned integration specification against Meridian's approved public API and artifact. Keep current Solstice behavior operational while the integration is prepared.
+- [ ] Migrate from the existing Breezy data layer feature by feature, following the approved Solstice migration order (the earlier agreed starting priority was alerts) only when Meridian provides the corresponding accepted capability. Retain adapters until each slice passes parity and regression checks.
+- [ ] Keep app-owned concerns in Solstice: saved places, permissions, background scheduling, notifications/Live Updates, app settings, UI, app-to-app sharing, and user consent. Meridian remains a UI-free independent engine.
+- [ ] Preserve provenance/freshness and the privacy boundary in every integration. Any future data contribution remains off by default and requires separate, explicit, revocable opt-in.
+- [ ] Record the exact Meridian version/commit, artifact checksum, API compatibility, tests, untested targets, and migration limits in the Solstice handoff and release notes.
