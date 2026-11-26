@@ -1,5 +1,8 @@
 # Meridian: research and build plan
 
+> **Historical Solstice-side proposal — 2026-11-26.** This 2026-11-23 plan predates the current [INFORMATION89/Meridian-Engine](https://github.com/INFORMATION89/Meridian-Engine) repository and is retained for research history only. It is not an implementation roadmap or architecture authority. Its former repository name, Kotlin Multiplatform selection, Room storage choice, public API/Flow sketch, Gradle composite-build/submodule distribution proposal, and M0–M8 sequence must not be treated as approved. The only current authority for Meridian status and technical decisions is [Meridian-Engine/PLAN.md](https://github.com/INFORMATION89/Meridian-Engine/blob/main/PLAN.md). Solstice owns its consumer integration plan here; it must not duplicate or override Meridian's source of truth.
+
+
 Status: **plan for Marco** (2026-11-23). The what is in ENGINE_SPEC.md; this is the how and the order.
 Clean room (RULES.md section 5): everything here comes from public docs and papers (listed at the end),
 none of it from Breezy's code.
