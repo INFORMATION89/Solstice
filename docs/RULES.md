@@ -17,8 +17,7 @@ They change only with Marco's OK. If a task seems to need breaking one, stop and
 
 ## 2. Motion and frameworks first, then the app
 
-1. Anything reusable is built in **Motion** first, tried in the Motion Lab, then the app imports it and
-   **configures** it. The app holds configuration and weather-specific content only.
+1. **Reusable interaction and motion behavior belongs in Motion** first, is tried in the Motion Lab where available, then the app imports and **configures** it. Reusable meteorological engine capabilities belong in Meridian-Engine under its own plan and approval gates; Solstice consumes its approved public contract. Solstice retains app-specific behavior, configuration, and weather presentation.
 2. Motion never imports app code. A change Motion needs lands in Motion, then Solstice bumps the
    submodule (CONTINUE.md, "Motion").
 3. **Use what exists before writing anything**, in this order: Motion's pieces and tokens → Material 3
