@@ -12,9 +12,6 @@ jobs:
       contents: read
     outputs:
       test_key_available: ${{ steps.test_key_check.outputs.available }}
-    env:
-      TEST_KEYSTORE: ${{ secrets.SOLSTICE_TEST_KEYSTORE_BASE64 }}
-      TEST_PASSWORD: ${{ secrets.SOLSTICE_TEST_KEY_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -50,6 +47,9 @@ jobs:
 
       - name: Check whether the test signing key is available
         id: test_key_check
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          TEST_KEYSTORE: ${{ secrets.SOLSTICE_TEST_KEYSTORE_BASE64 }}
         run: |
           if [ -n "$TEST_KEYSTORE" ]; then
             echo "available=true" >> "$GITHUB_OUTPUT"
@@ -59,6 +59,9 @@ jobs:
 
       - name: Configure test signing key
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.test_key_check.outputs.available == 'true'
+        env:
+          TEST_KEYSTORE: ${{ secrets.SOLSTICE_TEST_KEYSTORE_BASE64 }}
+          TEST_PASSWORD: ${{ secrets.SOLSTICE_TEST_KEY_PASSWORD }}
         run: |
           mkdir -p ~/.android
           echo "$TEST_KEYSTORE" | base64 -d > ~/.android/solstice-test.keystore
