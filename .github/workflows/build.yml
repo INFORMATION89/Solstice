@@ -34,6 +34,20 @@ jobs:
       - name: No old Material Icons
         run: "! grep -rn 'androidx.compose.material.icons' --include=*.kt --include=*.kts --include=*.toml ."
 
+      - name: Fetch comparison base
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          test -n "$BASE_SHA"
+          git fetch --no-tags --depth=1 origin "$BASE_SHA"
+
+      - name: No hardcoded UI literals
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          python3 .github/scripts/check_no_hardcoding.py --self-test
+          python3 .github/scripts/check_no_hardcoding.py "$BASE_SHA"
+
       - name: Check whether the test signing key is available
         id: test_key_check
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

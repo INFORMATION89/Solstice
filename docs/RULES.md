@@ -38,9 +38,12 @@ They change only with Marco's OK. If a task seems to need breaking one, stop and
    an update, never machine-translated.
 3. A value with no token yet: **stop, propose a name and value, ask**, then add it to the tokens. Don't
    add it "for now".
-4. Allowed without a token: 0, 1, mathematical constants, and the entries in the reviewed allowlist.
-   The no-hardcoding check is a required CI gate, but it is not currently present in the active workflow;
-   report it as NOT ENFORCED until a verified check is added. The allowlist only grows with Marco's OK.
+4. Allowed without a token: 0, 1, mathematical constants, and entries in the reviewed allowlist.
+   The required `No hardcoded UI literals` step scans added production Kotlin lines for common
+   dimensions, colors, alpha, animation timing, thresholds/counts/comparisons, and direct UI text.
+   It excludes test sources and the canonical `theme/Tokens.kt` token-definition file. This is a
+   deterministic heuristic, not a Kotlin AST or proof that every possible hardcode is caught;
+   review the full diff. Allowlist exceptions require Marco's OK.
 5. No special cases by screen ("if in a window…"). Differences are configuration (data), passed in.
 
 ## 4. Data, sources and privacy
@@ -137,8 +140,8 @@ Full rules in [MOTION.md](MOTION.md). In short:
 A change is done when:
 1. All configured required CI checks pass. The workflow runs Spotless, Motion unit tests,
    `:weather-unit:testDebugUnitTest`, `:maps-utils:testDebugUnitTest`, `:app:testBasicDebugUnitTest`,
-   and the Basic Debug assembly. The no-hardcoding check is not currently included; report it as
-   NOT ENFORCED until a deterministic check is added and verified;
+   and the Basic Debug assembly. The required `No hardcoded UI literals` step also runs in this job;
+   it is a heuristic guard on added production Kotlin lines, so manual review remains mandatory;
 2. logic has unit tests; each Motion piece has a Motion Lab demo;
 3. it was checked on the Pixel (profile build for smoothness; frame stats when motion changed), or is
    clearly marked "not checked on the phone";

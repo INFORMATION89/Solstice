@@ -78,6 +78,7 @@ Select checks according to changed risk. Do not run the full Android build for a
 - Reuse successful checks only for the same relevant SHA, toolchain, runner, and inputs. After a failure, inspect the failing job and rerun only failed jobs when supported.
 - Do not retry unchanged infrastructure failures repeatedly. Diagnose, make one meaningful adjustment, and report BLOCKED if it persists.
 - Keep required checks as merge gates. A green CI result does not prove physical-device behavior; report device checks as NOT TESTED or DEFERRED when not run.
+- For production Kotlin changes, run the required diff-based no-hardcoding guard. It checks common literal patterns in added lines only; it is a heuristic, not a full Kotlin parser. Review the entire diff and require owner approval for allowlist exceptions.
 
 ### Gradle container images
 

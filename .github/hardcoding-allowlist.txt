@@ -1,0 +1,3 @@
+# Reviewed exceptions for the diff-based no-hardcoding guard.
+# Format: repository-relative-path-glob<TAB>Python regular expression matching the added source line.
+# Keep empty unless the owner explicitly approves a narrowly scoped exception.

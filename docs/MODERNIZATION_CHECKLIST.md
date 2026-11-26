@@ -115,7 +115,8 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [ ] Verify cache keys and restore behavior for Gradle wrapper distributions, dependencies, transforms, and build outputs; never cache secrets or signing material.
 - [x] Add app and library unit-test tasks (`:app:testBasicDebugUnitTest`, `:weather-unit:testDebugUnitTest`, and `:maps-utils:testDebugUnitTest`) to the combined Gradle invocation; exact-head CI verification is pending.
 - [ ] Verify the newly added app/library unit-test tasks pass on the exact PR head. Run #267 exposed six pre-existing `weather-unit` JVM test failures caused by tests entering Android ICU APIs from the local JVM; make those tests explicitly exercise the deterministic Java formatting fallback, then rerun the full task graph.
-- [ ] Implement and verify a deterministic no-hardcoding check as a required CI gate; no such check exists in the repository yet.
+- [x] Implement a deterministic diff-based no-hardcoding guard for added production Kotlin lines, with built-in self-tests and reviewed allowlist support; exact-head CI verification pending.
+- [ ] Verify the no-hardcoding self-test and required Build step on the exact PR head; inspect findings for false positives and document scanner limits.
 - [ ] Record cold and warm build measurements, cache hits, runner minutes, artifact size, and CI failure/retry rates where available.
 - [ ] Ensure a failed required check blocks merge; rerun only failed jobs after inspecting the cause.
 - [x] Verify active GitHub ruleset `Protect main` targets `refs/heads/main`, requires the `build` status check, requires PRs, requires review-thread resolution, blocks force pushes/deletion, and has no bypass actors.
