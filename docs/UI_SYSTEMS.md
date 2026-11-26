@@ -1,9 +1,6 @@
 # Solstice UI systems: audit and libraries
 
-Researched 2026-11-19. This lists every UI system in `ui/expressive/`, what to standardize, and where
-an existing library does the job better than hand-written code. It feeds the "Motion framework" and
-"Design system foundations" sections of [PLAN.md](PLAN.md). Nothing here is built yet. Any change to
-motion still gets proposed and agreed first.
+Historical audit researched 2026-11-19. Its inventory counts and implementation descriptions are a snapshot of that date, not a verified description of the current tree. It records candidates for standardization and library evaluation; re-check the source and current Motion-UI status before acting on any row. It informed the "Motion framework" and "Design system foundations" sections of [PLAN.md](PLAN.md). Some recommendations may since have been implemented, superseded, or gated. Any user-visible motion change still requires agreement first.
 
 ## Short answer
 
