@@ -6,7 +6,7 @@ The shared [AI Usage and Cost Policy](https://github.com/INFORMATION89/Motion-UI
 
 The active documentation and CI audit is tracked in [MODERNIZATION_CHECKLIST.md](MODERNIZATION_CHECKLIST.md). The privacy evidence inventory is [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md); it is an internal technical audit, not the public notice. Start with the checklist before selecting the next modernization task.
 
-**Latest verified update (2026-11-26):** PR #14 remains Draft. Exact-head CI run #269 passed on `ed50741818faf44e892ca5b658091fb1e1d12d6c`, including the expanded unit-test task graph and the new 17-case diff-based no-hardcoding guard. The scanner is heuristic and manual review remains required. Do not merge until the outstanding privacy/public-notice, documentation reconciliation, independent CI/security review, and release-path gates are resolved or explicitly deferred with owner approval.
+**Latest verified update (2026-11-26):** PR #14 remains Draft at `bdab6b4c44fb239e4108db4923907bf7c6d23059`. Exact-head CI run #272 (`45788269061`) passed. Earlier run #268 passed the expanded unit-test task graph; run #269 passed the 17-case diff-based no-hardcoding guard. The scanner is heuristic and manual review remains required. Do not merge until the outstanding privacy/public-notice, documentation reconciliation, independent CI/security review, and release-path gates are resolved or explicitly deferred with owner approval.
 
 ## Next session: Saturday 2026-11-28, 1:00 AM (planned in chat 2026-11-22)
 
@@ -321,7 +321,7 @@ Reference for iOS behaviour: `docs/MORPH_STUDY.md`, and `NEORUAA/Glasmio` (Apach
 
 ## Motion (submodule)
 
-Since 2026-11-21 `motion/` is a git submodule: [INFORMATION89/Motion](https://github.com/INFORMATION89/Motion)
+Since 2026-11-21 `motion/` is a git submodule: [INFORMATION89/Motion-UI](https://github.com/INFORMATION89/Motion-UI)
 (Apache-2.0), built from source with `includeBuild` (`settings.gradle.kts`); the app depends on
 `io.github.information89:motion`. Plan and phases: Motion's `docs/MOTION_REPO_PLAN.md`.
 
@@ -333,7 +333,7 @@ Since 2026-11-21 `motion/` is a git submodule: [INFORMATION89/Motion](https://gi
 - **After pulling Solstice**, run `git submodule update --init` so `motion/` matches the pointer.
 - **Gradle paths:** Motion's tasks run as `:motion:motion:<task>` from Solstice (e.g.
   `./gradlew :motion:motion:testDebugUnitTest`), or as `:motion:<task>` inside `motion/`.
-- The Motion Lab still lives in Solstice (`ui/expressive/lab/`) until phase 2 moves it to Motion.
+- The standalone Motion Lab is now merged in Motion-UI as `:motion-lab` (PR #7, merge commit `6ea53caf31a17b70894487cd065707a800d1a35a`). It is not `:motion-ui`; that reusable UI-kit module does not exist yet. Do not treat the old Solstice lab path as the current lab implementation.
 
 ## Set up a new computer
 
