@@ -1478,3 +1478,7 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 
 
 - **2026-11-26:** Added `docs/MODERNIZATION_CHECKLIST.md` as the scoped audit tracker for docs, cross-repository status, privacy/security/licensing, AI task allocation, CI/Gradle efficiency, and verification. During review, moved signing secrets out of the general build-job environment and into main-only steps; the final workflow still requires CI and security verification before merge.
+
+
+- **2026-11-26:** Initial Solstice privacy code inspection identified current location/provider request paths, optional IP.SB IP-derived location, app-update checks disabled by default, local ContentProvider sharing under READ_PROVIDER, configured Gadgetbridge/update broadcasts, manual local crash-log export, and inherited Breezy permission/policy wording. Full privacy wording remains blocked on complete data-source/build-flavor/retention audit.
+- **2026-11-26:** Pinned artifact actions in the modernization workflow to verified release commits (upload-artifact v7.0.2; download-artifact v8.0.2) and restricted signing file permissions. Candidate CI run 45778065987 was still executing at last check; no savings or final pass claimed.
