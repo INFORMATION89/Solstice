@@ -59,7 +59,10 @@ The schema lists every field as required but many as nullable: a missing value i
 
 Present weather to condition (first match wins, intensity kept): `TS` → thunderstorm; `SN`, `SG` →
 snow; `PL`, `GR`, `GS` → hail/ice; `FZ` → freezing; `RA`, `SH` → rain or showers; `DZ` → drizzle;
-`FG` → fog; `BR` → mist; `HZ`, `FU` → haze/smoke; `DU`, `SA` → dust. No weather: from cloud cover
+`FG` → fog; `BR` → mist; `HZ`, `FU` → haze/smoke; `DU`, `SA` → dust. **`VC` (in the vicinity, e.g.
+`VCSH`, `VCTS`) is not weather at the place:** it never sets rain or thunderstorm as the current
+condition, only a "nearby" note (rain or storms nearby), and never counts as "raining now" for the rain
+card or alerts. A cloud layer marked `CB` or `TCU` (storm clouds) is kept as `convectiveClouds`. No weather: from cloud cover
 (clear, partly, mostly, overcast). The table is data, not code.
 
 Missing values stay missing; never filled from the forecast.
@@ -78,7 +81,13 @@ night, not sunny) follow the place's sun times.
 
 ## Tests
 
-- Fixture for MMMX (and one with `VRB`, gusts, missing temperature, a special report, `CAVOK`).
+- Fixture for MMMX (and one with `VRB`, gusts, missing temperature, a special report, `CAVOK`, `VC`
+  weather and `CB` clouds).
+- **Real MMMX sample, 2026-11-23, 22:37 to 01:05 UTC (read through the web, summarised, so record the
+  real file on Saturday):** 9 reports in 2.5 hours, 6 of them special reports during a storm;
+  thunderstorm and rain, then light rain and "rain in the vicinity"; `BKN020CB`; altimeter already in
+  hPa (1023.5 to 1024.1). So: special reports are common in storms (the newest one wins), and the
+  `VC` rule matters in Mexico City's storm season.
 - Unit changes against hand-worked values.
 - Rule: a 2-hour-old report isn't used; a station 40 km away isn't; mixed per variable works.
 - Station picker: a place between two airports picks the nearer; one at 2,240 m skips a station at
