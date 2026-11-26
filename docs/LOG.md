@@ -1475,3 +1475,6 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 
 
 - **2026-11-26:** Documentation modernization started on branch docs/modernize-ai-ci-meridian-status: added root agent instructions and Solstice-specific AI/CI cost policy; reconciled the historical Meridian storage/M0 notes with Meridian-Engine's current M0.1 status. CI workflow optimization is being evaluated separately from documentation changes.
+
+
+- **2026-11-26:** Added `docs/MODERNIZATION_CHECKLIST.md` as the scoped audit tracker for docs, cross-repository status, privacy/security/licensing, AI task allocation, CI/Gradle efficiency, and verification. During review, moved signing secrets out of the general build-job environment and into main-only steps; the final workflow still requires CI and security verification before merge.
