@@ -36,8 +36,11 @@ A checked item means that the stated evidence was inspected or the change was ve
 
 ### Entry points and governance
 
-- [ ] Review root `README.md` for accurate project identity, fork attribution, build/install instructions, current maturity, and links.
-- [ ] Audit inherited `CONTRIBUTING.md`, `INSTALL.md`, `HELP.md`, and `3RD_PARTY.md`; remove obsolete Breezy-only instructions/links where needed without erasing applicable upstream attribution or licence obligations.
+- [x] Review root `README.md` identity, attribution, licence, test APK instructions and channel links; clarify that publication requires successful CI and configured signing secrets.
+- [x] Replace the inherited `CONTRIBUTING.md` with Solstice-specific contribution, approval, AI, licence, and PR guidance.
+- [x] Replace the inherited `INSTALL.md` with the current Solstice testing-release installation and Obtainium instructions; remove Breezy releases/F-Droid channels.
+- [x] Replace the inherited `3RD_PARTY.md` with code-verified Solstice broadcast and ContentProvider integration documentation; label third-party compatibility as unverified where appropriate.
+- [ ] Audit `HELP.md` section-by-section; retain only support advice verified against Solstice's current features and remove Breezy-only support/issue links.
 - [x] Review root `AGENTS.md` against actual repo layout, current PR workflow, mandatory reading order, and context-efficiency requirements.
 - [x] Review the top-level authority links and current Meridian integration gate in `docs/PLAN.md`; deeper product-decision cleanup remains open.
 - [ ] Review `docs/RULES.md` for contradictions, obsolete paths, policies repeated elsewhere, and approval boundaries that agents cannot follow consistently.
