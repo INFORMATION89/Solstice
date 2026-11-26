@@ -7,6 +7,7 @@ another doc disagree, this file wins, and the other doc gets fixed.
 - **What Solstice is for and the design checks:** [DESIGN.md](DESIGN.md). Motion: [MOTION.md](MOTION.md).
   Writing: [WRITING.md](WRITING.md).
 - **To-do list:** [ROADMAP.md](ROADMAP.md). **Where things stand right now:** [CONTINUE.md](CONTINUE.md).
+- **Calendar integration contract:** [CALENDAR_INTEGRATION.md](CALENDAR_INTEGRATION.md).
 - **Documentation/CI audit:** [MODERNIZATION_CHECKLIST.md](MODERNIZATION_CHECKLIST.md) (active checklist; tracking only, not a product-decision authority).
 - **Privacy evidence:** [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md) is an internal code/data-flow audit, not the public privacy policy; the public notice remains under review.
 - **History:** [LOG.md](LOG.md) (every dated entry, unchanged). The old, long PLAN.md is in
@@ -70,6 +71,11 @@ logs, session notes or build reports here.
 | Upstream sync | Patch-based (CONTINUE.md); edits to upstream files kept small and listed below |
 | Weather sources | Worldwide + North America; AccuWeather disabled for now; current-location name from Android's geocoder |
 | Widgets | Upstream's for now; Solstice widgets later |
+
+### Calendar and future platforms (decided 2026-11-26)
+- **Calendar-aware weather:** read events through Android's system Calendar Provider API (`CalendarContract`) only. Request `READ_CALENDAR` only when the user enables the feature; remain read-only and use only the event title, time, and physical location needed for the feature. No Microsoft Graph, Outlook SDK, OAuth, Microsoft sign-in, or server-side calendar connection. Outlook events are available only when Outlook's optional sync to the Android calendar is enabled and permitted. See [Calendar integration](CALENDAR_INTEGRATION.md).
+- **Adaptive windows and foldables:** Solstice should eventually adapt to the actual app window on phones, tablets, foldables, rotation, and multi-window. Generic reusable capability belongs in Motion UI; Solstice owns only its app-specific composition and later adoption of a stable public API.
+- **Wear OS:** a companion experience is a post-MVP initiative and a V2/V3+ candidate, not part of the minimum viable product. Evaluate focused glanceable surfaces (Tiles and complications) before considering a full watch app.
 
 ### Look and feel
 | Topic | Decision |
