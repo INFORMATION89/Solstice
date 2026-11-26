@@ -37,12 +37,12 @@ A checked item means that the stated evidence was inspected or the change was ve
 ### Entry points and governance
 
 - [ ] Review root `README.md` for accurate project identity, fork attribution, build/install instructions, current maturity, and links.
-- [ ] Audit inherited `CLAUDE.md` (now aligned as a provider-specific entry point), `CONTRIBUTING.md`, `INSTALL.md`, `HELP.md`, and `3RD_PARTY.md`; remove obsolete Breezy-only instructions/links where needed without erasing applicable upstream attribution or licence obligations.
-- [ ] Review root `AGENTS.md` against actual repo layout, current PR workflow, mandatory reading order, and context-efficiency requirements.
-- [ ] Review `docs/PLAN.md` for one current decision per topic; move historical or session-level detail out of the master plan.
+- [ ] Audit inherited `CONTRIBUTING.md`, `INSTALL.md`, `HELP.md`, and `3RD_PARTY.md`; remove obsolete Breezy-only instructions/links where needed without erasing applicable upstream attribution or licence obligations.
+- [x] Review root `AGENTS.md` against actual repo layout, current PR workflow, mandatory reading order, and context-efficiency requirements.
+- [x] Review the top-level authority links and current Meridian integration gate in `docs/PLAN.md`; deeper product-decision cleanup remains open.
 - [ ] Review `docs/RULES.md` for contradictions, obsolete paths, policies repeated elsewhere, and approval boundaries that agents cannot follow consistently.
 - [ ] Review `docs/AI_COST_POLICY.md` against the shared Motion-UI policy and Meridian policy; keep Solstice-specific Android/Gradle rules local and avoid copying volatile provider prices or quotas.
-- [ ] Review `docs/CONTINUE.md` so it contains only the current state, exact next task, active blockers, and relevant handoff—not an obsolete session schedule.
+- [x] Replace the obsolete 2026-11-25 Motion PR inventory in `docs/CONTINUE.md` with the verified 2026-11-26 Motion/Meridian status and current PR #14 handoff. The older scheduled-session notes still need a broader age/relevance review.
 - [ ] Review `docs/ROADMAP.md`: classify shipped, in-progress, proposed, blocked, deferred, and obsolete work accurately.
 - [ ] Review `docs/LOG.md` for chronology and factual references; preserve historical entries, correct only demonstrably false current pointers through dated clarifications.
 - [ ] Confirm the authority map and links among PLAN, RULES, ROADMAP, CONTINUE, LOG, AGENTS, and AI_COST_POLICY.
@@ -62,8 +62,8 @@ A checked item means that the stated evidence was inspected or the change was ve
 ### Weather sources and Meridian references
 
 - [ ] Review `docs/SOURCES.md` and distinguish existing source behavior, accepted decisions, proposed providers, and future Meridian responsibilities.
-- [ ] Review `docs/ENGINE_SPEC.md` and `docs/MERIDIAN_PLAN.md` for stale claims (including repository name, Kotlin Multiplatform/Rust, Room, API/Flow contracts, distribution, and milestones).
-- [ ] Mark the Solstice copies as historical integration research/reference only, or replace them with links to Meridian-Engine's authoritative documents where appropriate.
+- [x] Initial review of `docs/ENGINE_SPEC.md` and `docs/MERIDIAN_PLAN.md` identified stale claims (repository name, KMP, Room, API/Flow, distribution and milestone assumptions); a deeper meteorological content reconciliation remains pending in Meridian's own gates.
+- [x] Mark `docs/ENGINE_SPEC.md` and `docs/MERIDIAN_PLAN.md` as historical Solstice-side research references and point to Meridian-Engine's master plan as the architecture/status authority.
 - [ ] Do not silently copy Meridian's current architecture into Solstice or allow Solstice docs to become a second source of truth.
 - [ ] Verify Meridian milestone status against its current `PLAN.md`, exact branch/PR heads, and CI before updating claims.
 - [ ] Keep the Solstice integration gate explicit: no production dependency/API/storage/distribution decision until Meridian's relevant evidence and owner gates are approved.
@@ -72,9 +72,9 @@ A checked item means that the stated evidence was inspected or the change was ve
 
 ### Motion and framework integration
 
-- [ ] Review `docs/MOTION_ADOPTION_PLAN.md` against current Motion-UI repository state, exact adopted submodule SHA, open PRs, and CI.
+- [x] Refresh `docs/MOTION_ADOPTION_PLAN.md` against the current Motion-UI main SHA, Solstice's pinned submodule SHA, merged PR #4, open PR #7, and both relevant CI results.
 - [x] Correct the submodule URL to canonical `INFORMATION89/Motion-UI.git` while deliberately preserving the existing submodule commit.
-- [ ] Verify `.gitmodules`, `motion/` submodule commit, composite build configuration, and clean recursive checkout.
+- [ ] Verify the canonical URL checkout, current `motion/` submodule commit, composite build configuration, and clean recursive checkout on the latest exact PR head (CI checkout for run #246 succeeded; the build is still running).
 - [x] Distinguish Motion Core MOT0.1 merged in Motion PR #4 from the standalone Motion Lab PR #7 still in Draft, and the planned but non-existent `:motion-ui` module.
 - [ ] Do not describe a planned UI kit, iOS, desktop, or cross-platform capability as currently available in Solstice.
 - [ ] Verify ownership boundaries: generic motion/framework behavior belongs in Motion; weather behavior, screens, identity, navigation policy, and Solstice configuration remain here.
@@ -82,6 +82,7 @@ A checked item means that the stated evidence was inspected or the change was ve
 ## 2. Privacy, security, licensing, and public claims
 
 - [ ] Rewrite and validate root `PRIVACY.md`: it currently contains Breezy Weather wording and cannot be treated as Solstice's finished privacy notice.
+- [ ] Update the custom `READ_PROVIDER` permission label/description strings: they still say “Breezy Weather” and mention exported location coordinates; keep this as a separate user-visible copy change requiring the approval in RULES.md.
 - [ ] Inventory actual permissions, weather/location/geocoding providers, update checker, crash/error reporting, data sharing, background work, and app-to-app sharing against implementation.
 - [ ] Confirm telemetry and data contribution remain off by default; onboarding invitation is optional, informed, separate from core functionality, and revocable.
 - [ ] Ensure each proposed data flow states what is collected, purpose, destination/recipients, retention, controls, and an inspectable example payload before any collection is implemented.
