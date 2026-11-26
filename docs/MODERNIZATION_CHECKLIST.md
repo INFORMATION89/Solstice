@@ -114,7 +114,7 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [ ] Consider a custom container image only after proving it includes the required Android toolchain, is pinned by digest, is maintained, and improves measured end-to-end cost/time.
 - [ ] Verify cache keys and restore behavior for Gradle wrapper distributions, dependencies, transforms, and build outputs; never cache secrets or signing material.
 - [x] Add app and library unit-test tasks (`:app:testBasicDebugUnitTest`, `:weather-unit:testDebugUnitTest`, and `:maps-utils:testDebugUnitTest`) to the combined Gradle invocation; exact-head CI verification is pending.
-- [ ] Verify the newly added app/library unit-test tasks pass on the exact PR head.
+- [ ] Verify the newly added app/library unit-test tasks pass on the exact PR head. Run #267 exposed six pre-existing `weather-unit` JVM test failures caused by tests entering Android ICU APIs from the local JVM; make those tests explicitly exercise the deterministic Java formatting fallback, then rerun the full task graph.
 - [ ] Implement and verify a deterministic no-hardcoding check as a required CI gate; no such check exists in the repository yet.
 - [ ] Record cold and warm build measurements, cache hits, runner minutes, artifact size, and CI failure/retry rates where available.
 - [ ] Ensure a failed required check blocks merge; rerun only failed jobs after inspecting the cause.
