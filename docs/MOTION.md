@@ -101,7 +101,7 @@ squished while the container first stretches:
 - **Everything else** (2026-11-19): on tokens. Exceptions: the sticker peel, the Forecast develop
   and the moon's drift (timed effects / a slow drift, not gestures). The moon card keeps its own
   MotionValue (a full-height sheet whose pull plays the morph backwards).
-- **Motion lab** (M5, 2026-11-19): Settings → Debug → Motion lab; slow motion is `MotionTime.scale`.
+- **Motion Lab:** now a standalone `:motion-lab` app in Motion-UI (PR #7 merged 2026-11-26); it is no longer launched from Solstice Settings → Debug. Slow motion remains controlled by `MotionTime.scale` in the Motion demos.
 - **Haptics** (2026-11-21, F1): `:motion` `Haptic` tokens via `haptics().perform(...)`; no direct
   vibrator or `HapticFeedbackType` calls in the app, and no new haptics without agreeing them.
 - **Page changes** (2026-11-21, revised): `:motion` `PageSpring` (`pageSpringFling`, `springToPage`,
