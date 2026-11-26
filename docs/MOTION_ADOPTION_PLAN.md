@@ -12,8 +12,8 @@ This plan turns the Motion direction recorded in [PLAN.md](PLAN.md) into a pract
 | Motion submodule | `motion/` currently points to `25ffa862f503b482ed98671cd5eab66040f0d75f` |
 | Motion integration | Already included through `includeBuild("motion")` and dependency substitution in `settings.gradle.kts` |
 | Submodule URL | `.gitmodules` still uses the former `INFORMATION89/Motion.git` URL; the canonical repository is `INFORMATION89/Motion-UI` |
-| Motion work under review | PR #4, branch `work/consolidated-docs-platforms`, head `2c53e7f4a3f049e64a324261d4c3d60106b5846c` |
-| Motion CI | GitHub Actions run `45731824540` passed Spotless, unit tests, and library build for that exact PR head |
+| Motion work under review | PR #4, branch `work/consolidated-docs-platforms`, current head `e4904c11d806984f8813e9ee37ee7fa935f91d4a` (includes the latest framework-boundary documentation) |
+| Motion CI | Run `45731824540` passed Spotless, unit tests, and library build for the earlier head `2c53e7f`. A fresh run, `45732526162`, is still running for current head `e4904c1`; verify it before adopting this revision |
 | Motion PR status | PR #4 is still open and draft; its remaining MOT0.1 MorphMotion reliability tests are a gate |
 | UI kit status | A separate `:motion-ui` Gradle module does not exist yet. It is a planned next layer, not something Solstice can import today |
 | Platform scope | Solstice and the current Motion artifact are Android/Jetpack Compose. iOS and desktop are future targets, not current support |
