@@ -1,5 +1,9 @@
 # Solstice: dated log
 
+> **Historical record:** this file preserves past decisions and implementation notes, including
+> superseded work involving external projects. References to removed plans, branches, modules, or
+> APIs below are archival context only, not active Solstice requirements or task instructions.
+
 Everything that happened, in order, moved out of PLAN.md on 2026-11-22 without changes. History only:
 the decisions in force are in [PLAN.md](PLAN.md). Add new entries at the end.
 

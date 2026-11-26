@@ -209,7 +209,7 @@ Meteorological processing supplied by an independent engine is a dependency cont
    built in, but "off until relevant": a local source (SMN, CDMX network, SGIRPC) appears only for
    places it covers, starts off, and is offered once ("Mexico City has a local network, use it?").
    Revisit plugins only if the source list grows a lot. **Decided 2026-11-23:** all built in, off
-   until relevant where needed (SOURCES.md).
+   until relevant where needed, based on the app's verified location coverage.
 6. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
 
 ## Solstice product research queue
@@ -256,8 +256,6 @@ Meteorological processing supplied by an independent engine is a dependency cont
 - `gradle.properties`: fork links filled in (`app.report_issue`, source, releases, install, privacy,
   GitHub org/repo/prefix).
 - `app/build.gradle.kts`: `profile` build type (release code, debug-signed, `.profile`) (2026-11-19).
-- `settings.gradle.kts`, `app/build.gradle.kts`, `gradle/libs.versions.toml`: Motion (`includeBuild`
-  of the `motion/` submodule since 2026-11-21) and the Haze dependency (2026-11-19).
 - `buildSrc/.../AndroidConfig.kt`: minimum Android 10 (2026-11-21).
 - Added: `res/values/strings_expressive.xml` (new strings kept out of upstream's `strings.xml`;
   English only so far).

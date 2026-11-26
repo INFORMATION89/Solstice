@@ -8,7 +8,7 @@
 Read root [AGENTS.md](../AGENTS.md), [RULES.md](RULES.md), [PLAN.md](PLAN.md),
 [ROADMAP.md](ROADMAP.md), and [AI_COST_POLICY.md](AI_COST_POLICY.md). Use this file only for the
 current app handoff. Dependency consumer boundaries are in [INTEGRATIONS.md](INTEGRATIONS.md);
-do not use Solstice plans to continue development of Motion-UI or Meridian-Engine.
+do not use Solstice plans to continue development of external dependencies.
 
 ## Current modernization PR
 
