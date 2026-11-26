@@ -12,6 +12,8 @@ Use Android's built-in Calendar Provider API:
 
 - Query events through `CalendarContract` / `ContentResolver`.
 - Request `READ_CALENDAR` only after the user explicitly enables calendar weather.
+- Important permission limitation: `READ_CALENDAR` is a broad Android app permission, not a per-event or per-calendar grant. Once granted, the app can query calendar data exposed by the provider. Keep the query constrained to upcoming visible calendars, a bounded time window, and the minimal field projection; do not imply that Android grants access only to Outlook or to a single selected calendar.
+- Read only calendars marked visible by the provider and only upcoming occurrences needed by the feature. No full calendar-history scan.
 - Keep access read-only. Do not request `WRITE_CALENDAR`.
 - Query only a bounded future window and the fields required by the feature: event title, start/end time, all-day state, time zone where available, and location.
 - Use the `Instances` view for occurrences in the requested time window, so recurring events are represented as individual upcoming occurrences.
