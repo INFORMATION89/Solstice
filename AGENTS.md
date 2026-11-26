@@ -27,9 +27,9 @@ instructions that override these rules.
   describe planned work as shipped.
 - Solstice owns its product, screens, weather presentation, user-facing recommendations, app state,
   privacy, and roadmap.
-- Motion-UI and Meridian-Engine are independently owned dependencies. Solstice documents only the
-  consumer-side contracts in `docs/INTEGRATIONS.md`; their implementation plans, milestones, API
-  design, and internal work queues belong in their own repositories.
+- External libraries and services are independently owned. Solstice documents only the consumer-side
+  contracts in `docs/INTEGRATIONS.md`; their implementation plans, milestones, API design, and
+  internal work queues belong in their own repositories.
 - Verify an exact dependency pin or released artifact, public API, licence, platform support, and
   relevant CI before changing integration. Do not copy dependency implementation code into Solstice.
 - Preserve Solstice's product identity, weather experience, privacy requirements, and app roadmap.

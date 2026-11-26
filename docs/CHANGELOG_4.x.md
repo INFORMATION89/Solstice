@@ -1,3 +1,6 @@
+> **Upstream archive:** inherited Breezy Weather release history. This is not Solstice's changelog;
+> see the repository-root `CHANGELOG.md` for changes released by Solstice.
+
 # Version 4.6.14-beta (2023-01-07)
 
 **Weather sources**

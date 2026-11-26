@@ -19,10 +19,10 @@ Read specialist references only as needed: [DESIGN.md](docs/DESIGN.md), [MOTION.
 [WRITING.md](docs/WRITING.md), [UI_SYSTEMS.md](docs/UI_SYSTEMS.md), [PROPOSALS.md](docs/PROPOSALS.md),
 [INTEGRATIONS.md](docs/INTEGRATIONS.md), or a Solstice-owned feature specification.
 
-Motion-UI and Meridian-Engine are independent dependencies. Their implementation plans, internal
+External libraries and services are independently owned. Their implementation plans, internal
 milestones, labs, and technical decisions belong in their own repositories. Solstice's consumer-side
-boundary is documented only in [INTEGRATIONS.md](INTEGRATIONS.md).
+boundary is documented only in [INTEGRATIONS.md](docs/INTEGRATIONS.md).
 
-Claude-specific instructions do not override [AGENTS.md](../AGENTS.md), [RULES.md](RULES.md), or
-[AI_COST_POLICY.md](AI_COST_POLICY.md). Never push upstream Git history into this repository; never
+Claude-specific instructions do not override [AGENTS.md](AGENTS.md), [RULES.md](docs/RULES.md), or
+[AI_COST_POLICY.md](docs/AI_COST_POLICY.md). Never push upstream Git history into this repository; never
 build with `-Pbreezy`.
