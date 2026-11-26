@@ -18,15 +18,17 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [x] Compare Meridian-Engine's current master plan with Solstice's historical Meridian notes.
 - [x] Record that Meridian remains at the MER-0.1 evidence/owner-review gate; do not describe the production engine, stack, API, or integration as complete.
 - [x] Enable Gradle's local build cache in `gradle.properties`.
+- [x] Consolidate formatting, Motion unit tests, Debug assembly, and optional main-branch Profile assembly into a single Gradle invocation/task graph.
+- [x] Add workflow concurrency cancellation so newer runs for the same PR/branch supersede obsolete runs.
 - [x] Consolidate debug and main-branch Profile builds into one Gradle workspace; split publication into a least-privilege job.
 - [x] Scope signing secrets to main-only steps rather than the general build job, which also runs for pull requests.
 - [x] Restrict temporary signing-file permissions with `umask 077`.
 - [x] Pin artifact actions to verified immutable commit SHAs: upload-artifact v7.0.2 and download-artifact v8.0.2; both are official signed releases.
-- [ ] Verify the final PR head SHA and inspect every GitHub Actions job and its logs. Latest inspected run: #239 (`45778503796`) on head `6dfc5e1c82ccf0c976c85fc5fd84cac51880f814`; Spotless and Motion unit tests passed; the combined Debug/optional Profile assemble was in progress at last inspection.
+- [ ] Verify the final PR head SHA and inspect every GitHub Actions job and its logs after the single-invocation/concurrency change. Recheck checkout of the canonical Motion submodule URL and exact artifact paths.
 - [ ] Verify the main-branch Profile APK is produced, downloaded, signed, named, and published as the expected testing pre-release.
 - [ ] Verify fork and ordinary pull-request runs receive no signing secrets and cannot access release-write permissions.
 - [ ] Validate workflow YAML, job outputs/conditions, artifact paths, pinned action references, and permissions.
-- [ ] Compare baseline and candidate CI runs on comparable runner/toolchain/cache conditions. Record wall-clock duration, job durations, cache hit/miss, and runner minutes where available.
+- [ ] Compare baseline and candidate CI runs on comparable runner/toolchain/cache conditions. Record wall-clock duration, job durations, cache hit/miss, and runner minutes where available. Existing run #239 (before single-invocation/concurrency changes) is a candidate baseline only if its final timing and job outcomes can be retrieved.
 - [ ] Do not claim a time or cost saving until comparable measurements support it.
 - [ ] Obtain focused independent review of the workflow/security diff. **Opus review recommended** because CI credentials and release permissions are involved; this does not block implementation or replace tests/owner authorization.
 
@@ -157,6 +159,7 @@ These are concrete audit leads, not a substitute for the full review:
 - `docs/MOTION_ADOPTION_PLAN.md` has been refreshed: Motion PR #4 is merged, PR #7 remains Draft with a Spotless failure, the submodule is still pinned to the pre-MOT0.1 base commit, and `:motion-ui` is not present.
 - `docs/UI_SYSTEMS.md` identifies itself as a 2026-11-19 research snapshot and says listed work is not built; refresh its inventory against current code before using it to assign implementation work.
 - The current Gradle Wrapper is 9.9.1, JDK is pinned to 21, `gradle/actions/setup-gradle` is already in use, and local Gradle build caching was disabled before this modernization branch. These facts should be rechecked on the final PR head.
+- The current workflow groups Spotless, Motion unit tests, Debug assembly, and optional main-only Profile assembly in one Gradle invocation, and cancels obsolete runs for the same PR/branch. This is a design-level optimization; measured savings remain unknown.
 - The CI refactor now scopes signing-secret access to main-only steps, pins artifact actions, and combines variant assembly in one Gradle invocation. Latest inspected run #239 passed Spotless and Motion unit tests; assembly remained in progress. Final artifact/publication checks and comparable timing measurements remain pending.
 
 ## 8. Explicit non-goals
