@@ -6,6 +6,8 @@ The shared [AI Usage and Cost Policy](https://github.com/INFORMATION89/Motion-UI
 
 The active documentation and CI audit is tracked in [MODERNIZATION_CHECKLIST.md](MODERNIZATION_CHECKLIST.md). The privacy evidence inventory is [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md); it is an internal technical audit, not the public notice. Start with the checklist before selecting the next modernization task.
 
+**Latest verified update (2026-11-26):** PR #14 remains Draft. Exact-head CI run #269 passed on `ed50741818faf44e892ca5b658091fb1e1d12d6c`, including the expanded unit-test task graph and the new 17-case diff-based no-hardcoding guard. The scanner is heuristic and manual review remains required. Do not merge until the outstanding privacy/public-notice, documentation reconciliation, independent CI/security review, and release-path gates are resolved or explicitly deferred with owner approval.
+
 ## Next session: Saturday 2026-11-28, 1:00 AM (planned in chat 2026-11-22)
 
 Theme: **guardrails and the start of Motion as the UI framework.** Nothing on screen should change

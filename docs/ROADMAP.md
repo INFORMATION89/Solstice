@@ -1,8 +1,8 @@
 # Solstice roadmap
 
-Everything still to do, sorted by area of the app and by type. `PLAN.md` keeps the decisions and the
-dated log; this file is the to-do list. Keep it updated: tick items off (or delete them) when they
-ship, and add new notes under the right area.
+**Status (2026-11-26):** This file is a mixed historical backlog, not a verified live sprint board. Its dated session headings record what was planned or checked at the time; they are not current schedules. Completed items may remain checked as historical evidence, and unchecked items must be revalidated against source, current product decisions, and the modernization checklist before implementation. The current documentation/CI audit is tracked in [MODERNIZATION_CHECKLIST.md](MODERNIZATION_CHECKLIST.md); authoritative decisions remain in [PLAN.md](PLAN.md), and cross-repository gates are recorded there.
+
+Everything is grouped by area and type. Keep the roadmap focused on work still relevant to the app; remove or archive obsolete items only after checking the current source and approved decisions.
 
 - **Functionality:** something new the app can do.
 - **Fix:** something broken or wrong.

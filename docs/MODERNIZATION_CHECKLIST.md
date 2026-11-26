@@ -114,9 +114,9 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [ ] Consider a custom container image only after proving it includes the required Android toolchain, is pinned by digest, is maintained, and improves measured end-to-end cost/time.
 - [ ] Verify cache keys and restore behavior for Gradle wrapper distributions, dependencies, transforms, and build outputs; never cache secrets or signing material.
 - [x] Add app and library unit-test tasks (`:app:testBasicDebugUnitTest`, `:weather-unit:testDebugUnitTest`, and `:maps-utils:testDebugUnitTest`) to the combined Gradle invocation; exact-head CI verification is pending.
-- [ ] Verify the newly added app/library unit-test tasks pass on the exact PR head. Run #267 exposed six pre-existing `weather-unit` JVM test failures caused by tests entering Android ICU APIs from the local JVM; make those tests explicitly exercise the deterministic Java formatting fallback, then rerun the full task graph.
-- [x] Implement a deterministic diff-based no-hardcoding guard for added production Kotlin lines, with built-in self-tests and reviewed allowlist support; exact-head CI verification pending.
-- [ ] Verify the no-hardcoding self-test and required Build step on the exact PR head; inspect findings for false positives and document scanner limits.
+- [x] Verify the expanded app/library unit-test tasks on exact PR head `230a692d19e7b9081ad0dff9708c02b1795242c2`: run #268 passed after the affected `weather-unit` tests explicitly selected the deterministic Java formatting fallback. Android ICU-specific behavior remains an instrumentation-test follow-up.
+- [x] Implement a deterministic diff-based no-hardcoding guard for added production Kotlin lines, with 17 built-in self-tests and reviewed allowlist support; exact-head CI run #269 passed.
+- [x] Verify the no-hardcoding self-test and required Build step on exact PR head `ed50741818faf44e892ca5b658091fb1e1d12d6c`: run #269 passed; all 17 self-test cases passed and the diff scan found no guarded literals. The scanner's heuristic scope and exclusions are documented.
 - [ ] Record cold and warm build measurements, cache hits, runner minutes, artifact size, and CI failure/retry rates where available.
 - [ ] Ensure a failed required check blocks merge; rerun only failed jobs after inspecting the cause.
 - [x] Verify active GitHub ruleset `Protect main` targets `refs/heads/main`, requires the `build` status check, requires PRs, requires review-thread resolution, blocks force pushes/deletion, and has no bypass actors.
@@ -143,8 +143,8 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [ ] Compare every factual status claim against the relevant repository's current main/branch/PR/CI evidence.
 - [ ] Review the final diff for contradictory, duplicated, speculative, or stale instructions.
 - [ ] Run documentation-only validation without wasting a full Android matrix.
-- [x] Run the appropriate workflow checks for build/Gradle/CI changes: final exact-head run #250 completed successfully.
-- [x] Inspect exact PR head SHA and CI run SHA before accepting green checks: PR head `872c7a4450bcc93e899f0a970053f87d67d3cd0b` matches successful run #262 (`45782022879`).
+- [x] Run the appropriate workflow checks for build/Gradle/CI changes: exact-head run #269 completed successfully after adding the no-hardcoding guard.
+- [x] Inspect exact PR head SHA and CI run SHA before accepting green checks: PR head `ed50741818faf44e892ca5b658091fb1e1d12d6c` matches successful run #269 (`45786536059`).
 - [ ] Mark Pixel/physical-device checks NOT TESTED or DEFERRED unless actually performed.
 - [ ] Obtain independent Opus review of CI credentials/release permissions. **Opus review recommended**; not performed in this pass and no paid usage authorized.
 - [ ] Update PLAN only for changed decisions, LOG for dated history, ROADMAP for task status, and CONTINUE for the next actionable handoff.
