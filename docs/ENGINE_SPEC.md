@@ -1,5 +1,8 @@
 # Meridian, the weather engine: spec
 
+> **Historical Solstice-side reference — 2026-11-26.** This document is an earlier draft/proposal, not the current implementation specification or architecture authority for Meridian. The active project is [INFORMATION89/Meridian-Engine](https://github.com/INFORMATION89/Meridian-Engine); its [current master plan](https://github.com/INFORMATION89/Meridian-Engine/blob/main/PLAN.md) governs production language, platform targets, storage, public API, distribution, milestones, and acceptance gates. In particular, older KMP, Room, Flow API, and submodule assumptions below remain proposals unless Meridian-Engine explicitly adopts them. Keep this file only as historical product/meteorological research to reconcile through Meridian's documented gates.
+
+
 Status: **draft for Marco** (2026-11-23). Clean room step 1 (RULES.md section 5): written in our own
 words from public sources only (list at the end). The build session works from this file, never from
 Breezy's code. Design background: SOURCES.md. Decisions: PLAN.md, "Weather engine". Libraries, modules, sources' terms, methods and
