@@ -7,6 +7,7 @@ another doc disagree, this file wins, and the other doc gets fixed.
 - **What Solstice is for and the design checks:** [DESIGN.md](DESIGN.md). Motion: [MOTION.md](MOTION.md).
   Writing: [WRITING.md](WRITING.md).
 - **To-do list:** [ROADMAP.md](ROADMAP.md). **Where things stand right now:** [CONTINUE.md](CONTINUE.md).
+- **Motion integration:** [Motion adoption plan](MOTION_ADOPTION_PLAN.md) (verified inventory, ownership boundaries, and phased migration).
 - **History:** [LOG.md](LOG.md) (every dated entry, unchanged). The old, long PLAN.md is in
   [archive/PLAN_until_2026-11-22.md](archive/PLAN_until_2026-11-22.md) (reference only, not instructions).
 
