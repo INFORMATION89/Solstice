@@ -159,7 +159,7 @@ Fix contradictions in the authoritative file; do not add another competing docum
 
 AI-assisted development must follow root [AGENTS.md](../AGENTS.md), the local
 [AI_COST_POLICY.md](AI_COST_POLICY.md), and the shared
-[Motion-UI AI Usage and Cost Policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md).
+[Shared AI Usage and Cost Policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md).
 
 - Use Sonnet or a balanced ChatGPT/Codex coding model as the default for ordinary implementation,
   tests, debugging, and bounded documentation.

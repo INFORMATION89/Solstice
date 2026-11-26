@@ -7,7 +7,6 @@ another doc disagree, this file wins, and the other doc gets fixed.
 - **What Solstice is for and the design checks:** [DESIGN.md](DESIGN.md). Motion: [MOTION.md](MOTION.md).
   Writing: [WRITING.md](WRITING.md).
 - **To-do list:** [ROADMAP.md](ROADMAP.md). **Where things stand right now:** [CONTINUE.md](CONTINUE.md).
-- **External dependency contracts:** [INTEGRATIONS.md](INTEGRATIONS.md). This file records only what Solstice consumes and the app-owned responsibilities; dependency implementation plans live in their own repositories.
 - **Documentation/CI audit:** [MODERNIZATION_CHECKLIST.md](MODERNIZATION_CHECKLIST.md) (active checklist; tracking only, not a product-decision authority).
 - **Privacy evidence:** [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md) is an internal code/data-flow audit, not the public privacy policy; the public notice remains under review.
 - **History:** [LOG.md](LOG.md) (every dated entry, unchanged). The old, long PLAN.md is in
@@ -71,7 +70,6 @@ logs, session notes or build reports here.
 | Upstream sync | Patch-based (CONTINUE.md); edits to upstream files kept small and listed below |
 | Weather sources | Worldwide + North America; AccuWeather disabled for now; current-location name from Android's geocoder |
 | Widgets | Upstream's for now; Solstice widgets later |
-| UI/motion dependencies | External libraries are consumed through reviewed, pinned integration points; see [INTEGRATIONS.md](INTEGRATIONS.md). Solstice owns its UI, styling, and behavior. |
 
 ### Look and feel
 | Topic | Decision |
@@ -88,12 +86,10 @@ logs, session notes or build reports here.
 ### App interaction ownership
 - Solstice owns its interaction design, toolbar, page transitions, cards, sheets, accessibility
   behavior, reduced-motion experience, haptics policy, and design tokens.
-- Reusable dependencies may provide generic mechanics. They do not define Solstice's product layout,
-  visual identity, content, navigation policy, or feature roadmap.
-- Keep the current animated toolbar and its bud as Solstice product behavior; integration of generic
-  primitives must not remove or redesign it without an explicit product decision.
-- Detailed app motion principles are in [MOTION.md](MOTION.md); dependency contracts are in
-  [INTEGRATIONS.md](INTEGRATIONS.md).
+- Keep the current animated toolbar and its bud as Solstice product behavior; do not remove or redesign
+  them without an explicit product decision.
+- Keep page movement, sheet behavior, touch feedback, and content transitions consistent across the app.
+- Detailed app motion principles are in [MOTION.md](MOTION.md).
 ### Places and travel (decided 2026-11-22)
 - **Home is your current location** by default. Without location access, onboarding asks you to
   choose a place, which becomes home. Using a fixed place instead lives in Settings › Locations.
@@ -145,10 +141,8 @@ Values follow the unit settings; a card is skipped when the source has no data f
 - **Accessibility:** follows Android's "Time to take action" timeout; a message with an action waits
   until dismissed when TalkBack is on.
 
-### Weather data and consumer responsibilities
-Solstice remains a weather application. It owns the app experience built around weather information: saved places, permissions, refresh scheduling, settings, notifications, source presentation, user consent, and the practical recommendations shown to people. Clothing and footwear, umbrella and sunscreen advice, activity suggestions, outdoor planning, personal preferences, alert thresholds, cooldowns, wording, and delivery remain Solstice features.
-
-Meteorological processing supplied by an independent engine is a dependency contract, not an app-owned implementation roadmap. Solstice does not define another project's language, storage, networking, providers, forecast algorithms, release packaging, or milestones. See [INTEGRATIONS.md](INTEGRATIONS.md) for the consumer boundary only.
+### Solstice weather experience
+Solstice owns the app experience built around weather information: saved places, permissions, refresh scheduling, settings, notifications, source presentation, user consent, and the practical recommendations shown to people. Clothing and footwear, umbrella and sunscreen advice, activity suggestions, outdoor planning, personal preferences, alert thresholds, cooldowns, wording, and delivery are Solstice features.
 
 
 ### Rain and alerts (decided 2026-11-22)
@@ -164,15 +158,14 @@ Meteorological processing supplied by an independent engine is a dependency cont
 - Store-facing text (name, description, About) written like a real product.
 - Solstice keeps its data/provider and upstream-derived implementation details behind app-facing
   boundaries, and progressively replaces inherited UI, settings, and widgets with its own product
-  experience. Preserve all applicable upstream and third-party notices; do not transplant inherited
-  app code into independent dependencies.
+  experience. Preserve all applicable upstream copyright, licence, and third-party notices.
 
 ### App interaction principles (full rules: MOTION.md)
 - Interactions should respond promptly, remain interruptible, and never swallow unrelated input.
 - Surfaces should retain a clear visual relationship to the control or content that opened them.
 - The Solstice toolbar and its bud animation remain app-owned product behavior.
 - Keep haptics, blur, glass, page movement, and reduced-motion behavior consistent with Solstice's
-  design decisions. Use dependency APIs only where they are already available at the pinned version.
+  design decisions.
 
 ### Content
 - **Summaries:** one question per summary, the top 1–2 facts from a priority list, nothing extra when
@@ -191,7 +184,7 @@ Meteorological processing supplied by an independent engine is a dependency cont
 
 ### Settings and navigation
 - Settings on Navigation 3 (N1 done; N2 one stack and N3 adaptive still to do).
-- Reordering with the Reorderable library; M3 controls everywhere except the toolbar and postcards.
+- Reordering for app-managed lists; M3 controls everywhere except the toolbar and postcards.
 
 ## Open questions (to settle with Marco)
 

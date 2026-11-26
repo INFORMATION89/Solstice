@@ -1,6 +1,6 @@
 # Solstice roadmap
 
-**Status (2026-11-26):** This is Solstice's application backlog, not a schedule or a work queue for external dependencies. Dated session headings are historical, not current commitments. Revalidate unchecked items against current app source and approved product decisions before implementation. Documentation/CI work is tracked in [MODERNIZATION_CHECKLIST.md](MODERNIZATION_CHECKLIST.md); product decisions remain in [PLAN.md](PLAN.md). Consumer-side dependency boundaries are documented separately in [INTEGRATIONS.md](INTEGRATIONS.md).
+**Status (2026-11-26):** This is Solstice's application backlog, not a session schedule. Dated session notes are historical, not current commitments. Revalidate unchecked items against current app source and approved product decisions before implementation. Documentation/CI work is tracked in [MODERNIZATION_CHECKLIST.md](MODERNIZATION_CHECKLIST.md); product decisions remain in [PLAN.md](PLAN.md).
 
 Everything is grouped by area and type. Keep the roadmap focused on work still relevant to the app; remove or archive obsolete items only after checking the current source and approved decisions.
 
@@ -10,51 +10,6 @@ Everything is grouped by area and type. Keep the roadmap focused on work still r
 - 🗓 = scheduled · ⭐ = high priority · 💬 = needs your OK (a design or motion proposal) before building.
 
 ---
-
-## 🗓 Scheduled for today, 7:30 AM (2026-11-19)
-
-Built 2026-11-19 morning; not yet checked on the Pixel (it wasn't connected).
-
-
-- [x] ⭐ **TOP PRIORITY · Fix · Moon:** the rotation still rocks back and forth. Smooth it with a
-  heavy ease so the motion isn't jerky.
-- [x] ⭐ **TOP PRIORITY · Fix · Moon:** when you flick the dial, the moon should ignore some of the
-  movement so it doesn't turn too much.
-- [x] **Refinement · Search:** with the keyboard collapsed, swiping up and hitting the top opens the
-  keyboard.
-- [x] **Functionality · Forecast:** show the local time on the main screen when the starred place
-  is in a different time zone from you.
-- [x] **Refinement · Places:** make the star (stamp) on the current location's strip red too.
-- [x] **Refinement · Places:** make the current location's weather icon and temperature red too.
-- [x] **Refinement · Precipitation:** refine the rain card (reference:
-  `docs/references/rain-next-hour.png`, minute bars with Now · 10m · 20m … 50m under them). Take
-  the layout as inspiration only: no marker lines for the rain, and rounder shapes like the rest
-  of the app.
-  - add the times under the bars, a gradient, and the amount of rain;
-  - a switch between probability and amount;
-  - wording: "Light rain expected in the next hour" / "Heavy rain expected in 15 minutes".
-- [x] **Refinement · Forecast:** when precipitation is within the next hour, the rain card's
-  background turns light blue. Once it's actually raining, the sky changes to its rain state.
-- [x] Commit and push.
-
-## 🗓 Scheduled for Friday
-
-- [ ] **Fix · Places:** dragging a card that's partly out of view breaks the drag.
-- [ ] **Fix · Places:** dragging a card to the edge of the screen doesn't scroll the list.
-- [x] **Fix · Moon:** the moon card doesn't open when you're visiting a place.
-
-## 🗓 6 AM session (2026-11-21): new morph refining, research, plans
-
-Historical session note. Revalidate remaining Solstice-owned interaction issues against the current
-app source and the app-specific motion principles before adding them to the active backlog.
-
-## 🗓 Next week: interactive glass (backlog, added 2026-11-22)
-
-Possible Solstice glass-interaction refinement (not approved for implementation): press swell and
-springy release; a touch light that follows the finger; a subtle hold response; elastic stretch near
-the edge; a release ripple; and adjacent glass controls sharing a surface. Any approved version must
-preserve responsive input, accessibility, and reduced-motion behavior. Implementation remains in the
-Solstice app and must not require changes to an external dependency.
 
 ## 🐞 Review 2026-11-22: bugs, fixes and what to rebuild (from chat; details per item below)
 
@@ -67,21 +22,23 @@ approved Solstice UI refinements. Each visible change still follows RULES.md.
   line with a typed-in " · ", postcard caption in capitals without the clock, search). Fix: one
   Solstice-owned place-time component (variants), shown whenever the time differs; "Visiting" only for
   previews; separator as a string.
-- [ ] **B2 · Rain card at 0 %, noisy rain notifications** (`RainCard.kt` `rainOutlook`: any trace over
-  0.05 mm, or a "rain" code at 0 %; snow ignored; "10m"… typed in. Upstream `Weather.hasMinutelyPrecipitation`:
-  any radar reading > 0). Fix: one shared rule (PLAN.md "Rain and alerts") for card, notification
-  and Live Update, with a cooldown; unit tests from real AccuWeather data.
+- [ ] **B2 · Rain card at 0 %, noisy rain notifications** (`RainCard.kt` `rainOutlook`: trace values and
+  rain codes can produce a card at 0 %; snow is not handled consistently; time labels are typed in).
+  Fix: one shared rule (PLAN.md "Rain and alerts") for card, notification and Live Update, with a
+  cooldown; use deterministic fixtures from currently supported providers.
 - [ ] **B3 · Tapping after a swipe stops the tabs** (`PageSpring.kt`): the pager counts as scrolling
-  until the bounce settles, and Compose's pager swallows the tap that stops a scroll; `SpringMorph`
-  also takes any tap while opening. Fix: travel by scroll without overshoot, draw the bounce as an
-  offset; a "settled" threshold token; an app regression test for swipe-then-tap.
+  until the bounce settles, and the tap intended to select a tab is swallowed. Keep tab selection
+  responsive while the pager settles; draw the bounce as an offset rather than extra scroll distance,
+  and add an app regression test for swipe-then-tap.
 - [ ] **B4 · Jumping across the toolbar flashes Forecast** (`springToPage` scrolls through every page;
   `Toolbar.kt:157` blends the highlight colour from the scroll position). Fix the Solstice page-selection transition so direct tab jumps do not flash intermediate pages and
   the highlight follows the target. Replaces "tab tap speeds" and "a little spring on the edge-to-edge jump" below.
-- [ ] **B5 · Blur text change too fast and distracting** (`BlurCrossfade.kt`: both texts blur at once on a
-  bouncy spring). App-side alternatives: A fade-through, B softer/slower blur, or C animate only changed digits. Review
-  the alternatives in Solstice before choosing.
+- [ ] **B5 · Text changes feel too blurred and distracting**: the old and new values become hard to
+  read during a content update. App-side alternatives: A fade-through, B softer/slower blur, or C animate
+  only changed digits. Review the alternatives in Solstice before choosing.
 
+- [ ] **B6 · Place drag near the viewport edge**: dragging a card that is partly out of view must continue to track the finger and settle on the intended position.
+- [ ] **B7 · Places edge auto-scroll**: dragging a card to the top or bottom edge must scroll the list predictably without losing the dragged item.
 ### Design fixes
 - [ ] **D1 · This week's text:** drop "through the week", "all week", "this week" from its summary lines
   (`strings_expressive.xml` `week_*`).
@@ -101,8 +58,8 @@ approved Solstice UI refinements. Each visible change still follows RULES.md.
   conditions on the design canvas first).
 - [ ] **Q2 · Professional feel** (PLAN.md): Advanced section for Data sharing, Gadgetbridge, Debug;
   Settings reshaped; README and docs rewritten; store text, name and About.
-- [ ] **Q3 · Breezy behind an interface:** a Solstice data interface over Breezy's sources and data;
-  replace upstream's UI, settings and widgets.
+- [ ] **Q3 · Replace inherited app behavior within Solstice:** keep weather-source access behind app-facing
+  interfaces, and progressively replace inherited screens, settings, and widgets with Solstice's own UX.
 - [ ] **Places model** (PLAN.md "Places and travel"): current location as home, no star, automatic
   travel swap with "Home" in Places, search preview with Cancel / Add, onboarding place choice.
 
@@ -116,15 +73,11 @@ approved Solstice UI refinements. Each visible change still follows RULES.md.
 | Rain card with real rain; animate amount ↔ chance | Covered by B2 and the precipitation card backlog |
 | Precipitation element for This week | Part of R1 |
 | Toolbar label and page heading showing together | An app page-layout rule |
-| Places: dragging a card partly off screen; no scrolling at the edge | Not fixed yet: fix in Solstice's reorderable list behavior |
+| Places: dragging a card partly off screen; no scrolling at the edge | Tracked by B6 and B7 |
 | Reset Places' scroll when you leave | Small fix, or a page-frame option |
 | Search keeps "Puebla" | Separate re-test |
-| "Last updated" and refresh on start | Already built; duplicate roadmap lines to remove |
+| "Last updated" and refresh on start | App implementation built; device verification remains listed above |
 | Swapping main and pinned when you travel | Decided: automatic swap (PLAN.md "Places and travel") |
-
-## Session planning
-
-Session scope and scheduling live in the app-only [CONTINUE.md](CONTINUE.md). This roadmap does not assign or schedule work for external projects.
 
 ## 💬 Proposals to bring to Marco (from chat 2026-11-22)
 
@@ -141,33 +94,31 @@ Session scope and scheduling live in the app-only [CONTINUE.md](CONTINUE.md). Th
   sun/moon path and time stay).
 - [ ] ⭐ **Moon card rework** as a Solstice-owned partial sheet.
 - [ ] 💬⭐ **Outlook** (This week renamed, decided 2026-11-23): propose its proactive answers (best weekend day
-  to go out, notable days ahead, good sky evenings); the day list stays. PLAN.md Direction 6.
+  to go out, notable days ahead, good sky evenings); the day list stays. PLAN.md Direction 4.
 - [ ] ⭐ **What to wear card** on Forecast, always shown, today by day and tomorrow from the evening switch.
 - [ ] ⭐ **Sun button and sun sheet** (decided 2026-11-23): a button in the hero like the moon's, opening a
   partial sheet with sunrise, sunset, daylight and UV. **UV first:** index number, next-hours timeline,
   what to do per level (WHO); the UV card opens it; card and button turn red at 8+ (plus icon or word).
 - [ ] ⭐ **One UV rule** shared by the UV card, the sun sheet and What to wear (sunscreen suggestion).
-- [ ] 💬 **Postcards in a standard look**, the physical feel kept in the interaction (Direction 3).
-- [ ] 💬⭐ **Proactive alerts the Gradient Weather way** (Direction 4): alerts you choose to watch, rain or
+- [ ] 💬 **Postcards in a standard look**, the physical feel kept in the interaction (Direction 2).
+- [ ] 💬⭐ **Proactive alerts the Gradient Weather way** (Direction 3): alerts you choose to watch, rain or
   snow countdown as a Live Update, cooldowns, official warnings in full, evening summary, what to wear.
 - [ ] 💬 Refine Solstice's interaction feel, reduced-motion behavior, and card materials (PLAN.md open questions).
-
-## ⭐ Next session priorities
-
-1. Rework what needs redoing and make everything consistent (spacing, materials, components).
-2. ~~The starred place folding into a compact version~~ (done 2026-11-19, "fold like paper").
-3. ~~The realistic moon~~ (done) and the small fixes below.
+- [ ] 💬 Optional interactive-glass response: restrained press swell, a finger-following highlight, a
+  subtle hold response, edge stretch, release ripple, or neighboring controls sharing one surface.
+  This is an unapproved idea; review the behavior and accessibility on Solstice before building it.
 
 ---
 
-## Foundations: systems and consistency
+## Solstice app foundations and consistency
 
 ### Functionality
 - [ ] ⭐ **Unify systems and components:** one toolbar, page scaffold, card, message and sheet,
   reused everywhere. Use well-maintained open-source libraries where they make the app lighter and
   faster.
-- [ ] **A reusable "move and transform into place" system** (morphs, for buttons too). Search for
-  libraries first. First use: a visited place's loading state (see Postcard window).
+- [ ] **Connected transitions for Solstice surfaces and controls:** define how a control expands into
+  its destination and how the visited-place loading state transforms into content. Keep the acceptance
+  criteria app-focused; implementation is chosen only when the app task is approved.
 - [x] Solstice motion tokens: `SolsticeMotion.kt` and `docs/MOTION.md` (2026-11-19), first used by the moon sheet.
 - [x] Apply the motion system to search, the postcard window, Places drag and the toolbar (2026-11-19).
 - [x] 💬⭐ **Design tokens:** spacing (4 dp grid), sizes, shapes with continuous corners, palette file,
@@ -175,9 +126,9 @@ Session scope and scheduling live in the app-only [CONTINUE.md](CONTINUE.md). Th
 - [x] 💬 **Haze prototype** for glass and edge blur, measured on the Pixel 7 against `Glass.kt`.
 - [x] **Component catalog** (first pass; one Sheet and PageScaffold come with in the initial pass): split `ShellPages.kt`; one Card / Sheet / Toolbar / Message / PageScaffold;
   `PlaceWindow` reuses them.
-- [x] Swap `ReorderList.kt` for the Reorderable library. Pushed screens to Navigation 3: decided, migration started (2026-11-19).
+- [x] Replace the initial custom list-reordering behavior with a reusable app implementation; move the relevant screens to Navigation 3 (migration started 2026-11-19).
 
-- [ ] **Design frameworks:** spacing scale, type scale, motion tokens, component rules.
+- [ ] **Solstice design system:** spacing scale, type scale, motion tokens, and app component rules.
 - [x] 💬⭐ **Icon style:** Material Symbols Rounded, one catalog (`SolsticeIcons`), old Material Icons
   removed (2026-11-19, PR #1). Check on the phone (CONTINUE.md).
 - [ ] **Fix:** frames drop opening the moon card and search. Decided: drop the page recede, re-measure,
@@ -188,32 +139,31 @@ Session scope and scheduling live in the app-only [CONTINUE.md](CONTINUE.md). Th
   "Solstice" launcher icon in test builds (CONTINUE.md 1C).
 
 - [x] **Minimum Android 10** (API 29), done 2026-11-21.
-- [ ] 💬⭐ **Morph and content refinements:** improve how app buttons become cards, how text changes
-  are introduced, and how numeric values update. Review the alternatives on the Solstice app before
-  implementation; no dependency or lab work is included.
+- [ ] 💬⭐ **Morph and content refinements:** improve how Solstice controls become app surfaces, how text
+  changes are introduced, and how numeric values update. Review alternatives in the app before implementation.
 
-- [ ] **"Last updated" and the weather source** at the bottom of Forecast (agreed 2026-11-21; CONTINUE.md "Right now").
-- [ ] **Refresh the main place on a cold start** (agreed 2026-11-21), then check the API cost with the user.
+- [ ] **Re-check the "Last updated" line and attribution** on a physical Android device.
+- [x] **Refresh the main place on a cold start** (built 2026-11-21; API-cost review recorded in CONTINUE.md).
 - [ ] **"Will I see it tonight?"** in the moon card (agreed 2026-11-21, with F5).
-- [ ] **Fix:** one toolbar for home and the postcard window (the window's This week title doesn't fold;
-  no page jump; missing hooks). Shared state + host, only configuration differs (CONTINUE.md 0b.3).
+- [x] **One toolbar for home and the postcard window** (shared app toolbar state; verified in the dated app history).
 - [x] 💬 **Solstice's opinion** (DESIGN.md, written with the user 2026-11-21).
-- [ ] 🔎 **Research:** refine the page-recede interaction within Solstice; long press alongside drag to reorder;
-  proactive channels (Live Updates, daily brief, clothing). PLAN.md "Research queue".
+- [ ] 🔎 **Research:** long press alongside drag to reorder; app-owned proactive channels (Live Updates,
+  daily brief, and clothing guidance).
 - [ ] **Design audits** (DESIGN.md): empty/loading/error/offline states everywhere; affordances vs behaviour;
   dead ends and links between information; landscape/foldable/tablet layouts; settings that shouldn't exist.
 - [ ] **Summary wording** (agreed table in CONTINUE.md "Right now").
-- [ ] **What the summaries say** (agreed 2026-11-21, PLAN.md): priority-list engine (one question per
+- [ ] **What the summaries say** (agreed 2026-11-21, PLAN.md): priority-based selection (one question per
   summary, top 1–2 facts, nothing extra when nothing is useful); Forecast evening switch at 6 PM, adjustable;
-  compare with yesterday if sources allow; This week trend and weekend; "precipitation" when snow is possible.
+  compare with yesterday if sources allow; Outlook trend and weekend; "precipitation" when snow is possible.
 - [ ] 💬 **Onboarding helps configure the app** (where you are, source, when your evening starts, …): steps to
   propose to the user.
 - [x] 💬 **Moon card redesign** designed in chat: direction A with changes (2026-11-21).
-- [ ] ⭐ **Foundations for it** (PLAN.md): ~~F1 haptics system~~ (built 2026-11-21), ~~F2 edge blur generalized~~ (built 2026-11-21), ~~F3 dial~~ (built 2026-11-21), ~~F4 sky effects~~ (built 2026-11-21) — **F5 (the moon card itself) on hold until the user says go** (2026-11-21)
-  (stars, twinkle ready but off, ready for weather effects), then F5 the moon card.
+- [x] **Moon-card foundations:** haptics, generalized edge blur, dial, sky effects, and the initial
+  moon-card experience were built during 2026-11-21. Any new moon-card design change is tracked as a
+  separate app-side proposal and requires approval.
 - [ ] 💬 **Twinkling stars** (built with F4, switched on only once agreed).
 - [x] **Moon icon on the Forecast diagram follows the moon's real tilt** (done 2026-11-21, `MoonSky`; not yet seen on the phone).
-- [ ] 💬 **Very subtle toolbar haptics**, once F1's haptics system exists.
+- [ ] 💬 **Very subtle toolbar haptics**, only if approved after the app's existing haptics are checked on device.
 - [x] **Fix:** taps blocked while a tab transition plays (done 2026-11-21: page changes no longer block taps; closing sheets also let taps through).
 - [x] **Fix:** the postcard window's pages lack home's blur between tabs (done 2026-11-21: `ShellNavigation`, shared with home).
 - [ ] **Icons vs M3** (PLAN.md "Icons", gaps 1–4): grade -25 for light icons on dark backgrounds; selected
@@ -226,19 +176,16 @@ Session scope and scheduling live in the app-only [CONTINUE.md](CONTINUE.md). Th
   including the moon button.
 - [ ] Look at how Android 17 blurs (live, cheap) and move glass and edge blur onto it.
 - [ ] Review the design against Apple's Human Interface Guidelines.
-- [ ] **Never a plain fade-in:** things morph into other things. Applies to every new motion.
+- [ ] **Prefer connected surface transitions:** use a morph when a control grows into a related surface;
+  use a clear fade/crossfade when it improves content clarity or reduced-motion behavior.
 
 ---
 
 ## Toolbar and navigation
 
-### Fix
-- [ ] **Tab tap speeds:** tapping the next tab still looks faster than the edge-to-edge jump. Use the
-  average of the two speeds for both (icon taps only; swipes stay as they are).
-
 ### Refinement
 - [x] Toolbar labels centred in their tabs (2026-11-19).
-- [ ] A little spring on the edge-to-edge jump.
+- [ ] A consistent, app-approved transition for direct tab jumps (tracked by B4).
 - [ ] A slight gradient on toolbar buttons: lighter on top, darker at the bottom, derived from each
   button's own colour.
 - [ ] Long pages: the toolbar label and the page heading never show at the same time (decide the
@@ -250,8 +197,8 @@ Session scope and scheduling live in the app-only [CONTINUE.md](CONTINUE.md). Th
 ## Forecast screen
 
 ### Functionality
-- [ ] **Last updated time** for the weather data.
-- [ ] **Refresh weather** when opening a place and when the app first opens.
+- [x] **Last updated time** for the weather data (built; verify presentation on device).
+- [ ] **Refresh behavior when opening a place**: confirm freshness and avoid unnecessary requests; the main-place cold-start path is tracked above.
 - [ ] **Feels-like everywhere the data has it** (hourly, This week), not only the main temperature.
 - [ ] Edit the Forecast blocks in place, like Pixel Weather.
 - [ ] Weather effects (rain, thunder, snow) on the sky.
@@ -273,7 +220,7 @@ Session scope and scheduling live in the app-only [CONTINUE.md](CONTINUE.md). Th
 ## Precipitation (Forecast)
 
 ### Fix
-- [ ] Check the rain card with real rain (redesigned 2026-11-19, not yet seen).
+- [ ] Check the rain card with real precipitation using a currently supported source (redesigned 2026-11-19, not yet seen).
 - [ ] 💬 **For later:** animate the change between amount and probability (propose first).
 - [x] Switch icons (raindrop, percent), probability shown as hourly pills with percentages, no resizing when switching (2026-11-19).
 
@@ -374,7 +321,7 @@ Session scope and scheduling live in the app-only [CONTINUE.md](CONTINUE.md). Th
 
 ## Writing
 
-- [ ] 🗓 **Writing session for the conditional texts** (tomorrow): fill in `docs/WRITING.md`.
+- [ ] Review conditional weather-summary wording against the current Solstice writing principles in `docs/WRITING.md`.
 
 ## Developer tools
 
@@ -389,8 +336,6 @@ Session scope and scheduling live in the app-only [CONTINUE.md](CONTINUE.md). Th
 
 ## Release
 
-- [ ] Replace inherited `PRIVACY.md` only after the technical evidence in `docs/PRIVACY_DATA_MAP.md` is complete and the final wording is reviewed.
-- [ ] Merge the Solstice-specific install, help, contribution, and third-party integration guides from PR #14 after exact-head CI and review.
-- [ ] Re-check a protected-main Profile build and testing-release publication end to end.
+- [ ] Replace inherited `PRIVACY.md` only after the technical evidence in `docs/PRIVACY_DATA_MAP.md` is complete and the final wording is reviewed. Detailed audit and release gates are tracked in `MODERNIZATION_CHECKLIST.md`.
 - [ ] Tablets: rotation and layout.
 - [ ] App icon: the softer, rounder icon search.

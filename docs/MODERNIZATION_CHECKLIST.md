@@ -23,17 +23,17 @@ successful build, or unperformed specialist review does not count as completion.
 - [x] Add Solstice-specific `docs/AI_COST_POLICY.md` and link the shared AI-use policy.
 - [x] Establish one authority per subject: PLAN, RULES, ROADMAP, LOG, CONTINUE, app design references,
   integration boundary, and privacy evidence map.
-- [ ] Keep PLAN and ROADMAP exclusively about the Solstice product, app code, and app work.
-- [ ] Keep CONTINUE limited to the current Solstice session and next app-owned task.
+- [x] Keep PLAN and ROADMAP exclusively about the Solstice product, app code, and app work.
+- [x] Keep CONTINUE limited to the current Solstice session and next app-owned task.
 - [ ] Keep LOG chronological; historical entries are not current implementation instructions.
 - [x] Add `docs/INTEGRATIONS.md` as the only consumer-side dependency boundary document.
 - [x] Remove duplicate dependency roadmaps, lab plans, weather-engine specs, model-test plans, and
   internal milestone specs from the active Solstice documentation tree.
-- [ ] Search all active docs for broken links to removed files, stale instructions, and dependency
+- [x] Search all active docs for broken links to removed files, stale instructions, and dependency
   implementation work that was accidentally copied into the app plan.
 - [ ] Validate internal relative links and high-value external links after the final documentation
   diff.
-- [ ] Review the remaining app UX and research references for stale implementation claims.
+- [x] Review the remaining app UX and research references for stale implementation claims.
 - [ ] Confirm feels-like temperature remains a prominent useful metric while actual air temperature
   stays visible; don't describe feels-like as a personal measurement.
 - [ ] Ensure app proposals are visibly marked as proposals and are not mistaken for approved work.

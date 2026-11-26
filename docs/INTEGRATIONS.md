@@ -19,11 +19,10 @@ choices, and all product behavior. The existing animated toolbar is part of Sols
 must not be removed or redesigned as incidental dependency work.
 
 **Motion supplies:** generic, documented motion and interaction primitives, and only components
-that are actually present in the pinned version. Do not implement Motion's internal roadmap, create
-its lab, or develop its component kit from this repository. Do not assume an upstream PR or an
-unmerged API is available to Solstice. If a missing generic capability is worth sharing, request it
-in Motion-UI; track only the resulting Solstice-side adoption after a stable API is released and
-pinned.
+that are actually present in the pinned version. Solstice's consumer-side acceptance requires those
+primitives to remain interruptible and not swallow unrelated taps or gestures. If a generic capability
+or defect must change upstream, it is handled by that library's owner; Solstice records only its own
+workaround or later adoption of a stable, reviewed API. Do not assume an unmerged API is available.
 
 Do not assume a component, module, or API exists merely because it appears in an external proposal.
 Use only what is actually present in Solstice's exact pinned revision, and verify availability again
