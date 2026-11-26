@@ -72,6 +72,15 @@ class MeridianResult(
 Solstice converts these to its UI models in one place (a small bridge in the app), so the UI never
 depends on Meridian's types directly.
 
+## 4.1 Consumer recommendation boundary
+
+This plan describes how Solstice consumes Meridian; it does not make Solstice's product recommendations part of Meridian's engine contract.
+
+Meridian supplies meteorological facts, derived indicators, forecast probabilities, timing, uncertainty, provenance, and explanations. Solstice owns the practical layer: clothing and footwear suggestions, umbrella or sunscreen advice, activity and outdoor-planning recommendations, personalized routines, alert thresholds, notification wording, and presentation.
+
+Keep this logic in Solstice's domain/application layer. Do not add Solstice-specific recommendation models, user preference models, copy, or policies to Meridian. Solstice may change its advice without requiring Meridian to change its public API, provided the meteorological contract remains sufficient.
+
+
 ## 5. Sources
 
 ### Open-Meteo (forecast, models, spread, air quality, archives)
