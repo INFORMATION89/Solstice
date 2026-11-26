@@ -78,7 +78,7 @@ These features are distinct from remote telemetry and are enabled only for confi
 ### Location update notifier
 
 - Code: `app/src/main/kotlin/org/breezyweather/sources/breezyupdatenotifier/BreezyUpdateNotifierService.kt`.
-- Action: `\${applicationId}.ACTION_UPDATE_NOTIFIER`.
+- Action: `${applicationId}.ACTION_UPDATE_NOTIFIER`.
 - Configured receiver packages can receive updated and all saved location IDs. This notifier payload is not the full weather payload.
 
 ### Read-only weather ContentProvider
