@@ -112,5 +112,4 @@ squished while the container first stretches:
 
 ## Framework
 
-The plan to build these rules once, as a reusable `:motion` module, is in
-[PLAN.md](PLAN.md#motion-framework-proposed-2026-11-19-to-agree-before-building) (proposed 2026-11-19).
+`:motion` now exists as the reusable Android/Jetpack Compose core in the separate Motion-UI repository. Solstice consumes it through the `motion/` submodule, currently pinned to a pre-MOT0.1 commit; the pointer has intentionally not been advanced in PR #14. Motion Lab is now a separate `:motion-lab` app in Motion-UI (PR #7 merged). The planned reusable `:motion-ui` component kit is still absent. See [CONTINUE.md](CONTINUE.md#motion-submodule) and the current Motion-UI repository plan before changing integration.
