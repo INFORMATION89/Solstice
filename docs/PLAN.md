@@ -168,7 +168,7 @@ Values follow the unit settings; a card is skipped when the source has no data f
   planning, recommendation wording, user preferences, and alert/notification thresholds and
   cooldowns are Solstice features. Do not add these product policies or recommendation types to
   Meridian's core/API; build them in Solstice using Meridian's neutral weather data and event results.
-  See [Meridian ADR-0002](https://github.com/INFORMATION89/Meridian-Engine/blob/main/docs/decisions/ADR-0002-application-owned-recommendations.md).
+  See [Meridian ADR-0002](https://github.com/INFORMATION89/Meridian-Engine/blob/c7ad3a9928ecf2bc9ac7b4a26e45f47312d0108e/docs/decisions/ADR-0002-application-owned-recommendations.md).
 - **No Rainbow.ai** (Marco: signing up asks for a card even for free use). Next-hour rain is phased:
   Open-Meteo's 15-minute data and the blend first; our own radar nowcast later, where public radar
   exists (optical flow, as in pysteps and LibreWXR).
