@@ -1497,3 +1497,6 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 
 
 - **2026-11-26:** Replaced inherited `HELP.md` with Solstice-specific troubleshooting guidance based on current location, source, background-update, and app-sharing code paths. Removed stale Breezy-only launcher/release/forum/source claims and directed support requests to Solstice Issues. The privacy notice and permission disclosure strings remain under a separate, evidence-led review.
+
+
+- **2026-11-26:** Added `docs/PRIVACY_DATA_MAP.md` as an internal technical audit, separating active network/provider paths, local app-to-app sharing, the exported permission-protected weather provider, optional app-update requests, and outstanding evidence from the public privacy notice. It is not a public privacy policy or legal opinion. Root `PRIVACY.md` remains unchanged pending provider/SDK/retention and owner review.
