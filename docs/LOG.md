@@ -1489,3 +1489,8 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 
 
 - **2026-11-26:** Further optimized Solstice Actions to run Spotless, Motion unit tests, Debug assembly, and optional main-only Profile assembly in one Gradle invocation; added same-PR/branch concurrency cancellation. This is a design-level efficiency improvement inspired by Motion-UI's current CI approach; measured savings remain unknown until comparable runs finish.
+
+
+- **2026-11-26:** Modernized public project documentation: replaced inherited Breezy install and contribution guides with Solstice-specific flows; documented current app-to-app integrations with explicit third-party compatibility limits; clarified conditional testing-release publication in README. The inherited FAQ and privacy notice remain under audit rather than being rewritten without complete feature/data-flow evidence.
+- **2026-11-26:** Solstice CI run #250 (`45779511947`) passed on PR head `e0c14077f0c82c85aafe25142062d290e55eb667`: canonical submodule checkout, JDK 21, Gradle, one combined `spotlessCheck :motion:motion:testDebugUnitTest assembleBasicDebug` invocation, and Debug artifact upload. Profile signing and publishing were skipped as expected for a pull request.
+- **2026-11-26:** Initial CI timing comparison: runs #237 and #239 each took 224 seconds; run #250 took 192 seconds (32 seconds / 14.3% lower elapsed job time). The successful Gradle invocation reported 204 actionable tasks (184 executed, 18 from cache, 2 up-to-date). This is a small initial sample, not a guaranteed or invoice-level cost saving; continue tracking additional warm/cold runs. Gradle 10 incompatibility/deprecation warnings were observed and left as separate maintenance work.
