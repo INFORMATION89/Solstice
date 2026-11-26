@@ -155,3 +155,19 @@ instead of adding to them. Never push upstream's history; never build with `-Pbr
    secrets, keys or `local.properties`.
 3. A pull request says what changed and what was checked (section 9). Once CI exists, `main` is
    protected and merges need it to pass.
+
+
+## 12. AI tools, model selection and cost
+
+AI-assisted development must also follow the shared [AI Usage and Cost Policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md). It supplements these Solstice-specific rules; it does not override the requirement to agree on user-visible product and design changes.
+
+- Use the least costly model that can reliably complete the task. Routine documentation, extraction and mechanical edits use an efficient model; ordinary implementation and debugging use a balanced coding model; complex architecture, difficult debugging and high-risk reviews justify a stronger reasoning model.
+- ChatGPT Work/Codex subscription allowances and OpenAI API billing are separate. Do not estimate subscription usage from API token prices or assume access to a model or plan.
+- Use Claude Haiku-class models for bounded routine tasks, Sonnet-class models for normal engineering, and reserve Claude Opus 5.5 for complex architecture, long-running coding, difficult debugging, broad refactors or independent review where its additional capability materially reduces risk or rework.
+- Treat model choice as guidance, not a blocker: ChatGPT/Codex may begin and own the task. When a stronger independent pass would help, mark **“Opus review recommended”** and leave that review for a useful checkpoint or before merge. Do not wait for Opus before starting, and do not incur extra paid usage without approval; if the review is not performed, say so.
+- One primary agent owns each coherent task. Add a second agent only for an independent review or specialist contribution; do not duplicate repository exploration, implementation or full CI runs by default.
+- Keep context focused: inspect relevant files and diffs, avoid repeating large reads and logs, reuse evidence only for the same relevant commit, and maintain concise handoffs.
+- Stop agents that loop, repeat unchanged searches or tests, or expand scope without approval.
+- No new paid API, credits, subscription, paid tool, higher-cost tier or open-ended spend without explicit owner approval. Never silently switch from subscription usage to API billing.
+- Cost-aware verification must not weaken correctness, privacy, accessibility, security, regression coverage or required release checks. For the Pixel/device requirement in section 9, report honestly when a physical-device check is unavailable; a green CI run is not a phone check.
+- Report actual model/tool usage only when known. Never invent token counts or monetary costs.

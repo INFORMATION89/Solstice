@@ -3,6 +3,8 @@
 Where things stand and how to pick the work up anywhere. Read [RULES.md](RULES.md) first; decisions
 are in [PLAN.md](PLAN.md), history in [LOG.md](LOG.md).
 
+AI coding sessions must also follow the [shared AI usage and cost policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md), as referenced by RULES.md.
+
 ## Next session: Saturday 2026-11-28, 1:00 AM (planned in chat 2026-11-22)
 
 Theme: **guardrails and the start of Motion as the UI framework.** Nothing on screen should change
