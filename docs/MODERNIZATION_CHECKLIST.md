@@ -44,8 +44,8 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [x] Replace inherited `HELP.md` with Solstice-specific support guidance for locations, sources, network/weather errors, background updates, local app-to-app sharing, and privacy caveats; remove Breezy-only launcher, release, forum, and unsupported-source instructions.
 - [x] Review root `AGENTS.md` against actual repo layout, current PR workflow, mandatory reading order, and context-efficiency requirements.
 - [x] Review the top-level authority links and current Meridian integration gate in `docs/PLAN.md`; deeper product-decision cleanup remains open.
-- [ ] Review `docs/RULES.md` for contradictions, obsolete paths, policies repeated elsewhere, and approval boundaries that agents cannot follow consistently.
-- [ ] Review `docs/AI_COST_POLICY.md` against the shared Motion-UI policy and Meridian policy; keep Solstice-specific Android/Gradle rules local and avoid copying volatile provider prices or quotas.
+- [x] Review `docs/RULES.md` for contradictions, obsolete paths, repeated policies, and approval boundaries. Corrected Motion/Meridian ownership, duplicate wording, branch-protection status, and claims about CI coverage; remaining CI gaps are tracked below.
+- [x] Review `docs/AI_COST_POLICY.md` against Motion-UI's shared `docs/AI_USAGE_POLICY.md` and Meridian-Engine's root `AI_COST_POLICY.md`. The Solstice policy keeps Android/Gradle and weather-provider-specific guidance local, avoids volatile prices/quotas, and preserves owner approval and independent Opus review guidance.
 - [x] Replace the obsolete 2026-11-25 Motion PR inventory in `docs/CONTINUE.md` with the verified 2026-11-26 Motion/Meridian status and current PR #14 handoff. The older scheduled-session notes still need a broader age/relevance review.
 - [ ] Review `docs/ROADMAP.md`: classify shipped, in-progress, proposed, blocked, deferred, and obsolete work accurately.
 - [ ] Review `docs/LOG.md` for chronology and factual references; preserve historical entries, correct only demonstrably false current pointers through dated clarifications.
@@ -100,7 +100,7 @@ A checked item means that the stated evidence was inspected or the change was ve
 
 ## 3. CI, Gradle, and build reproducibility
 
-- [ ] Inventory every active workflow under `.github/workflows/` and identify its triggers, jobs, permissions, secrets, artifacts, runner, and purpose.
+- [x] Inventory every active workflow under `.github/workflows/`: only `build.yml` is active; it runs on PRs and `main` pushes, uses `ubuntu-latest`, has a read-only build job and separate write-scoped publication job, exposes signing secrets only on main pushes, and publishes Debug/Profile artifacts to the testing pre-release path.
 - [ ] Verify the JDK version from `.github/.java-version`, Gradle Wrapper version/checksum, Android Gradle Plugin, Kotlin, SDK/build-tools, and action versions.
 - [ ] Confirm Gradle caching has a clear owner (`gradle/actions/setup-gradle`) and avoid overlapping cache actions for the same state.
 - [ ] Validate local build cache behavior after `org.gradle.caching=true`; confirm no stale-input or non-cacheable task problem.
@@ -113,6 +113,7 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [ ] Keep Android SDK/emulator-capable jobs on compatible runners. Do not replace them with a generic Gradle Docker image by default.
 - [ ] Consider a custom container image only after proving it includes the required Android toolchain, is pinned by digest, is maintained, and improves measured end-to-end cost/time.
 - [ ] Verify cache keys and restore behavior for Gradle wrapper distributions, dependencies, transforms, and build outputs; never cache secrets or signing material.
+- [ ] Add and verify the missing app unit-test task(s) in required CI and implement a deterministic no-hardcoding check; keep both as explicit gates rather than claiming current coverage.
 - [ ] Record cold and warm build measurements, cache hits, runner minutes, artifact size, and CI failure/retry rates where available.
 - [ ] Ensure a failed required check blocks merge; rerun only failed jobs after inspecting the cause.
 - [x] Verify active GitHub ruleset `Protect main` targets `refs/heads/main`, requires the `build` status check, requires PRs, requires review-thread resolution, blocks force pushes/deletion, and has no bypass actors.
