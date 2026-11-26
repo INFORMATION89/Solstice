@@ -84,7 +84,8 @@ A checked item means that the stated evidence was inspected or the change was ve
 
 ## 2. Privacy, security, licensing, and public claims
 
-- [ ] Rewrite and validate root `PRIVACY.md`: it currently contains Breezy Weather wording and cannot be treated as Solstice's finished privacy notice.
+- [x] Create `docs/PRIVACY_DATA_MAP.md` as an internal code-backed inventory of location, geocoding, weather providers, GitHub update checks, local app-to-app sharing, and unresolved privacy evidence.
+- [ ] Rewrite and validate root `PRIVACY.md`: it currently contains Breezy Weather wording and cannot be treated as Solstice's finished privacy notice. Use `docs/PRIVACY_DATA_MAP.md` as an evidence starting point, not as a legal notice.
 - [ ] Update the custom `READ_PROVIDER` permission label/description strings: they still say “Breezy Weather” and mention exported location coordinates; keep this as a separate user-visible copy change requiring the approval in RULES.md.
 - [ ] Inventory actual permissions, weather/location/geocoding providers, update checker, crash/error reporting, data sharing, background work, and app-to-app sharing against implementation.
 - [ ] Confirm telemetry and data contribution remain off by default; onboarding invitation is optional, informed, separate from core functionality, and revocable.
@@ -176,6 +177,8 @@ These are concrete audit leads, not a substitute for the full review:
 - Do not merge PR #14, change protected branch settings, publish a production release, or incur paid AI/API/runner usage without the required authorization.
 
 ### Privacy and data-flow inspection notes (initial code review, 2026-11-26)
+
+Detailed code-backed findings and unresolved questions are maintained in [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md). It is an internal technical audit only, not a public notice or legal approval.
 
 The following are code-backed findings from the initial review. They define what the full privacy audit must explain; they are not yet a complete legal/privacy approval.
 
