@@ -1532,3 +1532,6 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
   to remain in their respective repositories. Their consumer boundaries are kept in
   `docs/INTEGRATIONS.md`. Earlier dated entries remain historical records and are not current work
   instructions.
+
+
+- **2026-11-26 (Marco): calendar and Android platform direction.** Calendar-aware weather is approved as a simple, optional, read-only integration through Android's `CalendarContract` provider API. Request only `READ_CALENDAR`; no Microsoft Graph, Outlook SDK, OAuth, Microsoft sign-in, event writes, email access, or server calendar connection. Outlook is supported through Android's calendar provider only when the user enables Outlook calendar sync and the account policy allows it. Adaptive window/foldable capability belongs in Motion UI; Solstice tracks only later consumer adoption. Wear OS is a V2/V3+ candidate and explicitly outside the MVP.
