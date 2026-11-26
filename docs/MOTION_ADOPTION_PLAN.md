@@ -1,6 +1,6 @@
 # Motion adoption plan
 
-**Status:** planning only. No Solstice runtime code or Motion submodule pointer is changed by this document.
+**Status (rechecked 2026-11-26):** planning only. No Solstice runtime code or Motion submodule pointer is changed by this document.
 
 This plan turns the Motion direction recorded in [PLAN.md](PLAN.md) into a practical, evidence-based path for Solstice. The goal is to reuse the Motion framework and, later, its optional UI kit without moving Solstice's weather experience or visual identity into another repository.
 
@@ -13,14 +13,14 @@ This plan turns the Motion direction recorded in [PLAN.md](PLAN.md) into a pract
 | Motion integration | Already included through `includeBuild("motion")` and dependency substitution in `settings.gradle.kts` |
 | Submodule URL | The old `INFORMATION89/Motion.git` URL is being changed to canonical `https://github.com/INFORMATION89/Motion-UI.git` in the current documentation/CI PR; the pinned commit is intentionally unchanged |
 | Motion Core MOT0.1 | Motion PR #4 is **merged**. PR head `4b7d58ebef3a42a89596404930dfb22a502ed687`, merge commit `4025f320e48956dec573879b5f3e3abfa4508066`. Its exact PR-head workflow run #62 (`45764882203`) passed Spotless, unit tests, and `:motion:assembleRelease` |
-| Motion current main | `b5fb7892b0b63e6e180b365496804198269a739a` at this review. Verify again before any integration change |
-| Motion Lab | PR #7 is open and Draft, branch `docs/mot02-motion-lab-plan`, head `17db56fa0480411a7c60365afbed0c4513d31f15`. It proposes a standalone `:motion-lab` app; it is not merged and not yet part of Motion main |
-| Motion Lab CI | Latest recorded run #95 (`45778515410`) failed at `:motion-lab:spotlessKotlinCheck` because `MainActivity.kt` had one formatting violation around line 731. Tests and build tasks did not run after that failure. Do not describe the Lab module as merged/verified |
+| Motion current main | `04598184db3418f03a40eb4611bc0c5be853b949` at 2026-11-26 08:56 UTC. Verify again before any integration change |
+| Motion Lab | PR #7 merged 2026-11-26 08:42 UTC; final PR head `570bfdd199669e51bbf5a2dade37831bb98321ae`, merge commit `6ea53caf31a17b70894487cd065707a800d1a35a`. It adds standalone `:motion-lab`, not `:motion-ui` |
+| Motion Lab CI | Exact final PR-head run #106 (`45784947096`) passed. The earlier run #95 formatting failure was superseded by the corrected final head; the merged Lab is verified by that PR-head run |
 | UI kit status | A separate `:motion-ui` Gradle module does not exist yet. It remains planned, not something Solstice can import today |
 | Platform scope | Current Motion artifact is Android / Jetpack Compose only. iOS, Windows, macOS, and Linux desktop targets are not supported |
 | Solstice migration status | No Motion submodule pointer change is included here. A future pointer bump must target a deliberately selected merged Motion commit and pass Solstice's clean recursive checkout/build/CI |
 
-The MOT0.1 merge in Motion does not update Solstice automatically: the submodule is still pinned to its earlier commit. The separate Motion Lab PR is not the same as Motion UI and must not be treated as delivery of the planned `:motion-ui` component kit. The current CI failure is a concrete formatting failure, not evidence that the new Lab builds or tests successfully.
+The MOT0.1 and Motion Lab merges in Motion do not update Solstice automatically: the submodule is still pinned to its earlier commit. The merged standalone Motion Lab is not the same as Motion UI and must not be treated as delivery of the planned `:motion-ui` component kit.
 ## 2. What belongs where
 
 The intended architecture has two Motion layers:
@@ -93,7 +93,7 @@ Each phase should be a small, independently reviewable change. Do not start the 
 ### Phase 0 — unblock and align the baseline
 
 1. MOT0.1 reliability work is merged in Motion PR #4 and its recorded exact-head CI passed. Do not repeat the spike.
-2. The current PR #7 (standalone Motion Lab) remains Draft and its latest recorded CI failed at Spotless; wait for a corrected exact-head CI before relying on the Lab module.
+2. Motion PR #7 (standalone Motion Lab) is merged; its exact final PR-head run #106 passed. This does not create or deliver `:motion-ui`.
 3. The canonical submodule URL is updated in this Solstice PR while the existing submodule SHA is deliberately preserved.
 4. Verify clean recursive submodule checkout and Gradle composite build in Solstice CI after the URL change.
 5. Treat adopting the merged MOT0.1 commit as a separate implementation change: select the exact merged commit, review its diff against the currently pinned SHA, bump the pointer deliberately, and run focused Motion/Solstice checks before any further migration.
@@ -158,7 +158,7 @@ Every AI agent working on this migration must:
 
 ## 6. Verification checklist
 
-- [ ] Motion PR #4's remaining MOT0.1 acceptance criteria are complete and full CI passes on its exact final SHA.
+- [x] Motion PR #4 MOT0.1 merge and exact-head CI evidence verified; see baseline table. Remaining platform/API adoption work is tracked separately.
 - [ ] Solstice points to the reviewed Motion commit and uses the canonical submodule URL.
 - [ ] A clean recursive clone resolves the composite build.
 - [ ] No Motion source imports Solstice packages or weather-domain types.

@@ -76,7 +76,7 @@ A checked item means that the stated evidence was inspected or the change was ve
 
 ### Motion and framework integration
 
-- [x] Refresh `docs/MOTION_ADOPTION_PLAN.md` against the current Motion-UI main SHA, Solstice's pinned submodule SHA, merged PR #4, open PR #7, and both relevant CI results.
+- [x] Refresh `docs/MOTION_ADOPTION_PLAN.md` against the current Motion-UI main SHA, Solstice's pinned submodule SHA, merged PR #4 and #7, and exact-head CI results.
 - [x] Correct the submodule URL to canonical `INFORMATION89/Motion-UI.git` while deliberately preserving the existing submodule commit.
 - [x] Verify the canonical URL checkout, current `motion/` submodule commit, and recursive submodule checkout on the exact current PR head: run #260 checkout passed; the combined Gradle task also passed.
 - [x] Distinguish Motion Core MOT0.1 merged in Motion PR #4 from the standalone Motion Lab PR #7 still in Draft, and the planned but non-existent `:motion-ui` module.
@@ -168,7 +168,7 @@ These are concrete audit leads, not a substitute for the full review:
 - `PRIVACY.md` still opens with “Breezy Weather” and describes upstream behavior. Validate every statement against Solstice's current implementation before publishing a replacement.
 - `.gitmodules` still points to `https://github.com/INFORMATION89/Motion.git`, while the canonical repository identified by the Motion adoption plan is `INFORMATION89/Motion-UI`. Verify the current Motion repository/commit and migrate the URL deliberately in a separate, tested change.
 - `docs/ENGINE_SPEC.md` and `docs/MERIDIAN_PLAN.md` still present 2026-11-23 drafts with older assumptions such as KMP, Room, a planned repository name, and a proposed submodule/composite-build integration. They must not override Meridian-Engine's current master plan.
-- `docs/MOTION_ADOPTION_PLAN.md` has been refreshed: Motion PR #4 is merged, PR #7 remains Draft with a Spotless failure, the submodule is still pinned to the pre-MOT0.1 base commit, and `:motion-ui` is not present.
+- `docs/MOTION_ADOPTION_PLAN.md` has been refreshed: Motion PR #4 and PR #7 are merged with exact-head CI passing; Solstice's submodule remains pinned to the pre-MOT0.1 base commit, and `:motion-ui` is not present.
 - `docs/UI_SYSTEMS.md` identifies itself as a 2026-11-19 research snapshot and says listed work is not built; refresh its inventory against current code before using it to assign implementation work.
 - The current Gradle Wrapper is 9.9.1, JDK is pinned to 21, `gradle/actions/setup-gradle` is already in use, and local Gradle build caching was disabled before this modernization branch. These facts should be rechecked on the final PR head.
 - The current workflow groups Spotless, Motion unit tests, Debug assembly, and optional main-only Profile assembly in one Gradle invocation, and cancels obsolete runs for the same PR/branch. This is a design-level optimization; measured savings remain unknown.

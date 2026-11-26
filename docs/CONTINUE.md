@@ -389,14 +389,14 @@ This section supersedes the historical 2026-11-25 Motion PR inventory below; do 
 ### Motion-UI
 
 - **PR #4 — MOT0.1 core reliability and framework docs:** merged. The final PR head was `4b7d58ebef3a42a89596404930dfb22a502ed687`; the merge commit is `4025f320e48956dec573879b5f3e3abfa4508066`. Recorded run #62 (`45764882203`) passed Spotless, Motion Core unit tests and `:motion:assembleRelease` on the exact final PR head.
-- **PR #7 — standalone Motion Lab:** open, Draft, head `17db56fa0480411a7c60365afbed0c4513d31f15`. It adds a proposed `:motion-lab` Android app, not `:motion-ui`. Latest recorded CI run #95 (`45778515410`) failed at `:motion-lab:spotlessKotlinCheck` for a format issue in `motion-lab/src/main/kotlin/io/github/information89/motion/lab/MainActivity.kt` near line 731. Unit tests and assemble tasks did not run after the failure. The Lab is not merged or verified on main.
-- **Motion UI:** there is still no `:motion-ui` module. Keep the UI extraction in the planning/specification stage until Motion creates and verifies that separate module.
-- **Platform:** Motion remains an Android/Jetpack Compose library. It does not currently support iOS or desktop UI targets.
+- **PR #7 — standalone Motion Lab:** merged 2026-11-26 at `6ea53caf31a17b70894487cd065707a800d1a35a`; final PR head `570bfdd199669e51bbf5a2dade37831bb98321ae`. Exact PR-head run #106 (`45784947096`) passed. It adds `:motion-lab`, not `:motion-ui`.
+- **Motion UI:** there is still no `:motion-ui` module at Motion main `04598184db3418f03a40eb4611bc0c5be853b949`. Keep UI extraction in planning/specification until Motion creates and verifies that separate module.
+- **Motion main:** `04598184db3418f03a40eb4611bc0c5be853b949` (2026-11-26 08:56 UTC). Motion remains Android/Jetpack Compose; iOS and desktop UI targets are not supported.
 
 ### Solstice integration
 
 - Solstice's `motion/` submodule remains pinned at `25ffa862f503b482ed98671cd5eab66040f0d75f`, the pre-MOT0.1 merge base. PR #4 being merged in Motion does not automatically update this checkout.
-- The former `INFORMATION89/Motion.git` submodule URL is being changed to the canonical `INFORMATION89/Motion-UI.git`; the submodule commit is intentionally not being bumped in this documentation/CI PR.
+- The submodule URL is now canonical `https://github.com/INFORMATION89/Motion-UI.git`; the submodule commit is intentionally not being bumped in this documentation/CI PR.
 - Before adopting MOT0.1 changes, create a separate, focused submodule update to the reviewed merged commit, then validate recursive checkout, Gradle composite substitution, Motion unit tests, and Solstice build/CI on the exact pointer.
 - Do not depend on the new Motion Lab or planned Motion UI until their respective PR/module and CI gates are complete.
 
