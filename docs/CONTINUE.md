@@ -1,9 +1,8 @@
 # Continuing on another computer
 
-Where things stand and how to pick the work up anywhere. Read [RULES.md](RULES.md) first; decisions
-are in [PLAN.md](PLAN.md), history in [LOG.md](LOG.md).
+Where things stand and how to pick the work up anywhere. Read the root [AGENTS.md](../AGENTS.md), [RULES.md](RULES.md), and [AI_COST_POLICY.md](AI_COST_POLICY.md) first; decisions are in [PLAN.md](PLAN.md), tasks in [ROADMAP.md](ROADMAP.md), and history in [LOG.md](LOG.md).
 
-AI coding sessions must also follow the [shared AI usage and cost policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md), as referenced by RULES.md.
+The shared [AI Usage and Cost Policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md) applies across repositories; Solstice's local policy adds Android/Gradle-specific verification guidance.
 
 ## Next session: Saturday 2026-11-28, 1:00 AM (planned in chat 2026-11-22)
 
