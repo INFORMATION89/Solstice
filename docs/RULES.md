@@ -1,179 +1,176 @@
-# Rules
+# Solstice engineering rules
 
-How every session works on Solstice, Motion, and Meridian. These rules come before speed and before any task.
-They change only with Marco's OK. If a task seems to need breaking one, stop and ask.
+These rules govern work in the Solstice application repository only. They do not define the roadmap,
+architecture, API, or implementation process of an external dependency. They change only with owner
+approval; when a product decision is missing, stop and present the specific choice.
 
-## 1. Ask first, always
+## 1. Product approval
 
-1. **Plans are made in chat with Marco.** Coding sessions only carry out what's agreed in
-   [PLAN.md](PLAN.md), [ROADMAP.md](ROADMAP.md) and [CONTINUE.md](CONTINUE.md).
-2. **Never start building anything new without asking**: no new feature, screen, card, button, text,
-   setting, motion, haptic, token or system. Say exactly what would change, show options when there
-   are choices, and wait for a yes.
-3. **Check guidelines with Marco before relying on them.** When Apple's, Google's or our own rules
-   disagree, or a rule doesn't cover the case, bring it to Marco; don't pick on your own.
-4. When something agreed turns out not to work as planned, stop and report; don't improvise a
-   different solution.
+1. Product direction and visible changes are agreed in chat and recorded in [PLAN.md](PLAN.md).
+2. Do not introduce a new screen, feature, setting, interaction, text, haptic, token, or user-visible
+   behavior without approval. Describe the change and its impact before implementing it.
+3. When an agreed implementation does not work, report the evidence and propose an app-side
+   alternative rather than silently changing the product decision.
+4. Keep [ROADMAP.md](ROADMAP.md) limited to Solstice-owned app work. A dependency's feature backlog,
+   lab, internal milestone, API design, storage/network choice, or platform plan does not belong here.
 
-## 2. Motion and frameworks first, then the app
+## 2. App architecture and external dependencies
 
-1. **Reusable interaction and motion behavior belongs in Motion** first, is tried in the Motion Lab where available, then the app imports and **configures** it. Reusable meteorological engine capabilities belong in Meridian-Engine under its own plan and approval gates; Solstice consumes its approved public contract. Solstice retains app-specific behavior, configuration, and weather presentation.
-2. Motion never imports app code. A change Motion needs lands in Motion, then Solstice bumps the
-   submodule (CONTINUE.md, "Motion").
-3. **Use what exists before writing anything**, in this order: Motion's pieces and tokens → Material 3
-   components → a maintained library (check its licence) → new code, only after asking.
-4. **One of each system.** One page frame, card, sheet, toolbar, message, button style, text role set,
-   glass. If a system lacks something, extend the system; never build a one-off beside it.
-5. New code in the app goes in `ui/expressive/`; edits to upstream files stay small and are listed in
-   PLAN.md.
-6. **The weather engine works like Motion:** its own library, no UI code and no Solstice code in it;
-   Solstice imports and configures it. Written clean room (section 5).
+1. Solstice owns its product identity, weather experience, screens, navigation, app state, saved
+   places, settings, permissions, refresh scheduling, notifications, accessibility, copy, and
+   practical recommendations.
+2. Use stable, documented APIs from Compose, Material 3, Motion, and other maintained libraries for
+   reusable mechanics. Do not duplicate a dependency's internal implementation merely to avoid using
+   its API.
+3. An external dependency remains independently owned. Do not place its implementation tasks,
+   roadmap, milestones, lab work, API proposals, storage/network choices, or release plan in Solstice
+   documents. Record only the consumer-side contract and integration constraints in
+   [INTEGRATIONS.md](INTEGRATIONS.md).
+4. Integrate only an exact reviewed dependency commit or released artifact. Check the actual public
+   API, licence, platform requirements, transitive dependencies, and tests before changing the pin.
+   Never depend on an unmerged branch or an undocumented API.
+5. Solstice must remain buildable and useful without a not-yet-approved future dependency. Do not
+   describe a planned integration as shipped.
+6. Do not copy Solstice screens, business logic, weather models, user preferences, branding, or
+   resources into generic dependencies. Do not copy dependency implementation code into Solstice.
+7. New app UI code belongs in the established Solstice UI structure. Prefer existing app systems and
+   tokens over one-off components.
 
-## 3. Never hardcode anything
+## 3. Values and text
 
-1. **No typed-in values** in components or app code: no `dp`, `sp`, colours, alphas, corner radii,
-   durations, `delay()`s, springs, thresholds, fractions or counts. Every value is either a **token** or
-   **derived** (from layout, data, insets or another token).
-2. **No typed-in text:** every string is a resource; English first, other languages marked as needing
-   an update, never machine-translated.
-3. A value with no token yet: **stop, propose a name and value, ask**, then add it to the tokens. Don't
-   add it "for now".
-4. Allowed without a token: 0, 1, mathematical constants, and entries in the reviewed allowlist.
-   The required `No hardcoded UI literals` step scans added production Kotlin lines for common
-   dimensions, colors, alpha, animation timing, thresholds/counts/comparisons, and direct UI text.
-   It excludes test sources and the canonical `theme/Tokens.kt` token-definition file. This is a
-   deterministic heuristic, not a Kotlin AST or proof that every possible hardcode is caught;
-   review the full diff. Allowlist exceptions require Marco's OK.
-5. No special cases by screen ("if in a window…"). Differences are configuration (data), passed in.
+1. Do not hardcode dimensions, colours, alpha, corner radii, animation timings, thresholds, fractions,
+   or other design-system values in UI call sites. Use a named Solstice token or derive the value from
+   layout, data, insets, or another token.
+2. Do not hardcode user-facing text. Use string resources; add English first and mark translations
+   for a human update rather than machine-translating them.
+3. If a required token or string is missing, identify the name and proposed value/text before adding
+   it. Exceptions require owner approval.
+4. The CI no-hardcoding scan is a deterministic heuristic over added production Kotlin lines, not a
+   Kotlin parser or proof that all hardcodes are detected. Review the full diff; allowlist exceptions
+   require approval.
 
-## 4. Data, sources and privacy
+## 4. Weather data, sources, and privacy
 
-Design in [SOURCES.md](SOURCES.md).
+1. Solstice may request the weather/location data needed for its core forecast experience. Any
+   additional collection or contribution is off by default and requires separate, explicit, informed,
+   revocable opt-in.
+2. A contribution/consent screen must identify the actual payload, purpose, destination and recipients,
+   retention, user controls, and an inspectable example. Refusal must not reduce core functionality.
+3. Minimize data. Do not add accounts, device/ad identifiers, analytics, tracking, ads, or social
+   behavior without a separate product and privacy review.
+4. Every active provider used by the app must have a verified coverage, terms, privacy, and attribution
+   record. Show required credits where the relevant data is presented.
+5. Keep credentials out of source control and distributed build configuration unless the provider's
+   public-client model explicitly permits it. Never expose private developer credentials in artifacts.
+6. Test app-side provider adapters and mapping behavior with deterministic fixtures where feasible.
+   Meteorological blending, bias correction, learning algorithms, and engine-level provider strategy
+   belong to the independent weather-engine project, not this app ruleset.
+7. Keep weather evidence distinguishable from the advice Solstice derives from it. Clothing and
+   footwear, umbrella and sunscreen/shade advice, activity and outdoor planning, personal preferences,
+   alert thresholds, cooldowns, wording, and notification delivery are app-owned decisions.
 
-**Privacy**
-1. Nothing leaves the phone except the weather requests needed for a forecast, unless the person
-   opted in.
-2. Opt-in is asked once during onboarding, off by default, and can be changed any time in settings.
-   Saying no changes nothing else in the app.
-3. The opt-in screen shows the actual data that would be sent (a real example from that phone) and a
-   visualization of its path: phone → what's removed (place, time, identifiers) → our server → what's
-   done with it → what comes back to everyone.
-4. Data is minimized before it leaves the phone: forecast error only, the area rounded to a coarse
-   cell, time rounded to the hour. No account, no device or advertising ID, no location history, no
-   raw coordinates. Cell size and rounding are tokens.
-5. The server uses an area only once enough phones have contributed there; below that, nothing about
-   the area is kept. The threshold is a token.
-6. Contributions are kept for a short, stated time; the server code is open source; applicable law
-   (Mexico's LFPDPPP, the EU's GDPR) is checked before the server exists.
-7. No analytics, no tracking, no ads, no social features without Marco's OK.
+## 5. Source provenance, licensing, and fork boundaries
 
-**Sources**
-1. Each source declares its coverage, tier, terms and required attribution as data, not code.
-2. Every result carries its provenance: which sources, their weights, any correction, how fresh each
-   part is. What the app shows about sources comes from this, never from guesses.
-3. No single source can break a forecast: if one fails, the next tier fills in and the provenance
-   says so. Sources that read a website instead of an API are best-effort and never the only source.
-4. A source's terms are read in full before it's added; required credits are shown where its data
-   shows. Keys belong to the person and stay on the phone, never in the repo or the build.
-5. Sources are tested offline with recorded responses, and changes to the blend are verified against
-   public archives before they ship.
+1. Solstice is an application fork. Inherited Breezy-derived source remains within this repository
+   under its applicable licence and notices; do not transplant it into independent dependencies.
+2. Preserve upstream copyright, licence headers, third-party notices, and attribution when modifying
+   inherited code or adding dependencies. Review compatibility before introducing a new dependency.
+3. Do not copy implementation code from external projects into Solstice. Consume documented public
+   APIs; report a missing capability to the relevant dependency owner.
+4. Keep new app behavior and Solstice-specific adaptations in this repository. Do not make an
+   external dependency require a Solstice checkout, service, package, theme, data model, or lifecycle.
 
-## 5. Clean room (agreed 2026-11-23)
+## 6. Android platform and design guidelines
 
-Applies to the weather engine, Motion and future apps; the Solstice app itself stays a Breezy fork
-until Marco decides otherwise.
-1. **Never copy, translate or closely paraphrase another project's code**, Breezy included, into
-   these projects. Ideas, algorithms, public standards and data formats are fine.
-2. **Allowed sources:** public specs and standards (CAP, METAR, WMO), each service's own API docs and
-   terms, published papers, platform docs and guidelines, our own docs, and how things behave from
-   the outside. Libraries are used through their API, under their licence, never pasted in.
-3. **Spec, then build:** one session writes a spec in our own words from allowed sources and saves it
-   in the project's docs; a separate session builds only from that spec and never opens the original
-   code for that part.
-4. Each pull request lists what was consulted. Code that looks close to an existing project gets
-   rewritten, not justified.
-5. Honest limit: AI models have seen public code, so this lowers the risk rather than removing it.
+Android is the supported app platform. Do not imply that Solstice gains iOS or desktop support because
+a library consumed by the app supports other platforms.
 
-## 6. Platform guidelines
+**Material 3:** system back and predictive back; edge-to-edge; accessible touch targets; Material
+Symbols; dynamic colour roles; the type scale; Material components where appropriate; and a motion
+scheme configured with Solstice's design choices.
 
-Android first in structure, iOS quality in feel. Check both before proposing anything.
+**Interaction quality:** respond promptly, remain interruptible, preserve gesture ownership and
+velocity handoff, and avoid swallowing input. Use a sheet that remains connected to its source where
+that is the approved app design. Haptics are supplementary feedback, never the only feedback.
 
-**Material 3 (Android):** system back and predictive back everywhere; edge to edge; 48 dp touch
-targets; Material Symbols; the type scale; dynamic colour roles; Material components where they exist;
-the Material `MotionScheme` fed by our tokens.
+**Accessibility:** accessible touch targets and spacing; text scaling; contrast on every sky; never
+communicate by colour alone; every gesture must also have an accessible action; avoid time-only
+disappearing content; mirror layouts for RTL.
 
-**Apple HIG (feel and judgement):** fluid interfaces (respond at once, interrupt and redirect, hand over
-velocity, project flings, rubber-band); a sheet keeps its source and closes with a swipe; glass is for
-controls and navigation; motion is purposeful and brief on frequent actions; haptics consistent,
-short and never the only feedback.
+## 7. Solstice motion behavior
 
-**Accessibility, not negotiable:** 48 dp targets with room between them; text up to 200 %; contrast
-4.5:1 for body text, 3:1 for large text, on every sky; never colour alone; every gesture also has a
-button or a TalkBack action; nothing that disappears on a timer alone; RTL mirrored.
+The full app-specific motion reference is [MOTION.md](MOTION.md). Key rules:
 
-**Decided exceptions** (Marco): the ✕ sits at the end of headers; the toolbar keeps its current
-animation; glass on cards is under review. Exceptions are listed here and in PLAN.md, nowhere else.
+- Keep the current Solstice toolbar animation and its bud as part of the app's product identity.
+- Interactions should be interruptible where appropriate and must not delay or block input.
+- A surface that opens from a control should visually retain its relationship to that source.
+- The user must be able to stop, reverse, or redirect an interaction without waiting for an animation.
+- Respect Android's reduced-motion/system animation settings. Reduced motion should preserve state
+  clarity and direct manipulation while reducing spatial movement and decorative effects.
+- Do not add haptics or change the animation feel without product approval.
 
-## 7. Motion
-
-Full rules in [MOTION.md](MOTION.md). In short:
-- Springs only, from tokens. Movement and size use spatial springs; opacity, colour and blur use
-  effects springs, which never bounce.
-- Things morph, never pop; one material per morph; the button becomes the card; closing goes back
-  into the source.
-- Nothing blocks input; gestures drive a motion value and hand their velocity to the release.
-- **Reduce Motion** ("Remove animations"): every Motion piece has a reduced form, agreed with Marco
-  (Apple's list: fades instead of moves, no blur hand-offs, no depth, less bounce, follow the finger).
-- Haptics from tokens only; they follow the system setting; none added without agreeing them.
-- Every new or changed motion is proposed with options and agreed before it's built.
-
-## 8. Design
-
-- [DESIGN.md](DESIGN.md)'s checks apply to every proposal: one screen one job, someone needs it,
-  essentials first, every state designed (loading, empty, error, offline), any size and orientation.
-- **Skeuomorphism lives in interaction, not in looks** (physics, press, drag, haptics); visuals stay
-  clean and standard.
-- [WRITING.md](WRITING.md) for every sentence; every new sentence goes to Marco before it ships.
-
-## 9. Done means checked
+## 8. Definition of done
 
 A change is done when:
-1. All configured required CI checks pass. The workflow runs Spotless, Motion unit tests,
-   `:weather-unit:testDebugUnitTest`, `:maps-utils:testDebugUnitTest`, `:app:testBasicDebugUnitTest`,
-   and the Basic Debug assembly. The required `No hardcoded UI literals` step also runs in this job;
-   it is a heuristic guard on added production Kotlin lines, so manual review remains mandatory;
-2. logic has unit tests; each Motion piece has a Motion Lab demo;
-3. it was checked on the Pixel (profile build for smoothness; frame stats when motion changed), or is
-   clearly marked "not checked on the phone";
-4. the docs are updated: PLAN.md (decisions), LOG.md (a dated line), ROADMAP.md (ticked), Motion's
-   README for any Motion API change.
 
-## 10. Docs
+1. Relevant configured CI checks pass on the exact commit, including formatting, app/library unit
+   tests, and the required Debug build/artifact path.
+2. App logic has focused regression tests. UI behavior has appropriate Compose/instrumentation tests
+   where feasible.
+3. Physical-device checks are performed for interaction/visual changes when hardware is available.
+   Otherwise mark them **NOT TESTED**; CI is not a substitute for a phone check.
+4. Privacy, accessibility, provenance, licence, and failure/offline behavior are checked where the
+   change affects them.
+5. The complete diff is reviewed and app documentation is updated: PLAN for decisions, LOG for dated
+   history, ROADMAP for app tasks, CONTINUE for the current handoff. Dependency owners update their
+   own repository documentation for dependency implementation/API changes.
 
-One source of truth per topic: PLAN.md decisions, LOG.md history, ROADMAP.md to-dos, CONTINUE.md
-current handoff, DESIGN/MOTION/WRITING product and design rules, this file Solstice engineering rules,
-root AGENTS.md agent operations, and AI_COST_POLICY.md AI/tool/CI efficiency. Shared AI policy is linked,
-not copied. Fix contradictions instead of adding to them. Never push upstream's history; never build with `-Pbreezy`.
+## 9. Documentation authority
 
-## 11. Git
+One source of truth per topic:
 
-1. Work on a branch and merge to `main` through a pull request; nothing is pushed to `main` directly.
-2. Commit as INFORMATION89. Never commit `gradlew.bat` (it shows as changed on Linux checkouts),
-   secrets, keys or `local.properties`.
-3. A pull request says what changed and what was checked (section 9). The `main` branch is protected by the active GitHub ruleset `Protect main`: changes require a pull request and the `build` status check; force pushes and branch deletion are blocked. Keep the repository ruleset aligned with this requirement when workflow check names change.
+- [PLAN.md](PLAN.md): current Solstice product decisions.
+- [ROADMAP.md](ROADMAP.md): Solstice-owned app tasks only.
+- [LOG.md](LOG.md): chronological history, including superseded historical decisions.
+- [CONTINUE.md](CONTINUE.md): current actionable app handoff.
+- [DESIGN.md](DESIGN.md), [MOTION.md](MOTION.md), [WRITING.md](WRITING.md): Solstice experience and
+  design rules.
+- [INTEGRATIONS.md](INTEGRATIONS.md): consumer-side dependency contracts only.
+- [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md): internal technical evidence inventory, not a public
+  privacy notice.
+- Root [AGENTS.md](../AGENTS.md): AI agent operating instructions.
+- [AI_COST_POLICY.md](AI_COST_POLICY.md): AI, tool, and CI cost controls.
 
+Fix contradictions in the authoritative file; do not add another competing document.
 
-## 12. AI tools, model selection and cost
+## 10. Git and CI
 
-AI-assisted development must follow the root [AGENTS.md](../AGENTS.md), this repository's [AI Cost and Resource Efficiency Policy](AI_COST_POLICY.md), and the shared [AI Usage and Cost Policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md). The local policy adds Android/Gradle-specific guidance; none of these policies override Solstice's product, privacy, design, and approval requirements.
+1. Work on a branch and merge to `main` through a pull request; do not push ordinary work directly to
+   `main`.
+2. Commit as INFORMATION89. Never commit `gradlew.bat`, secrets, keys, signing material, or
+   `local.properties`.
+3. Pull requests describe what changed, why, what was checked, what was not tested, and the exact
+   commit SHA.
+4. The active `Protect main` ruleset requires a pull request and the `build` status check, blocks
+   force pushes/deletion, and has no bypass actors. Keep the ruleset aligned if workflow check names
+   change.
 
-- Use the least costly model that can reliably complete the task. Routine documentation, extraction and mechanical edits use an efficient model; ordinary implementation and debugging use a balanced coding model; complex architecture, difficult debugging and high-risk reviews justify a stronger reasoning model.
-- ChatGPT Work/Codex subscription allowances and OpenAI API billing are separate. Do not estimate subscription usage from API token prices or assume access to a model or plan.
-- Use Claude Haiku-class models for bounded routine tasks, Sonnet-class models for normal engineering, and reserve Claude Opus 5.5 for complex architecture, long-running coding, difficult debugging, broad refactors or independent review where its additional capability materially reduces risk or rework.
-- Treat model choice as guidance, not a blocker: ChatGPT/Codex may begin and own the task. When a stronger independent pass would help, mark **“Opus review recommended”** and leave that review for a useful checkpoint or before merge. Do not wait for Opus before starting, and do not incur extra paid usage without approval; if the review is not performed, say so.
-- One primary agent owns each coherent task. Add a second agent only for an independent review or specialist contribution; do not duplicate repository exploration, implementation or full CI runs by default.
-- Keep context focused: inspect relevant files and diffs, avoid repeating large reads and logs, reuse evidence only for the same relevant commit, and maintain concise handoffs.
-- Stop agents that loop, repeat unchanged searches or tests, or expand scope without approval.
-- No new paid API, credits, subscription, paid tool, higher-cost tier or open-ended spend without explicit owner approval. Never silently switch from subscription usage to API billing.
-- Cost-aware verification must not weaken correctness, privacy, accessibility, security, regression coverage or required release checks. For the Pixel/device requirement in section 9, report honestly when a physical-device check is unavailable; a green CI run is not a phone check.
-- Report actual model/tool usage only when known. Never invent token counts or monetary costs.
+## 11. AI tools, model selection, and cost
+
+AI-assisted development must follow root [AGENTS.md](../AGENTS.md), the local
+[AI_COST_POLICY.md](AI_COST_POLICY.md), and the shared
+[Motion-UI AI Usage and Cost Policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md).
+
+- Use Sonnet or a balanced ChatGPT/Codex coding model as the default for ordinary implementation,
+  tests, debugging, and bounded documentation.
+- Use a stronger reasoning model such as Opus only when independent advanced review or difficult
+  architecture/root-cause work is likely to materially reduce risk.
+- Opus is optional, not an automatic gate and not permission for paid usage. Record a recommendation
+  as pending if it has not happened; do not block normal work waiting for it.
+- One primary agent owns each coherent task. Use a second agent for an independent review, not to
+  duplicate repository exploration or full CI by default.
+- Keep context focused, inspect exact diffs, reuse CI evidence only for the same relevant SHA, and
+  report model/tool usage only when known.
+- No new paid API, credits, subscriptions, paid tools, or open-ended spend without explicit approval.
+- Cost-aware verification must not weaken correctness, privacy, accessibility, security, regression
+  coverage, or required release checks.

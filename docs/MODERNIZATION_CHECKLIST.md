@@ -1,198 +1,120 @@
 # Solstice modernization checklist
 
-**Status:** Active audit and modernization tracker  
-**Created:** 2026-11-26  
-**Working branch:** `docs/modernize-ai-ci-meridian-status`  
-**Tracking PR:** [#14 — Modernize AI governance, Meridian status, and Gradle CI](https://github.com/INFORMATION89/Solstice/pull/14)
+**Scope:** Solstice Android application repository only  
+**Tracking PR:** [#14 — Solstice documentation, AI governance, and Gradle CI](https://github.com/INFORMATION89/Solstice/pull/14)  
+**Status snapshot:** 2026-11-26
 
-This checklist defines the scope and acceptance criteria for modernizing Solstice's documentation, cross-repository coordination, AI-assisted workflow, and CI/Gradle pipeline. It is a tracking document, not a new authority for product decisions. `docs/PLAN.md` remains authoritative for Solstice decisions; `docs/RULES.md` remains authoritative for Solstice-specific engineering constraints; root `AGENTS.md` defines agent operations; `docs/AI_COST_POLICY.md` governs AI/tool/CI efficiency.
+This checklist covers Solstice-owned documentation, governance, privacy, build/CI, and release
+readiness. It is not an implementation or status tracker for external dependencies. Product
+decisions remain in [PLAN.md](PLAN.md); app engineering constraints in [RULES.md](RULES.md);
+agent operations in root [AGENTS.md](../AGENTS.md); app tasks in [ROADMAP.md](ROADMAP.md).
 
-A checked item means that the stated evidence was inspected or the change was verified. A proposed change, green compile, or second-model opinion alone does not count as completion.
+External dependency information is limited to what Solstice consumes and what the app must continue
+to own, in [INTEGRATIONS.md](INTEGRATIONS.md). Dependency roadmaps and internal milestones do not
+belong in this checklist.
 
-## 0. Baseline and current PR
+A checked item means its stated evidence was inspected or the change was verified. A proposal,
+successful build, or unperformed specialist review does not count as completion.
 
-- [x] Create the modernization branch and tracking PR #14 as a draft.
-- [x] Add root `AGENTS.md` with the reading order, repository boundaries, task ownership, and evidence-based reporting.
-- [x] Add Solstice-specific `docs/AI_COST_POLICY.md`, aligned with the shared Motion-UI AI policy and Meridian's cost policy.
-- [x] Link the local policy from `docs/RULES.md`; update the entry points in `docs/PLAN.md` and `docs/CONTINUE.md`.
-- [x] Compare Meridian-Engine's current master plan with Solstice's historical Meridian notes.
-- [x] Record that Meridian remains at the MER-0.1 evidence/owner-review gate; do not describe the production engine, stack, API, or integration as complete.
-- [x] Enable Gradle's local build cache in `gradle.properties`.
-- [x] Consolidate formatting, Motion unit tests, Debug assembly, and optional main-branch Profile assembly into a single Gradle invocation/task graph.
-- [x] Add workflow concurrency cancellation so newer runs for the same PR/branch supersede obsolete runs.
-- [x] Consolidate debug and main-branch Profile builds into one Gradle workspace; split publication into a least-privilege job.
-- [x] Scope signing secrets to main-only steps rather than the general build job, which also runs for pull requests.
-- [x] Restrict temporary signing-file permissions with `umask 077`.
-- [x] Pin artifact actions to verified immutable commit SHAs: upload-artifact v7.0.2 and download-artifact v8.0.2; both are official signed releases.
-- [x] Verify PR head `e5a3f96784c5fbb403851014d968629d3afeb785` on run #260 (`45781291703`): checkout (including the canonical Motion submodule URL), JDK 21, Gradle setup, one combined verification/build step, and debug artifact upload all passed. The run produced artifact `solstice-basic-debug` (artifact ID `15097649394`).
-- [x] Verify final PR head `872c7a4450bcc93e899f0a970053f87d67d3cd0b` on run #262 (`45782022879`): `Build / build` passed, including checkout, JDK 21, Gradle setup, Spotless, Motion unit tests, Debug assembly, and Debug artifact upload. The main-only Profile/signing and publication jobs were skipped as expected for a pull request.
-- [ ] Verify the main-branch Profile APK is produced, downloaded, signed, named, and published as the expected testing pre-release.
-- [x] Verify PR run #260 skipped main-only signing-secret steps; build job had only `contents: read`, and the separate `contents: write` publish job was skipped.
-- [x] GitHub Actions parsed and executed the final workflow; Debug artifact path uploaded five files successfully. Profile artifact path and release job still require a protected-main run with approved signing secrets.
-- [x] Timing sample is mixed, not a stable saving: baseline runs #237 and #239 each took 224 s; run #250 took 192 s (32 s / 14.3% lower), but the later exact-head run #260 took 254 s (30 s / 13.4% slower than baseline) despite successful Gradle-cache restoration. Run #260's combined Gradle task took 216 s and reported `BUILD SUCCESSFUL in 3m 36s`; 204 actionable tasks (184 executed, 18 from cache, 2 up-to-date). Both candidate runs restored Gradle cache. Do not claim a stable CI time or runner-cost saving from this sample.
-- [x] Report the measured difference as variable: same configuration and cache restore do not guarantee faster hosted-runner wall time. Continue measuring several warm/cold runs and inspect job/task breakdowns; no invoice-level saving can be inferred.
-- [ ] Obtain focused independent review of the workflow/security diff. **Opus review recommended** because CI credentials and release permissions are involved; this does not block implementation or replace tests/owner authorization.
+## 1. Documentation ownership and consistency
 
-## 1. Documentation inventory and authority
-
-### Entry points and governance
-
-- [x] Review root `README.md` identity, attribution, licence, test APK instructions and channel links; clarify that publication requires successful CI and configured signing secrets.
-- [x] Replace the inherited `CONTRIBUTING.md` with Solstice-specific contribution, approval, AI, licence, and PR guidance.
-- [x] Replace the inherited `INSTALL.md` with the current Solstice testing-release installation and Obtainium instructions; remove Breezy releases/F-Droid channels.
-- [x] Replace the inherited `3RD_PARTY.md` with code-verified Solstice broadcast and ContentProvider integration documentation; label third-party compatibility as unverified where appropriate.
-- [x] Replace inherited `HELP.md` with Solstice-specific support guidance for locations, sources, network/weather errors, background updates, local app-to-app sharing, and privacy caveats; remove Breezy-only launcher, release, forum, and unsupported-source instructions.
-- [x] Review root `AGENTS.md` against actual repo layout, current PR workflow, mandatory reading order, and context-efficiency requirements.
-- [x] Review the top-level authority links and current Meridian integration gate in `docs/PLAN.md`; deeper product-decision cleanup remains open.
-- [x] Review `docs/RULES.md` for contradictions, obsolete paths, repeated policies, and approval boundaries. Corrected Motion/Meridian ownership, duplicate wording, branch-protection status, and claims about CI coverage; remaining CI gaps are tracked below.
-- [x] Review `docs/AI_COST_POLICY.md` against Motion-UI's shared `docs/AI_USAGE_POLICY.md` and Meridian-Engine's root `AI_COST_POLICY.md`. The Solstice policy keeps Android/Gradle and weather-provider-specific guidance local, avoids volatile prices/quotas, and preserves owner approval and independent Opus review guidance.
-- [x] Replace the obsolete 2026-11-25 Motion PR inventory in `docs/CONTINUE.md` with the verified 2026-11-26 Motion/Meridian status and current PR #14 handoff. The older scheduled-session notes still need a broader age/relevance review.
-- [ ] Review `docs/ROADMAP.md`: classify shipped, in-progress, proposed, blocked, deferred, and obsolete work accurately.
-- [ ] Review `docs/LOG.md` for chronology and factual references; preserve historical entries, correct only demonstrably false current pointers through dated clarifications.
-- [ ] Confirm the authority map and links among PLAN, RULES, ROADMAP, CONTINUE, LOG, AGENTS, and AI_COST_POLICY.
-- [ ] Remove duplicated instructions where a concise authoritative link is sufficient.
-- [ ] Ensure every document has a clear status (current, proposal, research, historical/archive, or superseded) where ambiguity could cause an agent to implement it accidentally.
-
-### Product, design, and writing
-
-- [ ] Review `docs/DESIGN.md` against the decisions currently recorded in PLAN.
-- [ ] Review `docs/MOTION.md` against the actual Motion APIs/tokens and current Solstice call sites; identify legacy spring/value tables.
-- [ ] Review `docs/UI_SYSTEMS.md` inventory against current source code; refresh counts, paths, dependency claims, and the statement about what has or has not been built.
-- [ ] Review `docs/WRITING.md` for approved versus proposed copy, English/Mexican Spanish consistency, and weather terminology.
-- [ ] Review `docs/PROPOSALS.md` and move only explicitly approved decisions into PLAN; keep unapproved proposals clearly non-implementable.
-- [ ] Verify that documentation continues to prioritize feels-like temperature while keeping actual air temperature visible, and does not present a derived metric as a personal measurement.
-- [ ] Check accessibility, reduced motion, RTL, loading/empty/error/offline states, and foldable/tablet layout rules remain consistent across design documents.
-
-### Weather sources and Meridian references
-
-- [ ] Review `docs/SOURCES.md` and distinguish existing source behavior, accepted decisions, proposed providers, and future Meridian responsibilities.
-- [x] Initial review of `docs/ENGINE_SPEC.md` and `docs/MERIDIAN_PLAN.md` identified stale claims (repository name, KMP, Room, API/Flow, distribution and milestone assumptions); a deeper meteorological content reconciliation remains pending in Meridian's own gates.
-- [x] Mark `docs/ENGINE_SPEC.md` and `docs/MERIDIAN_PLAN.md` as historical Solstice-side research references and point to Meridian-Engine's master plan as the architecture/status authority.
-- [ ] Do not silently copy Meridian's current architecture into Solstice or allow Solstice docs to become a second source of truth.
-- [ ] Verify Meridian milestone status against its current `PLAN.md`, exact branch/PR heads, and CI before updating claims.
-- [ ] Keep the Solstice integration gate explicit: no production dependency/API/storage/distribution decision until Meridian's relevant evidence and owner gates are approved.
-- [ ] Ensure no old instruction asks an agent to recreate the Meridian repository, repeat its M0 bootstrap, or start production weather features before the current gates.
-- [ ] Review references to Open-Meteo, providers, radar, observations, model spread, alert feeds, pricing, licences, and availability; revalidate time-sensitive facts at the implementation milestone.
-
-### Motion and framework integration
-
-- [x] Refresh `docs/MOTION_ADOPTION_PLAN.md` against the current Motion-UI main SHA, Solstice's pinned submodule SHA, merged PR #4 and #7, and exact-head CI results.
-- [x] Correct the submodule URL to canonical `INFORMATION89/Motion-UI.git` while deliberately preserving the existing submodule commit.
-- [x] Verify the canonical URL checkout, current `motion/` submodule commit, and recursive submodule checkout on the exact current PR head: run #260 checkout passed; the combined Gradle task also passed.
-- [x] Distinguish Motion Core MOT0.1 and the standalone Motion Lab (PR #7) as merged, while the planned `:motion-ui` module remains non-existent.
-- [ ] Do not describe a planned UI kit, iOS, desktop, or cross-platform capability as currently available in Solstice.
-- [ ] Verify ownership boundaries: generic motion/framework behavior belongs in Motion; weather behavior, screens, identity, navigation policy, and Solstice configuration remain here.
+- [x] Add root `AGENTS.md` with the mandatory reading order, Solstice project boundaries, work
+  method, AI task ownership, and evidence-based reporting.
+- [x] Add Solstice-specific `docs/AI_COST_POLICY.md` and link the shared AI-use policy.
+- [x] Establish one authority per subject: PLAN, RULES, ROADMAP, LOG, CONTINUE, app design references,
+  integration boundary, and privacy evidence map.
+- [ ] Keep PLAN and ROADMAP exclusively about the Solstice product, app code, and app work.
+- [ ] Keep CONTINUE limited to the current Solstice session and next app-owned task.
+- [ ] Keep LOG chronological; historical entries are not current implementation instructions.
+- [x] Add `docs/INTEGRATIONS.md` as the only consumer-side dependency boundary document.
+- [x] Remove duplicate dependency roadmaps, lab plans, weather-engine specs, model-test plans, and
+  internal milestone specs from the active Solstice documentation tree.
+- [ ] Search all active docs for broken links to removed files, stale instructions, and dependency
+  implementation work that was accidentally copied into the app plan.
+- [ ] Validate internal relative links and high-value external links after the final documentation
+  diff.
+- [ ] Review the remaining app UX and research references for stale implementation claims.
+- [ ] Confirm feels-like temperature remains a prominent useful metric while actual air temperature
+  stays visible; don't describe feels-like as a personal measurement.
+- [ ] Ensure app proposals are visibly marked as proposals and are not mistaken for approved work.
 
 ## 2. Privacy, security, licensing, and public claims
 
-- [x] Create `docs/PRIVACY_DATA_MAP.md` as an internal code-backed inventory of location, geocoding, weather providers, GitHub update checks, local app-to-app sharing, and unresolved privacy evidence.
-- [ ] Rewrite and validate root `PRIVACY.md`: it currently contains Breezy Weather wording and cannot be treated as Solstice's finished privacy notice. Use `docs/PRIVACY_DATA_MAP.md` as an evidence starting point, not as a legal notice.
-- [ ] Update the custom `READ_PROVIDER` permission label/description strings: they still say “Breezy Weather” and mention exported location coordinates; keep this as a separate user-visible copy change requiring the approval in RULES.md.
-- [ ] Inventory actual permissions, weather/location/geocoding providers, update checker, crash/error reporting, data sharing, background work, and app-to-app sharing against implementation.
-- [ ] Confirm telemetry and data contribution remain off by default; onboarding invitation is optional, informed, separate from core functionality, and revocable.
-- [ ] Ensure each proposed data flow states what is collected, purpose, destination/recipients, retention, controls, and an inspectable example payload before any collection is implemented.
-- [ ] Check the current app's third-party provider privacy links and attribution against actual enabled providers, not inherited upstream defaults alone.
-- [ ] Review app name/package identifier, upstream notices, LGPL-3.0 obligations, modifications, bundled dependencies, and third-party licence notices.
-- [ ] Verify no upstream privacy statement or unsupported claim remains in Solstice-facing About, Settings, README, Play Store drafts, or website text.
-- [ ] Review GitHub Actions permissions, secret exposure, signing, artifact provenance, release replacement behavior, dependency pinning, and untrusted PR execution.
-- [ ] Keep signing credentials out of PR jobs, build logs, artifacts, cache entries, and broadly scoped job environments.
-- [ ] Confirm no security gate is weakened for cost or speed.
+- [x] Create `docs/PRIVACY_DATA_MAP.md` as an internal code-backed inventory of location,
+  geocoding, weather providers, update checks, local app-to-app sharing, and unresolved questions.
+- [ ] Complete the code-path audit for background location, permissions, providers/endpoints,
+  refresh scheduling, app-to-app data disclosures, diagnostics, retention/deletion, and build
+  variants.
+- [ ] Rewrite and validate root `PRIVACY.md`. It still contains inherited Breezy wording and is
+  not Solstice's finished privacy notice. Use the data map as evidence, not as legal approval.
+- [ ] Correct the custom `READ_PROVIDER` permission label and description; it still uses Breezy
+  wording. Treat this as visible app copy and follow the approval rule.
+- [ ] Confirm telemetry and data contribution remain off by default; any future opt-in must be
+  explicit, informed, separate from core functionality, and revocable.
+- [ ] For every proposed data flow, state payload, purpose, destination/recipients, retention,
+  controls, and provide an inspectable example before implementation.
+- [ ] Check provider privacy links, attribution, licences, inherited notices, and LGPL-3.0
+  obligations against what the app actually ships.
+- [ ] Review Actions permissions, secret exposure, signing, artifact provenance, release replacement,
+  dependency pinning, and untrusted pull-request execution.
+- [ ] Keep signing credentials out of PR jobs, logs, artifacts, caches, and broad job environments.
+- [ ] Do not weaken privacy or security requirements for lower CI cost or faster execution.
 
-## 3. CI, Gradle, and build reproducibility
+## 3. Gradle, CI, and release reproducibility
 
-- [x] Inventory every active workflow under `.github/workflows/`: only `build.yml` is active; it runs on PRs and `main` pushes, uses `ubuntu-latest`, has a read-only build job and separate write-scoped publication job, exposes signing secrets only on main pushes, and publishes Debug/Profile artifacts to the testing pre-release path.
-- [ ] Verify the JDK version from `.github/.java-version`, Gradle Wrapper version/checksum, Android Gradle Plugin, Kotlin, SDK/build-tools, and action versions.
-- [ ] Confirm Gradle caching has a clear owner (`gradle/actions/setup-gradle`) and avoid overlapping cache actions for the same state.
-- [ ] Validate local build cache behavior after `org.gradle.caching=true`; confirm no stale-input or non-cacheable task problem.
-- [ ] Measure whether `org.gradle.parallel`, configuration cache, configuration-on-demand, build cache, and task consolidation are safe and beneficial for this project's actual module/task graph before changing them.
-- [ ] Remove redundant Gradle invocations or repeated environment setup only where task dependencies and artifact correctness are preserved.
-- [ ] Confirm debug and Profile tasks can share the same Gradle user home/workspace without leaking secrets into the build job.
-- [ ] Confirm release publication is a separate least-privilege job and has a reliable artifact handoff.
-- [ ] Check whether tests can run concurrently with safe build tasks without increasing memory pressure or introducing nondeterminism.
-- [ ] Evaluate path filters only if they cannot miss root Gradle, version catalog, submodule, resource, workflow, or shared source changes.
-- [ ] Keep Android SDK/emulator-capable jobs on compatible runners. Do not replace them with a generic Gradle Docker image by default.
-- [ ] Consider a custom container image only after proving it includes the required Android toolchain, is pinned by digest, is maintained, and improves measured end-to-end cost/time.
-- [ ] Verify cache keys and restore behavior for Gradle wrapper distributions, dependencies, transforms, and build outputs; never cache secrets or signing material.
-- [x] Add app and library unit-test tasks (`:app:testBasicDebugUnitTest`, `:weather-unit:testDebugUnitTest`, and `:maps-utils:testDebugUnitTest`) to the combined Gradle invocation. The combined task graph passed on PR head `0ab3684604be726c3c4243014223b77093e7752d` in exact-head Build run #279 (`45841946733`); this includes the tests, Spotless, Debug assembly, and Debug artifact upload.
-- [x] Verify the expanded app/library unit-test tasks on exact PR head `230a692d19e7b9081ad0dff9708c02b1795242c2`: run #268 passed after the affected `weather-unit` tests explicitly selected the deterministic Java formatting fallback. Android ICU-specific behavior remains an instrumentation-test follow-up.
-- [x] Implement a deterministic diff-based no-hardcoding guard for added production Kotlin lines, with 17 built-in self-tests and reviewed allowlist support; exact-head CI run #269 passed.
-- [x] Verify the no-hardcoding self-test and required Build step on exact PR head `ed50741818faf44e892ca5b658091fb1e1d12d6c`: run #269 passed; all 17 self-test cases passed and the diff scan found no guarded literals. The scanner's heuristic scope and exclusions are documented.
-- [ ] Record cold and warm build measurements, cache hits, runner minutes, artifact size, and CI failure/retry rates where available.
-- [ ] Ensure a failed required check blocks merge; rerun only failed jobs after inspecting the cause.
-- [x] Verify active GitHub ruleset `Protect main` targets `refs/heads/main`, requires the `build` status check, requires PRs, requires review-thread resolution, blocks force pushes/deletion, and has no bypass actors.
-- [ ] Keep test APK publication limited to pushes to protected `main` and report missing secrets/build artifacts honestly.
+- [x] Inventory active workflows: `.github/workflows/build.yml` is the active build workflow.
+- [x] Enable Gradle local build caching and keep `gradle/actions/setup-gradle` as the single cache
+  owner.
+- [x] Consolidate formatting, app/dependency unit tests, Debug assembly, and eligible main-only
+  Profile assembly into the intended Gradle task graph.
+- [x] Add same-PR/branch concurrency cancellation for obsolete runs.
+- [x] Separate least-privilege release publication and scope signing secrets to protected-main work.
+- [x] Restrict temporary signing-file permissions and pin artifact actions to verified immutable SHAs.
+- [x] Add the diff-based no-hardcoding guard with 17 built-in self-tests and a narrowly scoped,
+  owner-reviewed allowlist. It is a heuristic, not a Kotlin parser; manual review remains mandatory.
+- [x] Verify PR #14 exact head `31cace1d3166896871bb0e9ede8182f3b4c29aad` on Build run
+  #285 (`45905434026`): formatting, no-hardcoding checks, unit-test task graph, Debug assembly,
+  and Debug APK artifact upload passed.
+- [ ] Re-run and inspect the same checks on the final updated PR head after this documentation cleanup.
+- [ ] Verify Profile signing, testing APK artifact handoff, and testing-release publication on
+  protected `main` with configured secrets. PR CI intentionally skips those steps.
+- [ ] Re-check JDK, Gradle Wrapper checksum, Android Gradle Plugin, Kotlin, SDK/build-tools, and
+  action versions on the final head.
+- [ ] Measure several comparable cold/warm runs, cache hits, job durations, artifact sizes, and
+  failure/retry rates. Existing samples are mixed; no stable time or runner-cost saving is claimed.
+- [ ] Record physical-device and Android ICU checks as NOT TESTED or DEFERRED unless actually run.
 
-## 4. AI assignment, task sizing, and cost controls
+## 4. AI task sizing and cost controls
 
-- [ ] Apply one primary agent per coherent issue/PR, with a clear scope, acceptance criteria, stop condition, and handoff.
-- [ ] Assign routine extraction, formatting, and small mechanical documentation edits to an efficient model.
-- [ ] Prefer Claude Sonnet or ChatGPT/Codex for normal implementation, Android/Compose work, tests, and scoped debugging.
-- [ ] Use ChatGPT/Codex as coordinator when cross-repository context, GitHub operations, architecture tracking, or multi-step orchestration adds value.
-- [ ] Mark **Opus review recommended** for complex cross-module architecture, difficult root-cause work, concurrency/animation, security/privacy/licensing, data migrations, high-risk CI/release, or major refactors when an independent pass can reduce risk.
-- [ ] Do not block the first implementation on Opus; do not duplicate whole-repository exploration or full CI across agents.
-- [ ] Do not use paid APIs, credits, overages, subscriptions, hosted runners, or extra tiers without explicit approval.
-- [ ] Report actual model/tool usage only when available; never infer token, dollar, or subscription consumption from message counts.
-- [ ] Include exact files, SHA, checks, untested areas, remaining risks, and next action in every non-trivial handoff.
+- [x] Document one primary agent per coherent task and evidence-based handoffs.
+- [x] Set Sonnet or a balanced ChatGPT/Codex coding model as the default for ordinary implementation,
+  tests, debugging, and bounded documentation.
+- [x] Define when independent Opus review is recommended for difficult architecture, security,
+  privacy, licensing, high-risk CI/release, or broad refactors.
+- [x] State that Opus is optional and does not authorize paid usage.
+- [ ] Obtain independent review of CI credential/release permissions when available and authorized.
+- [ ] Do not use paid APIs, extra credits, subscriptions, tools, or tiers without explicit approval.
+- [ ] Report model/tool usage and costs only when known; never infer them from message counts.
 
-## 5. Verification and closure criteria
+## 5. Final review and closure
 
-- [x] GitHub Actions parsed and executed the updated YAML successfully on the exact PR head.
-- [ ] Validate all changed Markdown syntax and all internal/external documentation links.
-- [ ] Check internal relative links and high-value external links.
-- [ ] Search for obsolete repository names, paths, PR numbers, branch names, dates, model names, provider terms, and old architecture choices.
-- [ ] Compare every factual status claim against the relevant repository's current main/branch/PR/CI evidence.
-- [ ] Review the final diff for contradictory, duplicated, speculative, or stale instructions.
-- [ ] Run documentation-only validation without wasting a full Android matrix.
-- [x] Run the appropriate workflow checks for build/Gradle/CI changes: exact-head run #269 completed successfully after adding the no-hardcoding guard.
-- [x] Inspect exact PR head SHA and CI run SHA before accepting green checks: PR head `ed50741818faf44e892ca5b658091fb1e1d12d6c` matches successful run #269 (`45786536059`).
-- [ ] Mark Pixel/physical-device checks NOT TESTED or DEFERRED unless actually performed.
-- [ ] Obtain independent Opus review of CI credentials/release permissions. **Opus review recommended**; not performed in this pass and no paid usage authorized.
-- [ ] Update PLAN only for changed decisions, LOG for dated history, ROADMAP for task status, and CONTINUE for the next actionable handoff.
-- [ ] Close the modernization only when the applicable checklist sections are complete, unresolved items are explicitly deferred with reasons, and the owner has reviewed any strategic/privacy/paid-cost decisions.
+- [ ] Inspect the complete final diff for contradictions, duplicated authority, stale references,
+  and implementation tasks that belong outside the Solstice app.
+- [ ] Check Markdown rendering and all links to the new integration boundary and surviving docs.
+- [ ] Confirm deleted dependency plans/specs have no remaining active inbound links.
+- [ ] Ensure all remaining app privacy, release, accessibility, and device gaps are either completed
+  or explicitly marked deferred with evidence and an owner decision.
+- [ ] Review the final PR scope and exact-head CI before requesting owner review.
+- [ ] Keep PR #14 Draft until the owner review and outstanding acceptance gates are resolved or
+  explicitly deferred.
 
-## 6. Suggested execution order and ownership
+## 6. Confirmed boundaries
 
-| Order | Work package | Primary owner | Second review | Dependency / exit condition |
-|---|---|---|---|---|
-| 0 | PR #14 security hardening and CI validation | ChatGPT/Codex | Opus recommended | Secrets isolated; required CI green; artifacts verified |
-| 1 | Full documentation inventory and authority cleanup | ChatGPT/Codex coordinator; Sonnet implementation | Opus only for conflicting architecture/security claims | No stale active instructions or duplicated authority |
-| 2 | Meridian/Motion cross-repository reconciliation | ChatGPT/Codex | Opus recommended for architecture boundary changes | Exact external status verified; no copied source of truth |
-| 3 | Privacy, data-flow, attribution, and licensing audit | ChatGPT/Codex with source/code inspection | Opus strongly recommended | Every public claim matches implementation; unresolved legal/privacy points escalated |
-| 4 | Gradle/CI performance and reproducibility measurements | ChatGPT/Codex | Sonnet focused review; Opus if security-sensitive design remains | Comparable before/after evidence; no weakened gate |
-| 5 | Final docs validation, links, roadmap and handoff | Efficient model/Sonnet | ChatGPT/Codex final review | All modified docs consistent and PR ready |
-
-## 7. Findings already confirmed during the initial pass
-
-These are concrete audit leads, not a substitute for the full review:
-
-- `PRIVACY.md` still opens with “Breezy Weather” and describes upstream behavior. Validate every statement against Solstice's current implementation before publishing a replacement.
-- The earlier `.gitmodules` URL issue is resolved on this branch: it now points to the canonical `https://github.com/INFORMATION89/Motion-UI.git` while preserving the existing submodule commit. Do not repeat the URL migration unless the canonical upstream changes.
-- `docs/ENGINE_SPEC.md` and `docs/MERIDIAN_PLAN.md` still present 2026-11-23 drafts with older assumptions such as KMP, Room, a planned repository name, and a proposed submodule/composite-build integration. They must not override Meridian-Engine's current master plan.
-- `docs/MOTION_ADOPTION_PLAN.md` has been refreshed: Motion PR #4 and PR #7 are merged with exact-head CI passing; Solstice's submodule remains pinned to the pre-MOT0.1 base commit, and `:motion-ui` is not present.
-- `docs/UI_SYSTEMS.md` identifies itself as a 2026-11-19 research snapshot and says listed work is not built; refresh its inventory against current code before using it to assign implementation work.
-- The current Gradle Wrapper is 9.9.1, JDK is pinned to 21, `gradle/actions/setup-gradle` is already in use, and local Gradle build caching was disabled before this modernization branch. These facts should be rechecked on the final PR head.
-- The current workflow groups Spotless, Motion unit tests, Debug assembly, and optional main-only Profile assembly in one Gradle invocation, and cancels obsolete runs for the same PR/branch. This is a design-level optimization; measured savings remain unknown.
-- The CI refactor scopes signing-secret access to main-only steps, pins artifact actions, combines verification and variant assembly in one Gradle invocation, and cancels obsolete runs. Exact-head run #260 passed, uploaded the Debug APK, and correctly skipped Profile signing/publication on the PR. Performance measurements are variable: #250 was 192 s, #260 was 254 s versus 224 s baseline runs; no stable saving is demonstrated.
-
-## 8. Explicit non-goals
-
-- Do not redesign Solstice's UI, add product features, or change weather behavior as part of this documentation/CI audit.
-- Do not select Meridian's production language, storage, public API, providers, or packaging on Meridian's behalf.
-- Do not claim iOS/desktop support for Solstice because Meridian or Motion may target additional platforms.
-- Do not create a custom Gradle container image unless measurements justify the maintenance and supply-chain cost.
-- Do not merge PR #14, change protected branch settings, publish a production release, or incur paid AI/API/runner usage without the required authorization.
-
-### Privacy and data-flow inspection notes (initial code review, 2026-11-26)
-
-Detailed code-backed findings and unresolved questions are maintained in [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md). It is an internal technical audit only, not a public notice or legal approval.
-
-The following are code-backed findings from the initial review. They define what the full privacy audit must explain; they are not yet a complete legal/privacy approval.
-
-- The manifest declares fine/coarse and background location, but the inspected `AndroidLocationService.permissions` list requests only coarse/fine. The exact worker/call-site and user-visible request flow for background access remain unverified. Do not claim its purpose or refresh behavior until those code paths are traced.
-- The default location source falls back to Android native location. IP.SB is another available location source and calls `https://api.ip.sb/geoip`; using it necessarily exposes the requesting network's public IP to IP.SB, which estimates location from that IP. It does not require Android location permission.
-- Location search includes GeoNames; reverse geocoding uses Android's Geocoder first where available and Nominatim as a remote option/fallback. Weather source selection is per feature/place; currently registered sources include Open-Meteo, FPAS, MET Norway, NCEI, OpenWeather, Pirate Weather, WMO severe weather, ECCC, and NWS. AccuWeather is instantiated in code but Solstice's SourceManager comments say it is disabled from the active worldwide/national source lists for now. Confirm the actual UI-selectable set and exact endpoint fields before drafting final wording.
-- The app-update preference `isAppUpdateCheckEnabled` defaults to `false`. When enabled, the GitHub latest-release request is throttled to at most once per day unless forced; the current app version is compared locally with the returned release version. Do not describe this as telemetry or claim the version is transmitted without separate evidence.
-- Solstice exports a read-only weather ContentProvider, protected by its custom dangerous `READ_PROVIDER` permission. The provider returns saved-location data including latitude/longitude and weather results to apps that receive that permission. The permission prompt strings still say “Breezy Weather” and require Solstice wording.
-- Settings exposes a per-broadcast-source package selector. Gadgetbridge export includes place name, latitude/longitude, current conditions, forecast, and air-quality data. The separate update notifier broadcasts location IDs to configured recipient packages. These are local app-to-app disclosures, not proof of server-side telemetry.
-- Crash log export inspected so far creates a local logcat file for the user to open/share. No automatic crash-upload service was observed in the inspected code; complete dependency/workflow review is still required before making an absolute “no diagnostics are transmitted” claim.
-- The privacy notice currently describes Breezy Weather directly, so it is not a suitable Solstice notice. Replace it only after the complete provider, permission, local-sharing, retention, and build-flavor inventory is reconciled.
+- Solstice's active plans describe only the app's requirements, behavior, implementation, tests,
+  privacy, and release work.
+- A dependency's internal modules, code, lab, API design, technical decisions, milestone sequence,
+  and platform expansion are documented and implemented in that dependency's own repository.
+- Solstice documents only the consumer requirements it owns: compatible public API/artifact, pinned
+  version, licence/notices, Android support, privacy implications, lifecycle, errors, and parity
+  testing.
+- A dependency validation harness is not a production engine or a released consumer API.

@@ -8,7 +8,7 @@ a part is agreed it moves to PLAN.md "Decisions in force" and leaves this file.
 
 ## 1. Outlook (replaces "This week")
 
-Direction 6: a proactive planning page, like Acme Weather, not just a list of days. The day list stays.
+Direction 4: a proactive planning page, like Acme Weather, not just a list of days. The day list stays.
 
 **Shape of the page, top to bottom**
 1. **Up next:** at most three notable things in the coming days, most important first. Examples:
@@ -21,11 +21,10 @@ Direction 6: a proactive planning page, like Acme Weather, not just a list of da
 3. **Changes ahead:** a cold front, a big temperature drop or rise, the start or end of a rainy stretch,
    the first rains of the season.
 4. **Evenings for the sky:** clear evenings, with the moon phase (dark sky near the new moon).
-5. **The day list:** 10 days, as today, each with the confidence from Meridian's spread.
+5. **The day list:** 10 days, as today, each with a confidence indication where the app's weather data provides one.
 
 **Rules that keep it honest**
-- Every answer shows how sure it is: "models agree" or "could change" (from the spread, ENGINE_SPEC.md
-  section 7). Past a set number of days ahead (a token, about 5), only trends, never "best day" picks.
+- Every answer shows how sure it is: "models agree" or "could change" (from the available forecast confidence data; never invent confidence). Past a set number of days ahead (a token, about 5), only trends, never "best day" picks.
 - Each pick says why in a few words ("dry, light wind, 22°") and opens the day's detail.
 - The comfort band, weights and thresholds are tokens; the person can nudge "comfortable" warmer or
   cooler later, in Settings.
@@ -45,8 +44,7 @@ Decided: every card opens one sheet with two heights, no separate page (Marco, 2
 - **Partial (medium height):** the answer and its timeline. What the card says, bigger, plus the next
   hours, plus one line of "what to do" where it applies.
 - **Full (large height, swipe up or tap the grabber):** the detail, then the explainer (a short Solstice
-  text with "Read more" from Wikipedia, credited), then "Where this comes from" (sources and the
-  transparency graphic, SOURCES.md).
+  text with "Read more" from Wikipedia, credited), then "Where this comes from" (source attribution and the app's available provenance details).
 
 | Card | Partial | Full adds |
 |---|---|---|
@@ -70,9 +68,9 @@ proposal for each card's contents, still to confirm card by card.
 
 ## 3. Settings structure
 
-Rules: DESIGN.md rule 3 (a setting exists only for a real choice); Motion UI pieces (category icons in
-coloured shapes, inline choice buttons for 2 or 3 options, choice sheets for lists, large title that
-shrinks on scroll); every screen one job.
+Rules: DESIGN.md rule 3 (a setting exists only for a real choice); Solstice-owned category icons,
+inline choice buttons for 2 or 3 options, choice sheets for lists, and a large title that shrinks on
+scroll; every screen has one job.
 
 **Home, in this order**
 1. **Places:** home (current location or a fixed place), travel swap, the saved list.
@@ -99,7 +97,7 @@ Units, Appearance stay; Debug hidden.
 
 **Question for Marco:** search inside Settings, needed with nine sections?
 
-## 4. Proactive alerts (PLAN.md Direction 4, open question 4)
+## 4. Proactive alerts (PLAN.md Direction 3, open question 4)
 
 Proposed 2026-11-23. Wording in WRITING.md section 9.
 
@@ -120,7 +118,7 @@ changes, what to wear.
 the UV card's the UV alert), and all together in Settings › Notifications. Not in onboarding: the first
 time you open a card that has an alert, a one-line hint under its title.
 
-**How it runs** (from SOURCES.md, no server): the phone's scheduled refresh checks the minutely
+**How it runs** (Solstice-owned scheduling policy): the phone's scheduled refresh checks the minutely
 forecast more often only while a rain alert is armed and rain is possible in the next 2 hours
 (otherwise the normal schedule). Notification permission is asked when you first switch an alert on,
 never at start. The countdown is an Android Live Update (you started it, it has a Stop button);

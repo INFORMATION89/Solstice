@@ -1,6 +1,6 @@
 # Solstice roadmap
 
-**Status (2026-11-26):** This file is a mixed historical backlog, not a verified live sprint board. Its dated session headings record what was planned or checked at the time; they are not current schedules. Completed items may remain checked as historical evidence, and unchecked items must be revalidated against source, current product decisions, and the modernization checklist before implementation. The current documentation/CI audit is tracked in [MODERNIZATION_CHECKLIST.md](MODERNIZATION_CHECKLIST.md); authoritative decisions remain in [PLAN.md](PLAN.md), and cross-repository gates are recorded there.
+**Status (2026-11-26):** This is Solstice's application backlog, not a schedule or a work queue for external dependencies. Dated session headings are historical, not current commitments. Revalidate unchecked items against current app source and approved product decisions before implementation. Documentation/CI work is tracked in [MODERNIZATION_CHECKLIST.md](MODERNIZATION_CHECKLIST.md); product decisions remain in [PLAN.md](PLAN.md). Consumer-side dependency boundaries are documented separately in [INTEGRATIONS.md](INTEGRATIONS.md).
 
 Everything is grouped by area and type. Keep the roadmap focused on work still relevant to the app; remove or archive obsolete items only after checking the current source and approved decisions.
 
@@ -45,32 +45,27 @@ Built 2026-11-19 morning; not yet checked on the Pixel (it wasn't connected).
 
 ## 🗓 6 AM session (2026-11-21): new morph refining, research, plans
 
-See CONTINUE.md "6 AM session": reopen while it's still closing, a stronger text blur, iOS 26/27 blur and
-animation research, a velocity cap, a bit more opening bounce, the Motion Lab redesign plan (with a
-comparison to Google's libraries, no weather references), and Apple's principles for the toolbar.
+Historical session note. Revalidate remaining Solstice-owned interaction issues against the current
+app source and the app-specific motion principles before adding them to the active backlog.
 
 ## 🗓 Next week: interactive glass (backlog, added 2026-11-22)
 
-Liquid-Glass-style touch response for every glass button (`FrameButton`, toolbar, pills), as one
-`interactiveGlass` piece in Motion, Motion Lab first with a switch per behaviour, then the app. Ideas
-(chat, 2026-11-22; none agreed yet): press swell and springy release; a touch light that spreads from the
-finger and follows it; hold (brighter, a little more swell, a haptic tick, optionally growing into a small
-glass menu via the morph kinds, e.g. ✕ → "Close" / "Pin and close"); elastic stretch when the finger slides
-off, cancelling past the edge; a release ripple as a bend in the glass; appear and disappear through blur;
-neighbouring glass buttons merging into one shape (most ambitious); haptics from the existing tokens.
-Rules: never blocks input, values from Motion tokens only, Reduce Motion keeps light and haptics but drops
-stretch and scale.
+Possible Solstice glass-interaction refinement (not approved for implementation): press swell and
+springy release; a touch light that follows the finger; a subtle hold response; elastic stretch near
+the edge; a release ripple; and adjacent glass controls sharing a surface. Any approved version must
+preserve responsive input, accessibility, and reduced-motion behavior. Implementation remains in the
+Solstice app and must not require changes to an external dependency.
 
 ## 🐞 Review 2026-11-22: bugs, fixes and what to rebuild (from chat; details per item below)
 
-Suggested order: R3 with B3 and B4 (Motion's core), then B2's rule and D1's text, then Saturday's kit
-foundations, then the kit pieces in R2's order. Each item still gets agreed before it's built.
+Suggested order: app interaction bugs B3/B4, then B2's precipitation rule and D1's text, followed by
+approved Solstice UI refinements. Each visible change still follows RULES.md.
 
 ### Bugs
 - [ ] **B1 · Place time on the "Visiting" line** (`PageFrame.kt` `VisitingLine`): says "Visiting" even for
   saved places (ignores `pinned`); four different looks for a place's time (Forecast header, window
   line with a typed-in " · ", postcard caption in capitals without the clock, search). Fix: one
-  place-time component in the kit (variants), shown whenever the time differs; "Visiting" only for
+  Solstice-owned place-time component (variants), shown whenever the time differs; "Visiting" only for
   previews; separator as a string.
 - [ ] **B2 · Rain card at 0 %, noisy rain notifications** (`RainCard.kt` `rainOutlook`: any trace over
   0.05 mm, or a "rain" code at 0 %; snow ignored; "10m"… typed in. Upstream `Weather.hasMinutelyPrecipitation`:
@@ -79,14 +74,13 @@ foundations, then the kit pieces in R2's order. Each item still gets agreed befo
 - [ ] **B3 · Tapping after a swipe stops the tabs** (`PageSpring.kt`): the pager counts as scrolling
   until the bounce settles, and Compose's pager swallows the tap that stops a scroll; `SpringMorph`
   also takes any tap while opening. Fix: travel by scroll without overshoot, draw the bounce as an
-  offset; a "settled" threshold token; lab test of swipe-then-tap.
+  offset; a "settled" threshold token; an app regression test for swipe-then-tap.
 - [ ] **B4 · Jumping across the toolbar flashes Forecast** (`springToPage` scrolls through every page;
-  `Toolbar.kt:157` blends the highlight colour from the scroll position). Fix: a Motion "jump"
-  (snap next to the target, spring the last page), highlight driven by the target tab; a Motion UI
-  option. Replaces "tab tap speeds" and "a little spring on the edge-to-edge jump" below.
+  `Toolbar.kt:157` blends the highlight colour from the scroll position). Fix the Solstice page-selection transition so direct tab jumps do not flash intermediate pages and
+  the highlight follows the target. Replaces "tab tap speeds" and "a little spring on the edge-to-edge jump" below.
 - [ ] **B5 · Blur text change too fast and distracting** (`BlurCrossfade.kt`: both texts blur at once on a
-  bouncy spring). Lab options, all three: A fade-through (out, then in, no bounce), B softer blur and
-  slower spring, C only what changed moves (rolling digits). Marco picks on the phone.
+  bouncy spring). App-side alternatives: A fade-through, B softer/slower blur, or C animate only changed digits. Review
+  the alternatives in Solstice before choosing.
 
 ### Design fixes
 - [ ] **D1 · This week's text:** drop "through the week", "all week", "this week" from its summary lines
@@ -95,42 +89,10 @@ foundations, then the kit pieces in R2's order. Each item still gets agreed befo
   larger of the status bar and the camera cutout, plus an eased fade below, from tokens.
 - [ ] **D3 · The "no rain" line** becomes a small card that fits the card layout.
 
-### Framework pieces (Motion UI)
-- [ ] **F1 · Cards with several pages:** one sliding indicator (like iOS's segmented control),
-  animated content, tap to switch (no sideways swipe inside a card). The rain card first.
-- [ ] **F2 · Card heights:** medium shows the details, full shows an explainer (PLAN.md research 5).
-- [ ] **F3 · Page-transition blur** as a Motion UI option (on or off).
-- [ ] **F4 · Toolbar jump transition** (B4).
-- [ ] **F5 · Settings pieces:** collapsing large title, section header, rows (plain, switch, value,
-  connected-button choice), slider row, picker sheet, navigation stack with predictive back, About and
-  licences pages.
-- [ ] **Messages in Motion UI** (PLAN.md "Messages"): queue-and-merge or stacked as options, two lines,
-  accessibility timing, kinds with icons; every typed-in value to tokens.
-- [ ] **Header close side option** (✕ at the end or the start), already listed above.
+### Solstice-owned refinements
 
-### Rebuilds
-- [ ] **R1 · This week's temperature card** on the kit (layout kept; spacing and sizes checked); days as
-  kit rows instead of plain `Surface` buttons.
-- [ ] **R2 · Everything onto Motion UI:**
-  - Kit as is: `Glass`, `SolsticeCard`, `SheetHandle`, `SheetShape`, `ScreenCorners`, `SheetDialog`,
-    `SolsticeSheetState`, `IconBadge`, `PressMorph`, `ExpressiveChoices`, `CollapsingTopBar`,
-    `ScreenPush`, `PageFrame`, `Toolbar` + `ToolbarMotion`, `Messages`, theme files.
-  - Kit pieces from today's code: paged card (`RainCard`), partial sheet (moon card), full-page window
-    (`PlaceWindow`), search sheet (`SearchOverlay`), reorderable list (`ReorderList`, `PlacesPage`),
-    footnote line (`UpdatedLine`), place time (`PlaceTime`).
-  - Main pages off the framework today: Forecast's own frame (not `PageScaffold`), "More details"
-    (upstream's screen) and the empty state's plain buttons, the hand-drawn sun path with typed-in
-    sizes, the 700 ms develop timer; This week's day buttons; Places' own gestures and postcards (timed
-    animations and `delay()`s); the window's own pager.
-  - Stays in the app, built from kit parts: sky, sun path, postcard content, moon renderer,
-    summaries, rain logic. Goes: `SolsticeMotion.kt`, the lab copy.
-- [ ] **R3 · Motion's core, compared with Compose, Material 3, UIKit/SwiftUI, Framer Motion, React
-  Native's gesture handler:** explicit states for every interactive piece (not "are springs still
-  running"; `SpringMorph` runs five values in five coroutines); declared gesture rules (together,
-  exclusive, wait-for) instead of on/off flags (`shareTouchesWhile`, `morphPassThrough`); build on
-  Compose's `AnchoredDraggable` + nested scroll (sheet heights) and `SharedTransitionLayout` /
-  `SeekableTransitionState` (morphs, predictive back) with Motion's springs; bounces drawn, never
-  scrolled; touch slop, settle and blur sizes as tokens.
+- [ ] **R1 · This week's temperature card:** preserve the approved layout while refining spacing,
+  sizes, and day-row interaction in the app.
 
 ### Decisions and clean-up
 - [ ] **Q1 · Icons** (PLAN.md "Icons"): build the Rounded / Outlined / Sharp setting; weather conditions
@@ -147,39 +109,37 @@ foundations, then the kit pieces in R2's order. Each item still gets agreed befo
 ### Earlier bugs checked against the rebuild
 | Earlier item | Status |
 |---|---|
-| One toolbar for home and window | Fixed by the kit toolbar (R2) |
+| One toolbar for home and window | Fixed by the Solstice shell toolbar |
 | Tab tap speeds; spring on the edge-to-edge jump | Replaced by B4 |
 | Frames drop opening the moon card and search | Likely fixed by the moon card and search rebuilds; re-measure |
 | Drawing past the edges while the page recedes | Gone (recede dropped) |
-| Rain card with real rain; animate amount ↔ chance | Covered by B2 and F1 |
+| Rain card with real rain; animate amount ↔ chance | Covered by B2 and the precipitation card backlog |
 | Precipitation element for This week | Part of R1 |
-| Toolbar label and page heading showing together | A page-frame rule in the kit |
-| Places: dragging a card partly off screen; no scrolling at the edge | Not fixed by the move: fix in the kit's reorderable list (shared with Forecast cards) |
+| Toolbar label and page heading showing together | An app page-layout rule |
+| Places: dragging a card partly off screen; no scrolling at the edge | Not fixed yet: fix in Solstice's reorderable list behavior |
 | Reset Places' scroll when you leave | Small fix, or a page-frame option |
 | Search keeps "Puebla" | Separate re-test |
 | "Last updated" and refresh on start | Already built; duplicate roadmap lines to remove |
 | Swapping main and pinned when you travel | Decided: automatic swap (PLAN.md "Places and travel") |
 
-## 🗓 Saturday 2026-11-28, 1:00 AM
+## Session planning
 
-Plan in CONTINUE.md "Next session": guardrails (no-hardcoding CI check, app tests in CI), one Motion
-Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed), docs, phone pass.
+Session scope and scheduling live in the app-only [CONTINUE.md](CONTINUE.md). This roadmap does not assign or schedule work for external projects.
 
 ## 💬 Proposals to bring to Marco (from chat 2026-11-22)
 
 - [x] 💬⭐ **App layout:** Forecast keeps today's layout (2026-11-22). A2 from the layout canvas is the
   pattern for partial sheets (PLAN.md Direction 2).
-- [ ] ⭐ **Partial sheet in Motion's kit** (the A2 pattern): grows out of its card, dimmed page behind,
-  medium height first, then large (no separate page) for every card, grabber (drag, tap cycles heights, TalkBack), swipe down to close, ✕ at the end, room for a
-  chart and setting rows. Lab page first; then which Forecast cards open one (to agree).
-- [ ] ⭐ **Header close side as a Motion option:** ✕ at the end (default) or swapped with the leading
-  button; mirrored for right-to-left; a lab switch.
+- [ ] ⭐ **Partial sheet experience in Solstice** (the A2 pattern): grows out of its card, with a dimmed
+  page behind, medium height first and then large, a grabber that supports drag/tap/TalkBack, swipe down
+  to close, and room for a chart and setting rows. Confirm which Forecast cards open one.
+- [ ] ⭐ **Header close position in Solstice:** ✕ at the end (default) or swapped with the leading button; mirrored for right-to-left.
 - [ ] ⭐ **Optional, reorderable Forecast cards** with a general "most important moves to the top" rule
   (replaces the rain-only special case in `ForecastPage.kt`): on by default, the card returns to your order
   once it no longer matters, a switch to turn it off. Catalog and thresholds: PLAN.md "Forecast card catalog".
-- [ ] ⭐ **Forecast spacing pass** against Material's spacing guidance, kit tokens only (hero temperature,
+- [ ] ⭐ **Forecast spacing pass** against Material's spacing guidance, Solstice design tokens only (hero temperature,
   sun/moon path and time stay).
-- [ ] ⭐ **Moon card rework** on `motion-ui` as a partial sheet (with the kit move).
+- [ ] ⭐ **Moon card rework** as a Solstice-owned partial sheet.
 - [ ] 💬⭐ **Outlook** (This week renamed, decided 2026-11-23): propose its proactive answers (best weekend day
   to go out, notable days ahead, good sky evenings); the day list stays. PLAN.md Direction 6.
 - [ ] ⭐ **What to wear card** on Forecast, always shown, today by day and tomorrow from the evening switch.
@@ -190,7 +150,7 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 - [ ] 💬 **Postcards in a standard look**, the physical feel kept in the interaction (Direction 3).
 - [ ] 💬⭐ **Proactive alerts the Gradient Weather way** (Direction 4): alerts you choose to watch, rain or
   snow countdown as a Live Update, cooldowns, official warnings in full, evening summary, what to wear.
-- [ ] 💬 Spring tokens as speed × bounce; Reduce Motion behaviour; glass on cards (PLAN.md open questions).
+- [ ] 💬 Refine Solstice's interaction feel, reduced-motion behavior, and card materials (PLAN.md open questions).
 
 ## ⭐ Next session priorities
 
@@ -208,22 +168,15 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
   faster.
 - [ ] **A reusable "move and transform into place" system** (morphs, for buttons too). Search for
   libraries first. First use: a visited place's loading state (see Postcard window).
-- [x] Motion tokens: `SolsticeMotion.kt` and `docs/MOTION.md` (2026-11-19), first used by the moon sheet.
-- [x] Apply the motion system to search, the postcard window, Places drag and the toolbar (M4, 2026-11-19).
-- [x] **Fix:** `MotionValue` jumps back when an overshoot is caught; `motionDrag` doesn't catch a moving
-  surface until the touch slop. Add `MotionValue` tests. (CONTINUE.md, code review.)
+- [x] Solstice motion tokens: `SolsticeMotion.kt` and `docs/MOTION.md` (2026-11-19), first used by the moon sheet.
+- [x] Apply the motion system to search, the postcard window, Places drag and the toolbar (2026-11-19).
 - [x] 💬⭐ **Design tokens:** spacing (4 dp grid), sizes, shapes with continuous corners, palette file,
   hero type styles, Solstice `MotionScheme`. See `docs/UI_SYSTEMS.md`.
 - [x] 💬 **Haze prototype** for glass and edge blur, measured on the Pixel 7 against `Glass.kt`.
-- [x] **Component catalog** (first pass; one Sheet and PageScaffold come with M4): split `ShellPages.kt`; one Card / Sheet / Toolbar / Message / PageScaffold;
+- [x] **Component catalog** (first pass; one Sheet and PageScaffold come with in the initial pass): split `ShellPages.kt`; one Card / Sheet / Toolbar / Message / PageScaffold;
   `PlaceWindow` reuses them.
 - [x] Swap `ReorderList.kt` for the Reorderable library. Pushed screens to Navigation 3: decided, migration started (2026-11-19).
-- [ ] 💬⭐ **Motion framework** (`:motion` module, reusable in other projects): one motion value per
-  interaction, morphs from anchors instead of a seeked `SharedTransitionLayout`, iOS-style springs and
-  release rules. Plan in PLAN.md, "Motion framework" (M0 to M5); M0 = agree it.
-- [ ] **Motion in its own repo** (long term, the user 2026-11-21): `:motion` (Apache-2.0) and the
-  Motion Lab move out into their own repository, where Motion work then happens; Solstice depends on
-  it. Until then keep `:motion` free of app code (no Solstice imports) so the split stays a move.
+
 - [ ] **Design frameworks:** spacing scale, type scale, motion tokens, component rules.
 - [x] 💬⭐ **Icon style:** Material Symbols Rounded, one catalog (`SolsticeIcons`), old Material Icons
   removed (2026-11-19, PR #1). Check on the phone (CONTINUE.md).
@@ -232,20 +185,20 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 - [x] **Fix** (checked 2026-11-19): swiping search down shows two search icons (the toolbar's button is drawn while the
   card's icon travels to it); hide it until the hand-off (CONTINUE.md 1B).
 - [x] **Test builds for the user** (built 2026-11-20; waiting on the two GitHub secrets): profile build on a rolling `testing` pre-release, stable test key,
-  "Solstice Lab" launcher icon in test builds (CONTINUE.md 1C).
-- [ ] **M5:** motion lab, then refining rounds (moon, search, window, toolbar, Places, messages).
+  "Solstice" launcher icon in test builds (CONTINUE.md 1C).
+
 - [x] **Minimum Android 10** (API 29), done 2026-11-21.
-- [ ] 💬⭐ **Morph refining (Sat 2026-11-21, 1:00 AM, top priority):** lab renamed "Motion Lab"; the button
-  itself becomes the card; blur to hide text changes; text transformations (label into title, replace,
-  rolling numbers); a lab demo per kind of animation; the toolbar's animations into `:motion` and the lab.
-  PLAN.md "Morph refining".
+- [ ] 💬⭐ **Morph and content refinements:** improve how app buttons become cards, how text changes
+  are introduced, and how numeric values update. Review the alternatives on the Solstice app before
+  implementation; no dependency or lab work is included.
+
 - [ ] **"Last updated" and the weather source** at the bottom of Forecast (agreed 2026-11-21; CONTINUE.md "Right now").
 - [ ] **Refresh the main place on a cold start** (agreed 2026-11-21), then check the API cost with the user.
 - [ ] **"Will I see it tonight?"** in the moon card (agreed 2026-11-21, with F5).
 - [ ] **Fix:** one toolbar for home and the postcard window (the window's This week title doesn't fold;
   no page jump; missing hooks). Shared state + host, only configuration differs (CONTINUE.md 0b.3).
 - [x] 💬 **Solstice's opinion** (DESIGN.md, written with the user 2026-11-21).
-- [ ] 🔎 **Research:** page recede done cheaply as a `:motion` piece; long press alongside drag to reorder;
+- [ ] 🔎 **Research:** refine the page-recede interaction within Solstice; long press alongside drag to reorder;
   proactive channels (Live Updates, daily brief, clothing). PLAN.md "Research queue".
 - [ ] **Design audits** (DESIGN.md): empty/loading/error/offline states everywhere; affordances vs behaviour;
   dead ends and links between information; landscape/foldable/tablet layouts; settings that shouldn't exist.
@@ -261,7 +214,7 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 - [ ] 💬 **Twinkling stars** (built with F4, switched on only once agreed).
 - [x] **Moon icon on the Forecast diagram follows the moon's real tilt** (done 2026-11-21, `MoonSky`; not yet seen on the phone).
 - [ ] 💬 **Very subtle toolbar haptics**, once F1's haptics system exists.
-- [x] **Fix:** taps blocked while a tab transition plays (done 2026-11-21: `:motion` PageTransition; closing sheets let taps through too).
+- [x] **Fix:** taps blocked while a tab transition plays (done 2026-11-21: page changes no longer block taps; closing sheets also let taps through).
 - [x] **Fix:** the postcard window's pages lack home's blur between tabs (done 2026-11-21: `ShellNavigation`, shared with home).
 - [ ] **Icons vs M3** (PLAN.md "Icons", gaps 1–4): grade -25 for light icons on dark backgrounds; selected
   toolbar tab filled; audit small-icon labels, 48 dp touch targets, icon/text alignment; optical size 40 for big icons.
@@ -441,18 +394,3 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 - [ ] Re-check a protected-main Profile build and testing-release publication end to end.
 - [ ] Tablets: rotation and layout.
 - [ ] App icon: the softer, rounder icon search.
-
-
-## Meridian-Engine integration (blocked by Meridian's own acceptance gates)
-
-**Status as of 2026-11-26:** blocked. Meridian-Engine is still completing MER-0.1 platform and production-stack evidence. Its KMP platform proof is a candidate, not final production-stack approval. Track the authoritative status in [Meridian-Engine/PLAN.md](https://github.com/INFORMATION89/Meridian-Engine/blob/main/PLAN.md); Solstice does not own or duplicate Meridian's implementation roadmap.
-
-- [ ] Wait for Meridian's MER-0.1 evidence and explicit owner approval of the production direction. Do not repeat the platform spike or select Kotlin Multiplatform, Rust, HTTP engines, storage, or packaging on Meridian's behalf.
-- [ ] Wait for Meridian M0.2 public API and storage contracts, with an independent consumer test. Solstice must remain one consumer, not a required dependency or the source of public contracts.
-- [ ] Wait for Meridian M0.3 reproducible forecast/observation verification and its acceptance evidence before planning production weather-feature adoption.
-- [ ] Once those gates pass, review the actual versioned consumer artifact, supported Android target, dependency/license notices, cancellation/error contract, refresh lifecycle, and distribution method. Do not assume the old Solstice submodule/composite-build proposal is the official integration path.
-- [ ] Write a Solstice-owned integration specification against Meridian's approved public API and artifact. Keep current Solstice behavior operational while the integration is prepared.
-- [ ] Migrate from the existing Breezy data layer feature by feature, following the approved Solstice migration order (the earlier agreed starting priority was alerts) only when Meridian provides the corresponding accepted capability. Retain adapters until each slice passes parity and regression checks.
-- [ ] Keep app-owned concerns in Solstice: saved places, permissions, background scheduling, notifications/Live Updates, app settings, UI, app-to-app sharing, and user consent. Meridian remains a UI-free independent engine.
-- [ ] Preserve provenance/freshness and the privacy boundary in every integration. Any future data contribution remains off by default and requires separate, explicit, revocable opt-in.
-- [ ] Record the exact Meridian version/commit, artifact checksum, API compatibility, tests, untested targets, and migration limits in the Solstice handoff and release notes.

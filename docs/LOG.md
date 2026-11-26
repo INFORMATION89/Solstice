@@ -1521,3 +1521,10 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 
 - **2026-11-26 clarification:** Motion PR #7 (standalone Motion Lab) was merged at `6ea53caf31a17b70894487cd065707a800d1a35a` after exact PR-head run #106 (`45784947096`) passed. Motion main is now `04598184db3418f03a40eb4611bc0c5be853b949`; `:motion-ui` remains absent. The Solstice submodule pointer remains intentionally unchanged pending a separate adoption review.
 - **2026-11-26 clarification:** The earlier note that `main` lacked protection was true at that earlier observation but is superseded: the active `Protect main` repository ruleset now targets `refs/heads/main`, requires PRs and the `build` status check, resolves review threads, blocks force pushes/deletion, and has no bypass actors. It currently requires zero approving reviews; no review-count requirement was configured.
+
+- **2026-11-26 — documentation ownership cleanup:** Active Solstice plans and handoffs were narrowed to
+  app-owned product behavior, app engineering, privacy, and release work. Motion-UI and Meridian-Engine
+  internal roadmaps, milestones, lab work, implementation specifications, and technical decisions are
+  to remain in their respective repositories. Their consumer boundaries are kept in
+  `docs/INTEGRATIONS.md`. Earlier dated entries remain historical records and are not current work
+  instructions.

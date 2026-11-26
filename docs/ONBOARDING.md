@@ -40,7 +40,7 @@ has loaded, so it never stands between you and the weather:
 
 **Asked later, in context, never in onboarding:**
 - Notifications: when you first turn on a rain or alert notification.
-- Keys and best-effort sources: when you're in their area (SOURCES.md, "Off until relevant").
+- Source options and API-key setup: show them only when relevant to the selected place and describe coverage in the app's Weather Sources settings.
 - Evening time, units, sources: sensible defaults from the system and the place; changeable in
   Settings.
 

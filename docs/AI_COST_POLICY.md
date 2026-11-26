@@ -20,7 +20,7 @@ Use one primary owner for each coherent task. Model names and availability chang
 |---|---|---|
 | Formatting, short documentation edits, extraction, simple mechanical changes | Efficient model; Sonnet for bounded implementation | Not normally useful |
 | Normal Android/Compose implementation, tests, focused debugging, ordinary review | Claude Sonnet or ChatGPT/Codex with proportionate reasoning effort | Only if the diff has meaningful hidden risk |
-| Cross-module work involving Solstice, Motion, and Meridian; complex Gradle/CI diagnosis; difficult animation/concurrency bugs | ChatGPT/Codex or Sonnet as primary, with one clear owner | **Recommended** when an independent advanced review can challenge assumptions |
+| Cross-repository coordination, complex Gradle/CI diagnosis, difficult animation/concurrency bugs | ChatGPT/Codex or Sonnet as primary, with one clear owner | **Recommended** when an independent advanced review can challenge assumptions |
 | Security, privacy, licensing, data handling, major architecture, public API or migration decisions | ChatGPT/Codex or Sonnet prepares evidence and alternatives; owner approves strategic decisions | **Strongly recommended** as an independent review when available and approved |
 | Release, protected-branch, destructive, paid-service, or irreversible action | Explicit owner authorization required | Review does not replace authorization |
 
@@ -128,5 +128,5 @@ Never invent token counts, dollar amounts, cache savings, test results, or devic
 - `docs/RULES.md` remains authoritative for Solstice product, design, privacy, clean-room, and engineering constraints.
 - Root `AGENTS.md` gives coding agents their operational reading order and workflow.
 - This file defines Solstice-specific AI/resource efficiency and verification guidance.
-- The shared Motion-UI `AI_USAGE_POLICY.md` provides cross-repository baseline guidance. This document adds Solstice/Android/Gradle-specific rules.
+- The shared AI usage policy provides baseline guidance. This document adds Solstice/Android/Gradle-specific rules. This document adds Solstice/Android/Gradle-specific rules.
 - `docs/PLAN.md` owns product and architecture decisions; `docs/ROADMAP.md` owns remaining work; `docs/CONTINUE.md` owns the current handoff.

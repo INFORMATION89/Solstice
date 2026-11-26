@@ -7,7 +7,7 @@ another doc disagree, this file wins, and the other doc gets fixed.
 - **What Solstice is for and the design checks:** [DESIGN.md](DESIGN.md). Motion: [MOTION.md](MOTION.md).
   Writing: [WRITING.md](WRITING.md).
 - **To-do list:** [ROADMAP.md](ROADMAP.md). **Where things stand right now:** [CONTINUE.md](CONTINUE.md).
-- **Motion integration:** [Motion adoption plan](MOTION_ADOPTION_PLAN.md) (verified inventory, ownership boundaries, and phased migration).
+- **External dependency contracts:** [INTEGRATIONS.md](INTEGRATIONS.md). This file records only what Solstice consumes and the app-owned responsibilities; dependency implementation plans live in their own repositories.
 - **Documentation/CI audit:** [MODERNIZATION_CHECKLIST.md](MODERNIZATION_CHECKLIST.md) (active checklist; tracking only, not a product-decision authority).
 - **Privacy evidence:** [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md) is an internal code/data-flow audit, not the public privacy policy; the public notice remains under review.
 - **History:** [LOG.md](LOG.md) (every dated entry, unchanged). The old, long PLAN.md is in
@@ -18,12 +18,7 @@ logs, session notes or build reports here.
 
 ## Direction (discussed with Marco 2026-11-22, details to agree before any code)
 
-1. **Motion becomes the UI framework, not only the animation library.** The pieces Solstice built
-   (page frame and scaffold, card, sheet, toolbar, buttons and header actions, messages, text roles,
-   glass, tokens) move into the Motion repo, so Solstice and future apps are mostly configuration.
-   Work happens in Motion first (with its lab), then the app imports and configures it.
-   Structure, names and order: to propose and agree (see "Open questions").
-2. **Forecast keeps today's layout** (Marco, 2026-11-22: "it's more unique"). The layout wireframes
+1. **Forecast keeps today's layout** (Marco, 2026-11-22: "it's more unique"). The layout wireframes
    (design canvas "Solstice layout directions") are not the new Forecast; what stays from them:
    - **A2 is the pattern for cards that aren't full pages:** a partial sheet that grows out of the
      card you tapped, over a dimmed page, with the detail, a chart and that card's own settings (e.g.
@@ -42,12 +37,12 @@ logs, session notes or build reports here.
      **By default the important, relevant card moves to the top** while it matters, then goes back to its
      place in your order (Marco, 2026-11-22). "By default" means it can be switched off.
    - **Forecast keeps** the hero temperature with the sun/moon path and the time; it gets a **spacing
-     pass** against Material's spacing guidance using the kit's tokens.
-   - **The moon card gets reworked** with the move to `motion-ui`: it becomes a partial sheet built from
-     the kit (it doesn't follow the Material work so far).
-3. **Skeuomorphism moves into interaction, not looks** (Marco, 2026-11-22): physical feel (springs,
+     pass** against Material's spacing guidance using Solstice's design tokens.
+   - **The moon card is a Solstice feature:** its content, layout, visual treatment, and sheet behavior
+     remain owned and implemented by the app, using only reusable APIs already available to it.
+2. **Skeuomorphism moves into interaction, not looks** (Marco, 2026-11-22): physical feel (springs,
    drag, press, peel, haptics) stays; visuals follow a more standard design. The postcards go first.
-4. **Proactive alerts the Gradient Weather way** (Marco, 2026-11-22: "should be used as well"):
+3. **Proactive alerts the Gradient Weather way** (Marco, 2026-11-22: "should be used as well"):
    - Alerts are things **you choose to watch**, each with its own threshold: imminent rain or snow
      (a heads-up 10, 15 or 20 minutes before, with a **live countdown**), frost, UV above your level,
      pollen per allergen, air quality dropping, rapid pressure changes, official warnings, an evening
@@ -59,12 +54,10 @@ logs, session notes or build reports here.
    - Official warnings open in full inside Solstice, coloured by severity.
    - Which alerts, their wording, defaults and where you set them up: to propose and agree. Source:
      gradientweather.app and its Play Store listing (2026-11-22).
-6. **This week becomes "Outlook"** (Marco, 2026-11-23): a proactive planning page, like Acme Weather's
+4. **This week becomes "Outlook"** (Marco, 2026-11-23): a proactive planning page, like Acme Weather's
    approach, not just a list of days. Examples: the best weekend day to be outside, notable days ahead
    (heat, a cold front, a rainy stretch), good evenings for the sky. The day list stays. What it answers,
    and how, to propose to Marco.
-5. **No coding until the next session (Saturday 1:00 AM)**; this week is research, rules and planning.
-   Saturday's plan: [CONTINUE.md](CONTINUE.md), "Next session".
 
 ## Decisions in force
 
@@ -78,7 +71,7 @@ logs, session notes or build reports here.
 | Upstream sync | Patch-based (CONTINUE.md); edits to upstream files kept small and listed below |
 | Weather sources | Worldwide + North America; AccuWeather disabled for now; current-location name from Android's geocoder |
 | Widgets | Upstream's for now; Solstice widgets later |
-| Motion | Separate repo (`INFORMATION89/Motion`, Apache-2.0), a git submodule built with `includeBuild` |
+| UI/motion dependencies | External libraries are consumed through reviewed, pinned integration points; see [INTEGRATIONS.md](INTEGRATIONS.md). Solstice owns its UI, styling, and behavior. |
 
 ### Look and feel
 | Topic | Decision |
@@ -88,24 +81,19 @@ logs, session notes or build reports here.
 | Icons | Interface: Material Symbols, one catalog (`SolsticeIcons`), one weight (500), fill only for on/selected; **a setting for Rounded, Outlined or Sharp** (decided 2026-11-22; Rounded default). Weather conditions: **Material Symbols for now** (decided 2026-11-23: no animated icons); later option: **our own set built from Material Symbols' weather shapes** with a Solstice colour layer (two or three tones; Apache 2.0 allows it). Contrast checked on every sky. Moon phases stay the one exception. Coverage and gaps: docs/research/ICONS.md |
 | Glass | `surfaceContainerHigh` at 40 % for the toolbar, buttons and sheets; cards get a thicker card material (decided 2026-11-22, values to pick) |
 | Toolbar | One toolbar at shell level: a pages pill (navigation only) plus one accessory (home: Search; window: Pin); contexts are data. **Its current animation stays** (Marco, 2026-11-22) |
-| Close button | ✕ at the **end** of the header by default (Marco, 2026-11-22: easier to reach). **Motion option** to swap it with the leading button (✕ at the start, Apple's and Material's placement); mirrored for right-to-left. Back, predictive back and pull-down still close |
+| Close button | ✕ at the **end** of the header by default (Marco, 2026-11-22: easier to reach). An app setting may offer the leading position; mirror it for right-to-left. Back, predictive back and pull-down still close |
 | Handles | On the moon card and search, without tap actions (accessibility check pending) |
 | Look of cards | Standard, readable design; physical feel through interaction (Direction 3) |
 
-### Framework (decided 2026-11-22)
-- **Motion = two modules in one repo:** `motion` (core: springs, gestures, morphs, haptics; Compose
-  only) and `motion-ui` (the UI kit: theme, page frame, card, sheet pieces, header buttons, glass;
-  Material 3 and Haze). The kit never leaks into the core.
-- **Tokens:** the kit defines the names with neutral Material-based defaults; each app passes its own
-  values through the kit's theme. Solstice passes its current values.
-- **Springs:** speed (fast, default, slow) × bounce (subtle, slight, playful) for movement: **movement
-  always has some bounce** (Marco's opinion; a lab switch compares it with none). Effects springs
-  (opacity, colour, blur) never bounce; Reduce Motion removes bounce; `wobble` stays for the toolbar bud.
-- **Reduce Motion:** Apple's list, built into every Motion piece.
-- **Materials:** glass for controls, navigation and sheets; a thicker card material for cards.
-- **Motion Lab:** Motion's own app, built on the kit.
-- **No typed-in values:** CI check with a reviewed allowlist that only shrinks.
-
+### App interaction ownership
+- Solstice owns its interaction design, toolbar, page transitions, cards, sheets, accessibility
+  behavior, reduced-motion experience, haptics policy, and design tokens.
+- Reusable dependencies may provide generic mechanics. They do not define Solstice's product layout,
+  visual identity, content, navigation policy, or feature roadmap.
+- Keep the current animated toolbar and its bud as Solstice product behavior; integration of generic
+  primitives must not remove or redesign it without an explicit product decision.
+- Detailed app motion principles are in [MOTION.md](MOTION.md); dependency contracts are in
+  [INTEGRATIONS.md](INTEGRATIONS.md).
 ### Places and travel (decided 2026-11-22)
 - **Home is your current location** by default. Without location access, onboarding asks you to
   choose a place, which becomes home. Using a fixed place instead lives in Settings › Locations.
@@ -149,45 +137,19 @@ Values follow the unit settings; a card is skipped when the source has no data f
   the current level (e.g. sunscreen, shade at midday), following WHO's guidance per level.
 - **What to wear suggests sunscreen** from the same UV rule (one shared rule, like rain).
 
-### Messages (decided 2026-11-22; a Motion UI component)
-- Several at once: **two options in Motion UI**, queue-and-merge (priority order, repeats merge, one
-  morphs into the next) or stacked above the toolbar.
+### In-app messages (decided 2026-11-22)
+- Several at once: Solstice owns the message queue and presentation policy. The app may choose
+  queue-and-merge (priority order, repeats merge, one morphs into the next) or stacking above the toolbar.
 - Up to **two lines** (the action moves below when it doesn't fit); always an icon, chosen by the
   message's kind (never matched from its text).
 - **Accessibility:** follows Android's "Time to take action" timeout; a message with an action waits
   until dismissed when TalkBack is on.
 
-### Weather engine (decided 2026-11-23; design in SOURCES.md, spec in ENGINE_SPEC.md, plan in MERIDIAN_PLAN.md)
-- **Name: Meridian** (the sun's highest point at noon; an iOS app "Meridian: Daylight" shares the
-  name, acceptable for a library).
-- **Its own library repo**, like Motion: works on the phone, has no UI, any Android app can include
-  it. Solstice imports and configures it, and shares its results with other apps on the phone
-  (Breezy's data sharing). Written clean room (RULES.md section 5), no Breezy code in it.
-- **No Rainbow.ai** (Marco: signing up asks for a card even for free use). Next-hour rain is phased:
-  Open-Meteo's 15-minute data and the blend first; our own radar nowcast later, where public radar
-  exists (optical flow, as in pysteps and LibreWXR).
-- **Learns from public data first** (past forecast archives and station observations); the local
-  correction runs on the phone.
-- **Sharing data is opt-in, always.** Asked during onboarding, never on by default, and the screen
-  shows exactly what would be sent and visualizes how it travels to us. Later: anonymized forecast
-  errors per area, which needs a server. Rules in RULES.md section 4.
-- **Licence: Apache 2.0**, like Motion (patent grant, any app can use it, works inside LGPL Solstice).
-- **Solstice leaves the Breezy fork gradually** (decided 2026-11-23): the clean engine replaces
-  Breezy's data layer and Motion UI its screens, part by part, so the app keeps working throughout;
-  ties are cut once no Breezy code is left. Until then, Breezy's source code stays in the app as
-  adapters plugged into the engine, and is rewritten clean over time, main sources first.
-- Solstice retains ownership of app-side persistence and migrates its data layer feature by feature when the approved engine contracts are ready. Do not assume Room is Meridian's selected storage implementation.
-- Meridian's production stack, public API, storage contract, HTTP engines and packaging remain governed by Meridian's current master plan and milestone gates, not this historical proposal.
+### Weather data and consumer responsibilities
+Solstice remains a weather application. It owns the app experience built around weather information: saved places, permissions, refresh scheduling, settings, notifications, source presentation, user consent, and the practical recommendations shown to people. Clothing and footwear, umbrella and sunscreen advice, activity suggestions, outdoor planning, personal preferences, alert thresholds, cooldowns, wording, and delivery remain Solstice features.
 
+Meteorological processing supplied by an independent engine is a dependency contract, not an app-owned implementation roadmap. Solstice does not define another project's language, storage, networking, providers, forecast algorithms, release packaging, or milestones. See [INTEGRATIONS.md](INTEGRATIONS.md) for the consumer boundary only.
 
-### Cross-repository implementation status (verified 2026-11-26)
-
-- **Meridian-Engine is an independent project**, not a Solstice module whose architecture Solstice may dictate. Its current authoritative plan is [Meridian-Engine/PLAN.md](https://github.com/INFORMATION89/Meridian-Engine/blob/main/PLAN.md).
-- Meridian is still completing **MER-0.1 platform and production-stack evidence**. Its KMP platform proof is a candidate, not an approved production stack; Kotlin Multiplatform versus Rust and the final consumer/package contracts remain subject to evidence and owner review.
-- The recorded successful CI run for the preserved MER-0.1 branch does not close the milestone. Actual Android/Darwin/JVM HTTP-engine behaviour, timeout/error mapping, cancellation and resource lifecycle, package/runtime implications, and dependency licence inventory remain open gates.
-- Meridian's root licence/README bootstrap and M0.2 public API/storage contract and M0.3 forecast/observation verification are still pending. Production weather providers, blending, learning, alerts and radar are not authorized by the platform proof alone.
-- **Solstice integration status:** treat Meridian as a planned future engine dependency until its production direction, public API, distribution artifact and integration contract are approved and available. Keep current Solstice weather behaviour working; do not claim a completed engine migration or duplicate Meridian's specifications in this repository.
-- **Motion integration status:** follow [MOTION_ADOPTION_PLAN.md](MOTION_ADOPTION_PLAN.md) and verify Motion's exact merged commit and CI before adopting APIs. A planned motion-ui module is not an available dependency until it exists and passes its own gate.
 
 ### Rain and alerts (decided 2026-11-22)
 - **One "precipitation is likely" rule** for the rain card, notifications and Live Updates: hourly at
@@ -200,33 +162,31 @@ Values follow the unit settings; a card is skipped when the source has no data f
   and Google's weather apps.
 - Docs and README written as a product's (no plugin side plans or hobby wording).
 - Store-facing text (name, description, About) written like a real product.
-- Solstice keeps Breezy's weather sources and data behind a Solstice interface the UI never reaches
-  past, and replaces all of upstream's UI, settings and widgets (so it doesn't look or behave like a
-  clone). Breezy-derived code stays LGPL; Motion stays Apache.
+- Solstice keeps its data/provider and upstream-derived implementation details behind app-facing
+  boundaries, and progressively replaces inherited UI, settings, and widgets with its own product
+  experience. Preserve all applicable upstream and third-party notices; do not transplant inherited
+  app code into independent dependencies.
 
-### Motion (full rules: MOTION.md)
-- Springs only, from tokens; things morph, never pop; one material per morph; the button becomes the card.
-- Nothing blocks input, except page changes (the pager springs itself; a tap first stops it).
-- Pages: one page spring (`Motion.momentum`) for swipes and tab taps, bouncing past the ends.
-- Morphs: `SpringMorph` (iOS-style). A window grows from and closes into its postcard's live position.
-  Opening owns the screen; everything that grows out of a page belongs to that page.
-- Haptics: Motion's `Haptic` tokens only; no new haptics without agreeing them.
-- Edge blur: Motion's `EdgeBlurDefaults`, bands derived from the chrome over each edge.
-- Glass draws with Haze; the edge blur stays Motion's own (measured faster).
+### App interaction principles (full rules: MOTION.md)
+- Interactions should respond promptly, remain interruptible, and never swallow unrelated input.
+- Surfaces should retain a clear visual relationship to the control or content that opened them.
+- The Solstice toolbar and its bud animation remain app-owned product behavior.
+- Keep haptics, blur, glass, page movement, and reduced-motion behavior consistent with Solstice's
+  design decisions. Use dependency APIs only where they are already available at the pinned version.
 
 ### Content
 - **Summaries:** one question per summary, the top 1–2 facts from a priority list, nothing extra when
   nothing is useful. Forecast: "What do I need to know about today?" (alert; precipitation start/stop;
   high and when, compared with yesterday if the source has it; extremes only). From 6 PM (adjustable)
   it answers "tonight and tomorrow". This week: rain days, warmest day, coldest night, plus the trend
-  and the weekend when useful. Engine built (`shell/Summary.kt`), not wired; every new sentence goes
-  to Marco before it ships. Details: archive, "Summaries: what they say".
+  and the weekend when useful. The app-side summary logic exists in `shell/Summary.kt` but is not yet
+  wired to all intended pages. Every new sentence goes through the app's writing approval process.
 - **"Rain", "snow" or "precipitation":** rain-only says rain, snow-only says snow, either says
   precipitation; everywhere, This week included.
 - **Last updated line** at the bottom of Forecast ("Updated 12 min ago · Open-Meteo", "Couldn't
   update · Try again" only on a real failure).
 - **Refresh on a cold start:** the main place, whatever its age (API cost checked: no floor needed).
-- **Moon card (F5):** tonight line, three tiles, Motion's `Dial`, close button from the framework.
+- **Moon card:** tonight line, three tiles, and a Solstice-owned interactive dial and close behavior.
 - Writing: WRITING.md (future tense, natural, "The moon…", never "it"; 12-hour times follow the system).
 
 ### Settings and navigation
@@ -237,7 +197,7 @@ Values follow the unit settings; a card is skipped when the source has no data f
 
 1. **Card catalog leftovers:** where the switch for "important cards move to the top" lives.
 2. **Outlook's content:** which proactive answers it gives (Direction 6); proposal in PROPOSALS.md.
-3. **The card material's values** (opacity, blur), picked in the lab on Saturday.
+3. **The card material's values** (opacity, blur and contrast), reviewed as part of Solstice's own UI design.
 4. **Proactive alerts (Direction 4):** which alerts at first, their defaults and wording, and where you
    switch them on. Proposal and wording: PROPOSALS.md section 4, WRITING.md section 9 (2026-11-23).
 5. **Optional sources** (Marco, 2026-11-23: with very local sources, don't bundle everything). Facts:
@@ -252,127 +212,13 @@ Values follow the unit settings; a card is skipped when the source has no data f
    until relevant where needed (SOURCES.md).
 6. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
 
-7. **Clean room leftovers:** Motion Lab's 7 demo files still carry Breezy's LGPL header; first job on
-   Saturday (CONTINUE.md, step 2).
-
-## Research queue
-Weather sources design (coverage, Automatic per refresh, merged alerts, transparency graphic, Gradient
-review): `docs/SOURCES.md`, proposal awaiting Marco.
+## Solstice product research queue
 1. Gradient Weather's rain countdown on screen: how it looks and how it disappears.
 2. The page receding behind a sheet, done cheaply (plan in LOG.md, 2026-11-22: dim + recede).
 3. Long press alongside drag to reorder (iOS context menu as reference).
 4. Proactive channels: Live Updates, daily brief, clothing.
 5. Card explainers (swipe up past the details): short Solstice texts, with "Read more" from Wikipedia
    (CC BY-SA: credit and link, never silently edited).
-6. **Rainbow.ai nowcast** (checked 2026-11-23; **dropped** the same day, see Weather engine): fits Breezy's keyed-source pattern (like AccuWeather: own
-   key in the source's settings, per-feature choice, attribution). Gives minute-by-minute precipitation
-   for 4 hours at 1 km (updated every 10 min), an hourly/daily Weather API and precipitation/cloud map
-   tiles. Free tier is per account (5,000 requests a month per API on the pricing table), so each user
-   brings a free key; a shared key would run out. Terms: key kept private, "Powered by Rainbow.ai" with a
-   link wherever its data shows, not for safety-critical use (alerts stay official), may end free use
-   without notice. Call it only when rain is plausible or the countdown runs.
-   Terms read in full (2026-11-23, effective 2025-04-16): signing up asks for payment details even for
-   free use (pay-as-you-go), and users must be 18 or older, so "bring your own key" is a setup step for
-   adults with a card; say so in the source's settings. Attribution wherever its data or anything
-   derived from it shows (so the blend too), reasonably prominent, following their branding guidelines;
-   logo and name not altered. Apps may be distributed to anyone, as long as nobody gets direct API
-   access; reselling or sharing a key is out. The key stays on the device, never in the repo or the
-   build. Caching isn't addressed; keep it short (the data is stale in 10 minutes anyway). Rainbow can
-   end access at any time without reason, so Solstice must work fully without it.
-7. **Alerts coverage after the 2026-11-18 source cut:** Gradient gets official warnings from MeteoAlarm,
-   NWS, ECCC, SACHET, Hong Kong Observatory, CWA and WMO's national services (CAP); Solstice keeps NWS,
-   ECCC and WMO severe weather. Check what Europe and Asia lost.
-   **Checked 2026-11-23** against upstream's SOURCES.md and WMO's source list (sources.json): the cut
-   removed national alert sources for 13 European places (Météo-France, GeoSphere, DMI, Bright Sky,
-   Veðurstofa, MET Éireann, LHMT, MeteoLux, IPMA…), 8 in Asia and the Pacific (China, HKO, BMKG,
-   IMS, JMA, SMG, CWA/NCDR, MGM) and 17 African countries (ClimWeb). WMO lists an operating feed for
-   all of them **except Japan, Taiwan and Türkiye**, so those three lost official alerts; everywhere
-   else WMO stands in. (MET Norway stayed.) WMO also covers places upstream never had: Spain, Italy,
-   UK, Netherlands, Belgium, Switzerland, India, Korea, Philippines, Australia, Brazil, Argentina,
-   Colombia, Chile. Not checked: whether WMO's copy is as detailed or as quick as the national source
-   (Germany's DWD directly is per municipality); FOSS Public Alert Server is still "early testing"
-   upstream. Proposal: bring back JMA, CWA/NCDR and MGM for alerts only, or accept the gap.
-8. **Localized accuracy and combined sources** (Marco, 2026-11-23; Mexico City is hard to forecast:
-   afternoon storms shaped by the mountains and the city are poorly captured by models). Proposed in
-   steps, each verified before the next:
-   1. **Consensus:** several models from Open-Meteo (ECMWF, GFS, ICON, GEM…) blended, with their spread
-      shown ("the models disagree today"), like Acme and meteoblue's multi-model view.
-   2. **Nowcast first:** our own next-hour rain (Open-Meteo 15-minute data, then radar nowcast; Rainbow.ai dropped).
-   3. **Learn locally:** keep a log of each source's forecast against what was observed at your place,
-      and weight sources by their recent error there (what Gradient's "localized accuracy" implies);
-      nudge the next hours by the current error.
-   4. **Observations for Mexico City:** the airport METAR (MMMX, public), SMN's automatic stations
-      (10-minute data, ~5 km representative radius), the Tacubaya observatory, CDMX's own network on
-      aire.cdmx.gob.mx (hourly weather, air quality and UV per station; no official API found, open data
-      portal has some sets). UNAM's 55-station rain network (Observatorio Hidrológico) is reported out
-      of operation.
-      Access (checked 2026-11-23):
-      - **METAR MMMX:** the only one ready for "now": public, every 30–60 minutes, standard format.
-      - **SMN stations:** SMN publishes the station list and a KMZ map; I found no download or API for
-        the readings. The 10-minute averages reach SMN by satellite every 1 or 3 hours, so they can't
-        drive "now" anyway; they're useful for step 3 (checking forecasts after the fact). Ask SMN, or
-        check Conagua's hydrological system (SIH), before relying on them.
-      - **CDMX network (REDMET for weather, SIMAT for air):** yearly CSV/Excel files plus the latest
-        hours on the site; a BSD-licensed R package (aire.zmvm) and research scripts read the current
-        hour from the site's pages, so it works but by reading pages, which breaks when the site
-        changes and the site goes down at times. Treat it as best-effort with a fallback.
-   A Solstice "blend" source behind the data interface (Q3).
-9. **Conagua / SMN** (checked 2026-11-23): free web service, no key, forecasts per municipality (CDMX by
-   alcaldía): hourly for 48 hours and daily for 3 days, updated hourly at :15, as one national gzip
-   file of several MB. Its forecasts come from the FV3-GFS model, so it's local GFS, not a separate
-   local model. Terms of reuse, the endpoint details and SMN's official warnings (CAP) to check.
-10. **Local alerts for Mexico City:** CDMX's civil protection (SGIRPC) issues a colour alert per alcaldía
-    for rain (green under 15 mm, yellow 15–29, orange 30–49, red 50–70, purple above), plus wind, hail,
-    heat and cold, published on official channels; no machine-readable feed found yet. SMN adopted CAP
-    in 2014 and Mexico is building a CAP cell-alert system.
-    **SMN warnings already reach Solstice** (checked 2026-11-23): Solstice builds the `basic` variant,
-    which includes WMO severe weather, and `SourceManager.getDefaultSourceForFeature` already makes WMO
-    the default alert source. WMO's source list has "CONAGUA - Servicio Meteorológico Nacional de
-    México" as registered, official and operating, with its own CAP feed. To confirm on the phone
-    during the next storm warning: how fine its areas are (state, region or municipality). SGIRPC's
-    per-alcaldía colours stay the gap; ask SGIRPC whether a feed exists.
-11. **Mexico City air quality and UV:** SIMAT measures both per station; a local source would beat the
-    global CAMS model there. Access is the same as REDMET above (site pages, best-effort).
-12. **The engine on macOS and Windows** (checked 2026-11-23; spec in ENGINE_SPEC.md section 2):
-    Kotlin Multiplatform is stable for Android, iOS and desktop JVM; Kotlin/Native builds a framework
-    a Swift menu bar app can import. Jetpack's KMP support rates macOS tier 2 and Windows tier 3. Ktor
-    has native HTTP engines for Apple (Darwin) and Windows (WinHttp). Windhawk mods are single C++
-    files loaded into Windows processes, so a Windows helper runs the engine and the mod reads its
-    result. Consequence now: the engine's core avoids Android-only code from day one.
-13. **Next-hour rain without Rainbow.ai** (checked 2026-11-23): RainViewer's free radar forecast ended
-    on 2026-01-01. Open-Meteo has real 15-minute data only for Central Europe and North America.
-    LibreWXR (AGPL, self-hostable) blends optical-flow radar nowcasts with models for 60 minutes, with
-    real radar for the US, Canada, Europe, Japan, Taiwan and a few more, but not Mexico. NOAA's
-    Enterprise Rain Rate (GOES-18/19, Himawari-9; 2 km, every 10 minutes, open data on AWS) covers
-    Mexico City from satellite; it replaced the GOES rain-rate product retired on 2026-09-01. SMN's
-    Cerro Catedral radar near CDMX publishes images only; ask SMN.
-14. **Privacy law and a server for opt-in sharing** (checked 2026-11-23; not legal advice):
-    - **Mexico:** a new LFPDPPP took effect 2025-03-21; the authority is now the Secretaría
-      Anticorrupción y Buen Gobierno (INAI is gone); a privacy notice (aviso de privacidad) is due when
-      data is collected.
-    - **EU:** truly anonymous data is outside the GDPR, but the EDPB's draft guidelines (2026-07)
-      treat the anonymizing itself as processing, and location data is hard to anonymize. So what
-      reaches the server (and its IP address) counts as personal data until it's aggregated: consent,
-      a privacy notice, no IP logging, raw contributions deleted once aggregated.
-    - **Hosting:** Cloudflare's free Workers plan allows 100,000 requests a day and its D1 database
-      100,000 row writes a day, enough for a start; paid Workers begin at $0.30 per million requests.
-15. **How much models disagree in Mexico City** (2026-11-23): meteoblue compares 12 models for CDMX
-    (IFS, ICON, GFS, NAM, UKMO, GEM, ARPEGE, AIFS and its own NEMS), but its numbers are only in
-    images. The hard season is the rainy one (June to early October, about 85 % of the year's rain);
-    in November meteoblue rates predictability "very high". Measuring it properly needs a small
-    script (Open-Meteo's Previous Runs API against the MMMX airport reports, rainy season 2026;
-    spec in docs/research/MODEL_TEST_SPEC.md): a
-    research job, Saturday step 3 (CONTINUE.md).
-16. **Leaving the Breezy fork, inventory** (2026-11-23; Kotlin lines today): screens 39,000 (main 12.2k,
-    common 8.8k, settings 7.3k, details 7.1k, theme, search, about, alert) → Motion UI; sources 8,700,
-    common utilities 8,100, domain models 5,200, units 5,500, storage 2,300, map geometry 1,800 → the
-    engine; widgets and the notification views 8,500 and background refresh and notifications 3,900
-    → rebuilt on the engine; the old animated weather view 3,000 → dropped or replaced (check what still uses it); 65 translations →
-    new strings, translated again. Proposed order: units and models (the engine's base), sources
-    and refresh (adapters first), screens (ongoing with Motion UI), background and notifications,
-    widgets and sharing, settings and the rest, then translations, then the package name
-    (`org.breezyweather`) and licence change last. Translations and widgets: docs/research/AFTER_FORK.md.
-
 ## Upstream files touched
 - `app/src/main/kotlin/org/breezyweather/ui/theme/compose/Theme.kt`: `BreezyWeatherTheme` delegates
   to `ExpressiveTheme`; upstream's placeholder purple schemes removed (F1).

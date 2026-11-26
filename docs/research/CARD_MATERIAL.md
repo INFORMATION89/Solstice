@@ -1,32 +1,36 @@
-# Card material: options to compare in the Lab
+# Solstice card material — historical visual options
 
-Status: **options for Marco** (2026-11-24). Decision 6 (2026-11-22): glass for the toolbar, buttons and
-sheets; a **thicker card material** for cards, picked with Marco in the Lab.
+**Status:** visual research proposal, 2026-11-24. This document concerns Solstice's own card
+appearance. It does not define a reusable framework or require a separate component project. Any
+option selected here must be expressed through Solstice's own design tokens and checked in the app.
 
-## Today's glass (for reference)
+## Existing glass, for reference
 
-`surfaceContainerHigh` at 40 %, over a 28 dp blur, with a hairline white edge at 22 %; without blur
-(older Android), the tint at 92 %. Cards use the same glass now.
+The earlier shell used `surfaceContainerHigh` at 40 %, over a 28 dp blur, with a thin white edge at
+22 %; without blur, the tint was 92 %. Cards shared the same glass at that time.
 
-## Why cards need a thicker one
+## Why cards may need a thicker material
 
-Cards hold the most text, over the busiest backgrounds (a bright day sky, stars, a postcard photo).
-At 40 % the text's contrast changes with the sky behind it. Apple's materials go from ultra thin to
-ultra thick for the same reason: thicker where text must stay readable. Material 3 uses tonal surfaces
-without blur.
+Cards hold the most text and can sit over busy backgrounds (a bright day sky, stars, or a postcard
+photo). Text contrast should remain stable as the background changes. A thicker, more opaque material
+may improve readability at the cost of showing less of the background.
 
-## Options (all values become tokens; the Lab shows each on a clear day, a night sky and a storm)
+## Options for an app-side comparison
 
-| | Tint | Blur | Edge | What it's like |
+| Option | Tint | Blur | Edge | Character |
 |---|---|---|---|---|
-| **A. Frosted** | `surfaceContainerHigh` at 60 % | 40 dp | white 18 % | today's glass, thicker; still sky-coloured |
-| **B. Milky** | `surfaceContainerHigh` at 75 % | 24 dp | none, soft shadow (`Elevation.Card`) | reads as a card on the sky, the sky only hints through |
-| **C. Sky-tinted** | the sky's main colour mixed with `surfaceContainerHigh` (50/50) at 65 % | 32 dp | white 14 % | each card takes the weather's colour, like Apple's thick material over wallpaper |
-| **D. Solid** | `surfaceContainer` at 94 % | none | hairline `outlineVariant` | fastest to draw, Material-like; the same look on old phones |
+| **A. Frosted** | `surfaceContainerHigh` at 60 % | 40 dp | white 18 % | Similar to the current glass, but thicker |
+| **B. Milky** | `surfaceContainerHigh` at 75 % | 24 dp | none, soft shadow | Reads as a card; the sky only hints through |
+| **C. Sky-tinted** | sky colour mixed with `surfaceContainerHigh` (50/50) at 65 % | 32 dp | white 14 % | Takes some colour from the current sky |
+| **D. Solid** | `surfaceContainer` at 94 % | none | `outlineVariant` | Fastest to draw and consistent on older phones |
 
-## How to pick
+## How to review
 
-- Text on each option, on the three backgrounds, measured in the Lab: body text at least 4.5:1,
-  large text at least 3:1 (WCAG). An option that fails on any background is out.
-- Frame time while scrolling Forecast with 8 cards (the Lab's frame meter): blur costs most.
-- Then Marco's eye on the phone. The pick fills `CardStyle` in Solstice's tokens (MOTION_UI_MOVE.md).
+- Check readable text on a clear day, night sky, and storm background.
+- Target at least 4.5:1 for body text and 3:1 for large text; fail any option that is not readable on
+  all required backgrounds.
+- Measure frame time while scrolling Forecast with several cards on a representative Android device.
+- Review the actual appearance on a physical phone before choosing.
+- Store the selected values in Solstice's tokens and keep reduced-motion/accessibility behavior clear.
+
+This proposal is not approval to change the card material. Bring the comparison to the product owner.
