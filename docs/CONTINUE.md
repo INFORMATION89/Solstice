@@ -85,11 +85,7 @@ none. The Motion Lab gets a switch to compare subtle against no bounce on every 
    table, LOG.md, ROADMAP.md.
 9. **Phone pass**, if the Pixel is connected: the checklist in `docs/research/PHONE_PASS.md` (the
    "built, not checked" items further down this file, and the spring changes above).
-10. **Meridian M0, only if time is left (Marco, 2026-11-23; checklist: `docs/specs/M0_REPO.md`):** create `INFORMATION89/Meridian`
-    (Apache 2.0): an empty Kotlin Multiplatform project with the modules in MERIDIAN_PLAN.md section 3,
-    the licence, a README, a copy of the clean-room rule, and CI building on Linux. No engine code yet:
-    M1 starts from its own spec section in a later session. Add it to Solstice as a submodule only
-    when M1 has something to use.
+10. **Meridian integration is gated by Meridian-Engine, not by this old M0 bootstrap task.** Read the current [Meridian-Engine master plan](https://github.com/INFORMATION89/Meridian-Engine/blob/main/PLAN.md). As of 2026-11-26, its M0.1 platform/production-stack proof is still incomplete: actual platform HTTP-engine behaviour, cancellation/lifecycle, packaging, dependency licensing, and owner approval remain outstanding. Do not create a second Meridian repo, repeat its platform spike, select its storage/API, or add it as a Solstice dependency until its current milestone gates and distribution contract are approved.
 
 If time runs short, stop after a finished step; the rest moves to the next session in this order.
 
