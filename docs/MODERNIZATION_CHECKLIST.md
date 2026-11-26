@@ -20,7 +20,9 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [x] Enable Gradle's local build cache in `gradle.properties`.
 - [x] Consolidate debug and main-branch Profile builds into one Gradle workspace; split publication into a least-privilege job.
 - [x] Scope signing secrets to main-only steps rather than the general build job, which also runs for pull requests.
-- [ ] Verify the final PR head SHA and inspect every GitHub Actions job and its logs.
+- [x] Restrict temporary signing-file permissions with `umask 077`.
+- [x] Pin artifact actions to verified immutable commit SHAs: upload-artifact v7.0.2 and download-artifact v8.0.2; both are official signed releases.
+- [ ] Verify the final PR head SHA and inspect every GitHub Actions job and its logs. Latest recorded candidate: run `45778065987` on head `d69476249c932cf218d2e39fdcc0aaaa4133706e`; Spotless and Motion unit tests passed, debug assemble was in progress at last inspection.
 - [ ] Verify the main-branch Profile APK is produced, downloaded, signed, named, and published as the expected testing pre-release.
 - [ ] Verify fork and ordinary pull-request runs receive no signing secrets and cannot access release-write permissions.
 - [ ] Validate workflow YAML, job outputs/conditions, artifact paths, pinned action references, and permissions.
@@ -163,3 +165,16 @@ These are concrete audit leads, not a substitute for the full review:
 - Do not claim iOS/desktop support for Solstice because Meridian or Motion may target additional platforms.
 - Do not create a custom Gradle container image unless measurements justify the maintenance and supply-chain cost.
 - Do not merge PR #14, change protected branch settings, publish a production release, or incur paid AI/API/runner usage without the required authorization.
+
+### Privacy and data-flow inspection notes (initial code review, 2026-11-26)
+
+The following are code-backed findings from the initial review. They define what the full privacy audit must explain; they are not yet a complete legal/privacy approval.
+
+- The manifest requests fine/coarse location, background location, internet/network state, notifications, foreground-service, boot, and widget-related permissions. The background-location disclosure should explain that it supports refresh of the latest Android-known current position.
+- The default location source falls back to Android native location. IP.SB is another available location source and calls `https://api.ip.sb/geoip`; using it necessarily exposes the requesting network's public IP to IP.SB, which estimates location from that IP. It does not require Android location permission.
+- Location search includes GeoNames; reverse geocoding uses Android's Geocoder first where available and Nominatim as a remote option/fallback. Weather source selection is per feature/place; currently registered sources include Open-Meteo, FPAS, MET Norway, NCEI, OpenWeather, Pirate Weather, WMO severe weather, ECCC, and NWS. AccuWeather is instantiated in code but Solstice's SourceManager comments say it is disabled from the active worldwide/national source lists for now. Confirm the actual UI-selectable set and exact endpoint fields before drafting final wording.
+- The app-update preference `isAppUpdateCheckEnabled` defaults to `false`. When enabled, the GitHub latest-release request is throttled to at most once per day unless forced; the current app version is compared locally with the returned release version. Do not describe this as telemetry or claim the version is transmitted without separate evidence.
+- Solstice exports a read-only weather ContentProvider, protected by its custom dangerous `READ_PROVIDER` permission. The provider returns saved-location data including latitude/longitude and weather results to apps that receive that permission. The permission prompt strings still say “Breezy Weather” and require Solstice wording.
+- Settings exposes a per-broadcast-source package selector. Gadgetbridge export includes place name, latitude/longitude, current conditions, forecast, and air-quality data. The separate update notifier broadcasts location IDs to configured recipient packages. These are local app-to-app disclosures, not proof of server-side telemetry.
+- Crash log export inspected so far creates a local logcat file for the user to open/share. No automatic crash-upload service was observed in the inspected code; complete dependency/workflow review is still required before making an absolute “no diagnostics are transmitted” claim.
+- The privacy notice currently describes Breezy Weather directly, so it is not a suitable Solstice notice. Replace it only after the complete provider, permission, local-sharing, retention, and build-flavor inventory is reconciled.
