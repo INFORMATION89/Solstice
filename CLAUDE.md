@@ -8,6 +8,7 @@ Unofficial fork of Breezy Weather, redesigned. The UI framework and motion live 
    frameworks first, then the app configures them; never hardcode anything.
 2. `docs/PLAN.md`: decisions in force, direction, open questions.
 3. `docs/CONTINUE.md`: where things stand, setup, upstream updates, the Motion submodule workflow.
+4. The [shared AI usage and cost policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md): model choice, ChatGPT/Claude use, agent coordination, spending and context efficiency.
 
 Then, as the task needs: `docs/DESIGN.md`, `docs/MOTION.md`, `docs/WRITING.md`, `docs/UI_SYSTEMS.md`, `docs/SOURCES.md`, `docs/ENGINE_SPEC.md`, `docs/MERIDIAN_PLAN.md`, `docs/ONBOARDING.md`, `docs/PROPOSALS.md`, `docs/OUTREACH.md`,
 `docs/ROADMAP.md`, specs in `docs/specs/`, research notes in `docs/research/`. History is in `docs/LOG.md`; `docs/archive/` is reference only.
