@@ -1,6 +1,6 @@
 # Rules
 
-How every session works on Solstice and Motion. These rules come before speed and before any task.
+How every session works on Solstice, Motion, and Meridian. These rules come before speed and before any task.
 They change only with Marco's OK. If a task seems to need breaking one, stop and ask.
 
 ## 1. Ask first, always
@@ -147,16 +147,14 @@ A change is done when:
 One source of truth per topic: PLAN.md decisions, LOG.md history, ROADMAP.md to-dos, CONTINUE.md
 current handoff, DESIGN/MOTION/WRITING product and design rules, this file Solstice engineering rules,
 root AGENTS.md agent operations, and AI_COST_POLICY.md AI/tool/CI efficiency. Shared AI policy is linked,
-not copied. Fix contradictions instead of adding to them. Fix contradictions
-instead of adding to them. Never push upstream's history; never build with `-Pbreezy`.
+not copied. Fix contradictions instead of adding to them. Never push upstream's history; never build with `-Pbreezy`.
 
 ## 11. Git
 
 1. Work on a branch and merge to `main` through a pull request; nothing is pushed to `main` directly.
 2. Commit as INFORMATION89. Never commit `gradlew.bat` (it shows as changed on Linux checkouts),
    secrets, keys or `local.properties`.
-3. A pull request says what changed and what was checked (section 9). Once CI exists, `main` is
-   protected and merges need it to pass.
+3. A pull request says what changed and what was checked (section 9). The `main` branch is protected by the active GitHub ruleset `Protect main`: changes require a pull request and the `build` status check; force pushes and branch deletion are blocked. Keep the repository ruleset aligned with this requirement when workflow check names change.
 
 
 ## 12. AI tools, model selection and cost
