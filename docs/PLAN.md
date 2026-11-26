@@ -66,6 +66,17 @@ logs, session notes or build reports here.
 
 ## Decisions in force
 
+### Weather engine and consumer recommendation boundary
+
+Meridian owns reusable meteorological data and intelligence; Solstice owns the practical advice and experience built on top of it. This is an explicit product and API boundary, not merely a code-organization preference.
+
+- **Meridian:** normalized observations and forecasts, source/model evaluation and blending, provenance, uncertainty, confidence, meteorological derived variables, event detection, timing windows, and explanations of weather conditions or risks.
+- **Solstice:** what to wear, whether to carry an umbrella or sunscreen, activity and outdoor-planning advice, personalized routines, notification thresholds and wording, and other recommendations shaped by Solstice's UX or a person's preferences.
+- Solstice consumes Meridian's neutral outputs and translates them into app-specific recommendations. Meridian must not import Solstice concepts, user preferences, UI models, copy, or recommendation policies.
+- Keep practical recommendation logic in Solstice (or another consumer-specific layer), not in Meridian's core. Meridian must still provide meaningful meteorological interpretation; it is not reduced to a raw provider-data wrapper.
+
+The detailed shared contract is in [Meridian consumer boundary](MERIDIAN_BOUNDARY.md). Meridian's authoritative product decision is tracked in [ADR-0002](https://github.com/INFORMATION89/Meridian-Engine/blob/main/docs/decisions/ADR-0002-consumer-responsibility-boundary.md).
+
 ### Project
 | Topic | Decision |
 |---|---|
