@@ -3,7 +3,7 @@
 The decisions in force, the direction, and what's open. Short on purpose: if something here and
 another doc disagree, this file wins, and the other doc gets fixed.
 
-- **How we work:** [RULES.md](RULES.md) (read first, every session).
+- **How we work:** root [AGENTS.md](../AGENTS.md) (agent entry point), [RULES.md](RULES.md) (Solstice rules), and [AI_COST_POLICY.md](AI_COST_POLICY.md) (AI, tools, CI and verification costs). Read these before each coding session.
 - **What Solstice is for and the design checks:** [DESIGN.md](DESIGN.md). Motion: [MOTION.md](MOTION.md).
   Writing: [WRITING.md](WRITING.md).
 - **To-do list:** [ROADMAP.md](ROADMAP.md). **Where things stand right now:** [CONTINUE.md](CONTINUE.md).
@@ -174,9 +174,18 @@ Values follow the unit settings; a card is skipped when the source has no data f
   Breezy's data layer and Motion UI its screens, part by part, so the app keeps working throughout;
   ties are cut once no Breezy code is left. Until then, Breezy's source code stays in the app as
   adapters plugged into the engine, and is rewritten clean over time, main sources first.
-- **Room** for its database; Solstice **switches directly**, feature by feature (alerts first), no
-  side-by-side step; **M0** (empty repo) at the end of Saturday if time is left (2026-11-23).
-- Engine code starts after Saturday's session; Saturday stays as planned (guardrails, then Motion).
+- Solstice retains ownership of app-side persistence and migrates its data layer feature by feature when the approved engine contracts are ready. Do not assume Room is Meridian's selected storage implementation.
+- Meridian's production stack, public API, storage contract, HTTP engines and packaging remain governed by Meridian's current master plan and milestone gates, not this historical proposal.
+
+
+### Cross-repository implementation status (verified 2026-11-26)
+
+- **Meridian-Engine is an independent project**, not a Solstice module whose architecture Solstice may dictate. Its current authoritative plan is [Meridian-Engine/PLAN.md](https://github.com/INFORMATION89/Meridian-Engine/blob/main/PLAN.md).
+- Meridian is still completing **MER-0.1 platform and production-stack evidence**. Its KMP platform proof is a candidate, not an approved production stack; Kotlin Multiplatform versus Rust and the final consumer/package contracts remain subject to evidence and owner review.
+- The recorded successful CI run for the preserved MER-0.1 branch does not close the milestone. Actual Android/Darwin/JVM HTTP-engine behaviour, timeout/error mapping, cancellation and resource lifecycle, package/runtime implications, and dependency licence inventory remain open gates.
+- Meridian's root licence/README bootstrap and M0.2 public API/storage contract and M0.3 forecast/observation verification are still pending. Production weather providers, blending, learning, alerts and radar are not authorized by the platform proof alone.
+- **Solstice integration status:** treat Meridian as a planned future engine dependency until its production direction, public API, distribution artifact and integration contract are approved and available. Keep current Solstice weather behaviour working; do not claim a completed engine migration or duplicate Meridian's specifications in this repository.
+- **Motion integration status:** follow [MOTION_ADOPTION_PLAN.md](MOTION_ADOPTION_PLAN.md) and verify Motion's exact merged commit and CI before adopting APIs. A planned motion-ui module is not an available dependency until it exists and passes its own gate.
 
 ### Rain and alerts (decided 2026-11-22)
 - **One "precipitation is likely" rule** for the rain card, notifications and Live Updates: hourly at
