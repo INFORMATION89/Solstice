@@ -18,7 +18,7 @@ Do not repeat the inherited blanket claim that "no personal data is collected" u
 - Uses Android `LocationManager`, preferring Fused Location Provider where available, then network/GPS/passive providers as appropriate.
 - Requires coarse or fine Android location permission. Uses a balanced-accuracy location request and can fall back to the last known location.
 - The app receives latitude/longitude from Android. The app code does not itself send a network request in this service; Android's chosen location provider or device services may have their own data handling, which varies by device/vendor and is not controlled by Solstice.
-- The manifest includes coarse, fine, and background location permissions. The exact background scheduling/permission explanation must be cross-checked against all worker call sites before the user-facing policy is finalized.
+- The manifest declares coarse, fine, and `ACCESS_BACKGROUND_LOCATION`. The inspected `AndroidLocationService.permissions` list requests only coarse/fine location; this does not establish whether another worker or feature requests background access. The background permission's request flow, actual call sites, and user-visible rationale remain unverified. Do not infer continuous or background tracking from the manifest declaration alone.
 
 ### IP.SB IP-derived location
 
@@ -89,10 +89,11 @@ These features are distinct from remote telemetry and are enabled only for confi
 - The inspected provider's `isAllowedPackage()` method currently returns `true`; the access boundary is therefore the manifest's Android read permission, not a second in-code package allowlist. Keep the permission intact and make its Android permission prompt accurately disclose the data exposed.
 - The permission label and description strings still say "Breezy Weather". They need a separate Solstice-specific copy/security review before users are asked to grant the permission.
 - This mechanism is local Android app-to-app access, not a Solstice-hosted cloud API.
+- `PrivacyPolicyActivity.kt` dynamically lists privacy-policy URLs for HTTP weather sources returned by `SourceManager.getHttpSources()` and can show the configured app privacy URL. This provider-link list does not make the inherited root `PRIVACY.md` accurate for Solstice.
 
 ## 6. Diagnostics and logs
 
-An initial review of the crash/log helper found a user-initiated logcat export to a local file for the person to open/share. No automatic crash-report upload was identified in the limited code paths inspected. This is not yet proof that the entire app/dependency graph contains no diagnostics collection.
+The inspected `CrashLogUtils.dumpLogs()` path is user-initiated: it runs `logcat *:E -d -f` into a cache file, appends app version/flavor/commit, Android build, and device brand/manufacturer/name/model details, then exposes the file through a notification for the person to open/share. This is a local export path, not an automatic upload in the inspected implementation. Error-level logs may contain additional sensitive context if other code logs it; the person should be told to inspect the file before sharing. No automatic crash-report upload was identified in the limited code paths inspected. This is not yet proof that the entire app/dependency graph contains no diagnostics collection.
 
 Before making an absolute statement, scan the complete dependency graph, build variants, manifests, network interceptors, logging wrappers, and CI/release tooling for crash-reporting, analytics, telemetry, attribution, and automatic upload SDKs.
 
