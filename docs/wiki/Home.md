@@ -23,5 +23,5 @@ The rolling GitHub `testing` build is a development/testing channel. It is **not
 ## Start here
 
 - [Application roadmap](Roadmap)
-- [MVP, release stages, and versioning](../RELEASE_PLAN.md)
+- [MVP, release stages, and versioning](https://github.com/INFORMATION89/Solstice/blob/main/docs/RELEASE_PLAN.md)
 - [Source repository](https://github.com/INFORMATION89/Solstice)
