@@ -8,7 +8,7 @@ License: GNU LGPL-3.0, with the additional terms inherited from Breezy Weather.
 
 ## Testing on your phone
 
-Every push to `main` publishes a test build to the **[testing pre-release](https://github.com/INFORMATION89/Solstice/releases/tag/testing)**.
+When CI succeeds and the test signing secrets are configured, pushes to `main` publish a test build to the **[testing pre-release](https://github.com/INFORMATION89/Solstice/releases/tag/testing)**.
 It's the smooth `profile` build (release code), and a new one installs over the last one, so your
 places and settings stay.
 
