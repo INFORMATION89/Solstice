@@ -4,6 +4,8 @@ Where things stand and how to pick the work up anywhere. Read the root [AGENTS.m
 
 The shared [AI Usage and Cost Policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md) applies across repositories; Solstice's local policy adds Android/Gradle-specific verification guidance.
 
+The active documentation and CI audit is tracked in [MODERNIZATION_CHECKLIST.md](MODERNIZATION_CHECKLIST.md). Start there before selecting the next modernization task.
+
 ## Next session: Saturday 2026-11-28, 1:00 AM (planned in chat 2026-11-22)
 
 Theme: **guardrails and the start of Motion as the UI framework.** Nothing on screen should change
