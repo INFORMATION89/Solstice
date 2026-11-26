@@ -1486,3 +1486,6 @@ recedes slightly into a card, so its top bar slips behind the sheet's edge inste
 
 - **2026-11-26:** Reconciled the Solstice Motion adoption plan and continuation notes with current Motion-UI state: PR #4 merged (MOT0.1); PR #7 standalone Motion Lab remains Draft and its latest CI failed on one Spotless formatting violation; `:motion-ui` does not exist; Motion remains Android/Compose-only. Confirmed Solstice still pins the pre-MOT0.1 base SHA and deliberately did not bump the submodule. Updated `.gitmodules` to the canonical Motion-UI URL while retaining that pointer.
 - **2026-11-26:** Marked Solstice's `ENGINE_SPEC.md` and `MERIDIAN_PLAN.md` as historical Solstice-side research references; Meridian-Engine's current master plan is the authority for production stack/API/storage/distribution/milestones. Updated `CLAUDE.md` to use the common agent entry point and modernization checklist.
+
+
+- **2026-11-26:** Further optimized Solstice Actions to run Spotless, Motion unit tests, Debug assembly, and optional main-only Profile assembly in one Gradle invocation; added same-PR/branch concurrency cancellation. This is a design-level efficiency improvement inspired by Motion-UI's current CI approach; measured savings remain unknown until comparable runs finish.
