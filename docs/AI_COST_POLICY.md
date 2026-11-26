@@ -128,5 +128,5 @@ Never invent token counts, dollar amounts, cache savings, test results, or devic
 - `docs/RULES.md` remains authoritative for Solstice product, design, privacy, clean-room, and engineering constraints.
 - Root `AGENTS.md` gives coding agents their operational reading order and workflow.
 - This file defines Solstice-specific AI/resource efficiency and verification guidance.
-- The shared AI usage policy provides baseline guidance. This document adds Solstice/Android/Gradle-specific rules. This document adds Solstice/Android/Gradle-specific rules.
+- The shared AI usage policy provides baseline guidance. This document adds Solstice/Android/Gradle-specific rules.
 - `docs/PLAN.md` owns product and architecture decisions; `docs/ROADMAP.md` owns remaining work; `docs/CONTINUE.md` owns the current handoff.
