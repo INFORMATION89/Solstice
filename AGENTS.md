@@ -5,7 +5,7 @@ These instructions apply to every AI-assisted or automated coding session in thi
 ## Mandatory reading order
 
 1. Read this file.
-2. Read `docs/RULES.md` in full. It contains Solstice-specific product, design, privacy, clean-room, testing, and approval rules.
+2. Read `docs/RULES.md` and the task-relevant sections. Read it in full when changing project rules or when the task spans multiple Solstice domains; it contains product, design, privacy, clean-room, testing, and approval constraints.
 3. Read the relevant sections of `docs/PLAN.md` and the active task in `docs/ROADMAP.md`.
 4. Read `docs/CONTINUE.md` only for the current handoff and next bounded task.
 5. Follow `docs/AI_COST_POLICY.md` and the shared [AI Usage and Cost Policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md).
