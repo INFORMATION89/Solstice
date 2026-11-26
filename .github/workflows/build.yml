@@ -64,7 +64,7 @@ jobs:
         env:
           BUILD_PROFILE: ${{ steps.test_key_check.outputs.available == 'true' }}
         run: |
-          tasks=(spotlessCheck :motion:motion:testDebugUnitTest assembleBasicDebug)
+          tasks=(spotlessCheck :motion:motion:testDebugUnitTest :weather-unit:testDebugUnitTest :maps-utils:testDebugUnitTest :app:testBasicDebugUnitTest assembleBasicDebug)
           if [ "$BUILD_PROFILE" = "true" ]; then
             tasks+=(assembleBasicProfile)
           fi

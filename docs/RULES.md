@@ -135,9 +135,10 @@ Full rules in [MOTION.md](MOTION.md). In short:
 ## 9. Done means checked
 
 A change is done when:
-1. All configured required CI checks pass. The current workflow runs Spotless, Motion unit tests, and
-   the Basic Debug assembly; app unit tests and the no-hardcoding check are not currently included.
-   Report those coverage gaps as NOT RUN / NOT ENFORCED until the workflow is updated and verified;
+1. All configured required CI checks pass. The workflow runs Spotless, Motion unit tests,
+   `:weather-unit:testDebugUnitTest`, `:maps-utils:testDebugUnitTest`, `:app:testBasicDebugUnitTest`,
+   and the Basic Debug assembly. The no-hardcoding check is not currently included; report it as
+   NOT ENFORCED until a deterministic check is added and verified;
 2. logic has unit tests; each Motion piece has a Motion Lab demo;
 3. it was checked on the Pixel (profile build for smoothness; frame stats when motion changed), or is
    clearly marked "not checked on the phone";

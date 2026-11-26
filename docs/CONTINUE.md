@@ -406,4 +406,4 @@ This section supersedes the historical 2026-11-25 Motion PR inventory below; do 
 
 ### Current modernization task
 
-Work from [MODERNIZATION_CHECKLIST.md](MODERNIZATION_CHECKLIST.md) and tracking [PR #14](https://github.com/INFORMATION89/Solstice/pull/14). Its current CI run and security review must be checked against the exact PR head before deciding the next change. Do not merge the PR while CI is running or required checks are incomplete.
+Work from [MODERNIZATION_CHECKLIST.md](MODERNIZATION_CHECKLIST.md) and tracking [PR #14](https://github.com/INFORMATION89/Solstice/pull/14). `main` is now protected by the active `Protect main` ruleset. The combined Gradle task graph now includes app and library unit tests in addition to Motion tests; verify these on the exact PR head. The deterministic no-hardcoding CI check is still missing and remains a tracked gate. Opus review is recommended for the CI credential/release-permission diff. Do not merge while exact-head CI or required security/verification gates are incomplete.

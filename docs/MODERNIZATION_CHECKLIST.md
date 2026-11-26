@@ -113,7 +113,9 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [ ] Keep Android SDK/emulator-capable jobs on compatible runners. Do not replace them with a generic Gradle Docker image by default.
 - [ ] Consider a custom container image only after proving it includes the required Android toolchain, is pinned by digest, is maintained, and improves measured end-to-end cost/time.
 - [ ] Verify cache keys and restore behavior for Gradle wrapper distributions, dependencies, transforms, and build outputs; never cache secrets or signing material.
-- [ ] Add and verify the missing app unit-test task(s) in required CI and implement a deterministic no-hardcoding check; keep both as explicit gates rather than claiming current coverage.
+- [x] Add app and library unit-test tasks (`:app:testBasicDebugUnitTest`, `:weather-unit:testDebugUnitTest`, and `:maps-utils:testDebugUnitTest`) to the combined Gradle invocation; exact-head CI verification is pending.
+- [ ] Verify the newly added app/library unit-test tasks pass on the exact PR head.
+- [ ] Implement and verify a deterministic no-hardcoding check as a required CI gate; no such check exists in the repository yet.
 - [ ] Record cold and warm build measurements, cache hits, runner minutes, artifact size, and CI failure/retry rates where available.
 - [ ] Ensure a failed required check blocks merge; rerun only failed jobs after inspecting the cause.
 - [x] Verify active GitHub ruleset `Protect main` targets `refs/heads/main`, requires the `build` status check, requires PRs, requires review-thread resolution, blocks force pushes/deletion, and has no bypass actors.
