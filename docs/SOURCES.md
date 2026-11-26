@@ -1,7 +1,6 @@
 # Weather sources: design proposal
 
-Status: **proposal, not agreed** (2026-11-23). Nothing here gets built until Marco agrees to it
-(RULES.md: ask first). Research notes behind it are in PLAN.md, research queue 6 to 11.
+Status: **historical Solstice proposal, not an implementation plan** (2026-11-23). It predates the current separation of responsibilities between Solstice and Meridian-Engine. Do not implement its source-selection, blending, observation-correction, or forecast-engine steps in Solstice. Meridian-Engine is the independent owner of meteorological intelligence and its approved public contracts; Solstice is a consumer and owns app concerns such as presentation, permissions, saved places, refresh scheduling, and user consent. Follow [Meridian-Engine's master plan](https://github.com/INFORMATION89/Meridian-Engine/blob/main/PLAN.md) and its MER-0.1/M0.2/M0.3 acceptance gates. This file is retained as research/history until reconciled with the approved Meridian API.
 
 ## Goal
 
@@ -111,14 +110,9 @@ What feels intrusive, and why:
   data.
 
 Is it needed? The idea, yes; the way it's done, no:
-- **Correcting a forecast by local observations** is long-standing meteorology practice and is what
-  helps Mexico City most (the global models miss the valley's afternoon storms and heat).
-- **It can all happen on the phone:** keep a short local log per saved place (what each source
-  forecast, what the nearest observation said), and compute the correction from it. No server, no
-  account, no background location beyond normal refreshes, nothing sent anywhere except the usual
-  weather requests.
-- **No social features, no usage events.** Rain alerts use the phone's own scheduled refresh
-  (WorkManager), not a server holding your location.
+- **Correcting a forecast with observations** is established meteorological practice and remains a product goal, but belongs to Meridian-Engine's independent meteorological pipeline, not a Solstice-only engine.
+- **Privacy is an architectural requirement, not a preselected deployment design.** Minimize location exposure, retain provenance, and prefer local processing where it is technically appropriate. Meridian's approved architecture must define where observations and corrections are processed, stored, and shared; this historical note does not decide that boundary or promise that every operation happens on-device.
+- **No social features or silent telemetry.** Any optional contribution remains off by default and requires separate, explicit, revocable consent. Solstice-owned alerts and refresh scheduling remain app responsibilities.
 - **Shown, not hidden:** the correction appears in the sources sheet (below), and can be switched
   off.
 
@@ -159,7 +153,7 @@ Agreed 2026-11-23; they live in RULES.md, section 4 (Data, sources and privacy) 
   (best-effort). SGIRPC alerts once a feed exists; we can also propose SMN's
   CAP feed to the FOSS Public Alert Server.
 
-## Build order (each step checked on the phone before the next)
+## Historical build order (superseded by Meridian-Engine gates)
 
 1. Coverage as data, and Automatic resolved per refresh (no new sources yet). Check: travel with
    the debug location setting between the US, Canada and Mexico.
@@ -167,7 +161,7 @@ Agreed 2026-11-23; they live in RULES.md, section 4 (Data, sources and privacy) 
 3. Bring back upstream's national sources.
 4. Observations for current conditions (airport reports first).
 5. Mexico City local sources, offered once.
-6. Blend and spread, then local correction (research queue 8, steps 1 and 3).
+6. Consume Meridian's accepted blend, uncertainty/spread, and local-adaptation capabilities only after its M0.2 API and M0.3 verification gates pass; do not build a parallel Solstice forecast engine.
 
 ## Questions for Marco
 
