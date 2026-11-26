@@ -145,7 +145,9 @@ A change is done when:
 ## 10. Docs
 
 One source of truth per topic: PLAN.md decisions, LOG.md history, ROADMAP.md to-dos, CONTINUE.md
-where things stand, DESIGN/MOTION/WRITING the rules, this file how we work. Fix contradictions
+current handoff, DESIGN/MOTION/WRITING product and design rules, this file Solstice engineering rules,
+root AGENTS.md agent operations, and AI_COST_POLICY.md AI/tool/CI efficiency. Shared AI policy is linked,
+not copied. Fix contradictions instead of adding to them. Fix contradictions
 instead of adding to them. Never push upstream's history; never build with `-Pbreezy`.
 
 ## 11. Git
@@ -159,7 +161,7 @@ instead of adding to them. Never push upstream's history; never build with `-Pbr
 
 ## 12. AI tools, model selection and cost
 
-AI-assisted development must also follow the shared [AI Usage and Cost Policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md). It supplements these Solstice-specific rules; it does not override the requirement to agree on user-visible product and design changes.
+AI-assisted development must follow the root [AGENTS.md](../AGENTS.md), this repository's [AI Cost and Resource Efficiency Policy](AI_COST_POLICY.md), and the shared [AI Usage and Cost Policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md). The local policy adds Android/Gradle-specific guidance; none of these policies override Solstice's product, privacy, design, and approval requirements.
 
 - Use the least costly model that can reliably complete the task. Routine documentation, extraction and mechanical edits use an efficient model; ordinary implementation and debugging use a balanced coding model; complex architecture, difficult debugging and high-risk reviews justify a stronger reasoning model.
 - ChatGPT Work/Codex subscription allowances and OpenAI API billing are separate. Do not estimate subscription usage from API token prices or assume access to a model or plan.
