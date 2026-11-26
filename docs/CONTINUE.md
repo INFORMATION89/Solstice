@@ -380,3 +380,45 @@ Fix any conflicts, update `UPSTREAM_BASE` with the new commit and date, and note
 
 - `INFORMATION89/Weather-App-Experiment` (private): the earlier standalone app. Its custom design
   (sky renderer, glass, sun path) was dropped for this fork; kept only as an archive.
+
+## Cross-repository Motion and open-PR audit (2026-11-25)
+
+**Purpose:** reconcile Solstice's Motion plans with the current `INFORMATION89/Motion-UI` repository, review all relevant open PRs, and establish a reusable-library boundary before continuing the UI extraction. This is an audit-first handoff: do not merge PRs, change product behavior, migrate components, or modify runtime code until the evidence and proposed sequence have been reviewed.
+
+### Current repository / PR inventory
+
+**Motion-UI**
+- [PR #1 — MOT0.1 core validation](https://github.com/INFORMATION89/Motion-UI/pull/1), open draft. Changes `MotionValue`, `MotionPhysics`, `MorphMotion` / `SpringMorph`, adds regression tests, and introduces `AGENTS.md`, `CONTINUE.md`, and `docs/MOT0.1_PLAN.md`. The checked branch-head SHA `a0cdc50666c608e9be810b8e55d3b56b5cbea94b` had a successful GitHub Actions `build` check (run 45703217856). This is not merge approval: inspect the latest head and remaining acceptance criteria, especially deterministic interruption/reversal, retargeting, stale coroutine commands, initial placement races, and input boundaries. The PR description says these remain incomplete.
+- [PR #2 — README refresh](https://github.com/INFORMATION89/Motion-UI/pull/2), open, documentation-only. Describes Motion as an independent Android / Jetpack Compose library, current API/features, source composite-build consumption, platform requirements, and the fact that the Lab is not yet a Gradle module. Review for consistency with the actual repository and the future Core/UI split.
+- [PR #3 — cost-aware verification guidance](https://github.com/INFORMATION89/Motion-UI/pull/3), open, documentation-only. Adds AI-agent instructions and adjusts the repo plan so physical-device checks remain explicitly deferred when unavailable. Reconcile with PR #1's `AGENTS.md` / `CONTINUE.md` additions; avoid duplicate or conflicting agent guidance.
+
+**Solstice**
+- [PR #8 — MMMX observations](https://github.com/INFORMATION89/Solstice/pull/8), open. Review `VC` vicinity handling, station-vs-nearby rain scoring, `CB/TCU` observations, model test spec and real sample evidence against implementation and tests.
+- [PR #9 — sky ideas and decisions](https://github.com/INFORMATION89/Solstice/pull/9), open. Review Sky/Motion proposals and changes to Motion cleanup, source selection, Settings search, rain-heads-up onboarding, alerts and roadmap. Resolve conflicts with current decisions and implementation rather than assuming every proposal is built.
+- [PR #10 — product direction and reconstruction audit](https://github.com/INFORMATION89/Solstice/pull/10), open draft. Review its reconstruction, UI, Places and shell boundaries, UX research/audit/validation, Outlook and data-transparency documents. These are specifications/audits, not proof of implementation or authorization to delete/migrate inherited code.
+- [PR #11 — cost-aware verification rules](https://github.com/INFORMATION89/Solstice/pull/11), open. Documentation-only. Reconcile its verification policy with Motion-UI PR #3 and the repository rules.
+
+Earlier merged Solstice PRs #6 and #7 contain the initial Motion extraction and cleanup specifications. Treat them as historical decisions to verify against the current Motion-UI repository, not as proof that all planned phases shipped.
+
+### Required audit sequence
+
+1. **Establish exact state first.** Fetch current default-branch and PR-head SHAs, latest CI/check-runs, changed-file lists, review comments and merge status for the PRs above. Recheck PR #1 CI against its exact current head; the earlier successful run is evidence only for SHA `a0cdc50666c608e9be810b8e55d3b56b5cbea94b`.
+2. **Review Motion-UI PR #1 (MOT0.1) as code, not just documentation.** Trace validation and state transitions in `MotionValue`, `MotionPhysics`, and `MorphMotion`; inspect regression tests and verify that the implementation preserves interruptibility, velocity continuity, gesture ownership, legitimate transient geometry, and stale-command cancellation. Keep MOT0.1 within its stated core-reliability scope.
+3. **Review Motion-UI PRs #2 and #3 together.** Check README claims against the actual Gradle modules and source tree; reconcile `AGENTS.md`, `CONTINUE.md`, verification rules and the repository plan. Note that PR #1 and #3 both add agent guidance; determine the authoritative version before merging either.
+4. **Reconcile the Motion architecture across both repos.** Motion Core owns generic physics, gesture/state primitives, morph geometry and reusable interaction mechanics. The planned `motion-ui` layer owns reusable Compose UI components and neutral defaults/theme tokens. Solstice owns its product design, weather/sky state, icons, navigation decisions, strings/resources and weather-specific compositions. Motion must not import Solstice, Breezy domain models, weather concepts or consumer resources. Core must not depend on UI; UI may depend on Core.
+5. **Audit hardcoding and dependencies before extraction.** Inventory numeric literals, colours, dimensions, shapes, blur/fallback values, typography, strings, resource references, Material/Haze assumptions and application-specific imports in candidate components. Classify each as: (a) invariant algorithm/physics constant, (b) library default, (c) theme token, (d) component parameter, or (e) app-owned value. Do not turn every number into a public knob. Identify duplicated implementations and existing Compose/Material/Haze capabilities that should be reused instead of reimplemented.
+6. **Review the proposed Motion UI extraction** in `docs/specs/MOTION_UI_MOVE.md` and `docs/specs/MOTION_CORE_CLEANUP.md`. Validate each proposed component's dependencies and API. In particular, split generic card/surface behavior from Solstice's `SkyState` / `SkyEffects`; extract generic glass only if its material/backdrop contract can be configured without Solstice assumptions. Verify `PageFrame` boundaries so product navigation, weather location state and app strings remain in Solstice.
+7. **Audit Solstice PRs #8–#11** against current source, tests and authoritative docs. Distinguish product decisions, proposals, documentation, implemented behavior and unverified claims. Check PR #9's automatic-source decision against the dated LOG and current source-selection contracts; do not silently resolve contradictory decisions.
+8. **Reconcile stale documentation.** Solstice `docs/CONTINUE.md` still contains historical references to repository `INFORMATION89/Motion` and older Lab placement/workflow statements. Compare these with the current `INFORMATION89/Motion-UI` repository, its README and PRs. Update documentation only after the actual submodule path, branch, module layout and ownership are verified.
+9. **Produce one evidence-backed cross-repo report.** For every finding record repository, path/symbol, relevant PR/commit, status (`Implemented`, `Planned`, `Inconsistent`, or `Pending verification`), tests/CI evidence and recommended owner (Motion Core, Motion UI, Solstice, or platform/library dependency). Include a no-hardcoding policy proposal and migration order.
+
+### Guardrails
+
+- Audit first. No runtime-code edits, component moves, dependency changes, PR merges, releases or product/motion-feel changes as part of this investigation.
+- Do not assume a PR is safe because it is mergeable or CI is green. Review the diff and latest checks on the exact head.
+- Prefer existing Compose/Material/platform capabilities or established libraries when they meet the requirement; build custom primitives only for a demonstrated gap.
+- Keep Motion independently usable by unrelated Jetpack Compose applications. The current repository is Android/Compose-specific; do not imply it is already multiplatform.
+- Preserve Solstice's visual identity while replacing internal implementations incrementally. Validate parity before removing old implementations.
+- No hardcoded Solstice values inside reusable Motion UI components. Provide sensible neutral defaults and explicit, documented configuration contracts.
+- Mark device-only validation `NOT TESTED` / `DEFERRED` when no device run occurred; passing CI is not device validation.
+
