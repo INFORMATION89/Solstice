@@ -22,7 +22,7 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [x] Scope signing secrets to main-only steps rather than the general build job, which also runs for pull requests.
 - [x] Restrict temporary signing-file permissions with `umask 077`.
 - [x] Pin artifact actions to verified immutable commit SHAs: upload-artifact v7.0.2 and download-artifact v8.0.2; both are official signed releases.
-- [ ] Verify the final PR head SHA and inspect every GitHub Actions job and its logs. Latest recorded candidate: run `45778065987` on head `d69476249c932cf218d2e39fdcc0aaaa4133706e`; Spotless and Motion unit tests passed, debug assemble was in progress at last inspection.
+- [ ] Verify the final PR head SHA and inspect every GitHub Actions job and its logs. Latest inspected run: #239 (`45778503796`) on head `6dfc5e1c82ccf0c976c85fc5fd84cac51880f814`; Spotless and Motion unit tests passed; the combined Debug/optional Profile assemble was in progress at last inspection.
 - [ ] Verify the main-branch Profile APK is produced, downloaded, signed, named, and published as the expected testing pre-release.
 - [ ] Verify fork and ordinary pull-request runs receive no signing secrets and cannot access release-write permissions.
 - [ ] Validate workflow YAML, job outputs/conditions, artifact paths, pinned action references, and permissions.
@@ -35,6 +35,7 @@ A checked item means that the stated evidence was inspected or the change was ve
 ### Entry points and governance
 
 - [ ] Review root `README.md` for accurate project identity, fork attribution, build/install instructions, current maturity, and links.
+- [ ] Audit inherited `CLAUDE.md` (now aligned as a provider-specific entry point), `CONTRIBUTING.md`, `INSTALL.md`, `HELP.md`, and `3RD_PARTY.md`; remove obsolete Breezy-only instructions/links where needed without erasing applicable upstream attribution or licence obligations.
 - [ ] Review root `AGENTS.md` against actual repo layout, current PR workflow, mandatory reading order, and context-efficiency requirements.
 - [ ] Review `docs/PLAN.md` for one current decision per topic; move historical or session-level detail out of the master plan.
 - [ ] Review `docs/RULES.md` for contradictions, obsolete paths, policies repeated elsewhere, and approval boundaries that agents cannot follow consistently.
@@ -70,9 +71,9 @@ A checked item means that the stated evidence was inspected or the change was ve
 ### Motion and framework integration
 
 - [ ] Review `docs/MOTION_ADOPTION_PLAN.md` against current Motion-UI repository state, exact adopted submodule SHA, open PRs, and CI.
-- [ ] Correct the known historical reference to the former `INFORMATION89/Motion` repository/submodule URL where appropriate.
+- [x] Correct the submodule URL to canonical `INFORMATION89/Motion-UI.git` while deliberately preserving the existing submodule commit.
 - [ ] Verify `.gitmodules`, `motion/` submodule commit, composite build configuration, and clean recursive checkout.
-- [ ] Distinguish Motion Core capabilities already merged/adopted from work still in a PR or planned for `motion-ui`.
+- [x] Distinguish Motion Core MOT0.1 merged in Motion PR #4 from the standalone Motion Lab PR #7 still in Draft, and the planned but non-existent `:motion-ui` module.
 - [ ] Do not describe a planned UI kit, iOS, desktop, or cross-platform capability as currently available in Solstice.
 - [ ] Verify ownership boundaries: generic motion/framework behavior belongs in Motion; weather behavior, screens, identity, navigation policy, and Solstice configuration remain here.
 
@@ -153,10 +154,10 @@ These are concrete audit leads, not a substitute for the full review:
 - `PRIVACY.md` still opens with “Breezy Weather” and describes upstream behavior. Validate every statement against Solstice's current implementation before publishing a replacement.
 - `.gitmodules` still points to `https://github.com/INFORMATION89/Motion.git`, while the canonical repository identified by the Motion adoption plan is `INFORMATION89/Motion-UI`. Verify the current Motion repository/commit and migrate the URL deliberately in a separate, tested change.
 - `docs/ENGINE_SPEC.md` and `docs/MERIDIAN_PLAN.md` still present 2026-11-23 drafts with older assumptions such as KMP, Room, a planned repository name, and a proposed submodule/composite-build integration. They must not override Meridian-Engine's current master plan.
-- `docs/MOTION_ADOPTION_PLAN.md` records a baseline and PR/CI state that must be revalidated against current Solstice and Motion-UI heads before implementation.
+- `docs/MOTION_ADOPTION_PLAN.md` has been refreshed: Motion PR #4 is merged, PR #7 remains Draft with a Spotless failure, the submodule is still pinned to the pre-MOT0.1 base commit, and `:motion-ui` is not present.
 - `docs/UI_SYSTEMS.md` identifies itself as a 2026-11-19 research snapshot and says listed work is not built; refresh its inventory against current code before using it to assign implementation work.
 - The current Gradle Wrapper is 9.9.1, JDK is pinned to 21, `gradle/actions/setup-gradle` is already in use, and local Gradle build caching was disabled before this modernization branch. These facts should be rechecked on the final PR head.
-- The CI refactor now scopes signing-secret access to main-only steps; this still requires workflow execution and security review before merge.
+- The CI refactor now scopes signing-secret access to main-only steps, pins artifact actions, and combines variant assembly in one Gradle invocation. Latest inspected run #239 passed Spotless and Motion unit tests; assembly remained in progress. Final artifact/publication checks and comparable timing measurements remain pending.
 
 ## 8. Explicit non-goals
 
