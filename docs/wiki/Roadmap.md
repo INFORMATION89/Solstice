@@ -2,7 +2,7 @@
 
 This page is the product-facing roadmap. It describes what users can expect from the application, not internal implementation plans for Motion UI or Meridian.
 
-Release gates, MVP detail, and version naming live in the [release plan](../RELEASE_PLAN.md).
+Release gates, MVP detail, and version naming live in the [release plan](https://github.com/INFORMATION89/Solstice/blob/main/docs/RELEASE_PLAN.md).
 
 ## Now — define and complete the MVP
 
