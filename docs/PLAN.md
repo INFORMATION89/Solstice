@@ -161,6 +161,14 @@ Values follow the unit settings; a card is skipped when the source has no data f
 - **Its own library repo**, like Motion: works on the phone, has no UI, any Android app can include
   it. Solstice imports and configures it, and shares its results with other apps on the phone
   (Breezy's data sharing). Written clean room (RULES.md section 5), no Breezy code in it.
+- **Application-owned recommendations (decided 2026-11-26):** Meridian supplies meteorological facts,
+  forecasts, indices, detected weather events, evidence, provenance and uncertainty. Solstice owns
+  the interpretation that turns those results into user-facing advice. “What to wear”, outfit and
+  packing suggestions, umbrella advice, sunscreen/shade guidance, activity suggestions, daily
+  planning, recommendation wording, user preferences, and alert/notification thresholds and
+  cooldowns are Solstice features. Do not add these product policies or recommendation types to
+  Meridian's core/API; build them in Solstice using Meridian's neutral weather data and event results.
+  See [Meridian ADR-0002](https://github.com/INFORMATION89/Meridian-Engine/blob/main/docs/decisions/ADR-0002-application-owned-recommendations.md).
 - **No Rainbow.ai** (Marco: signing up asks for a card even for free use). Next-hour rain is phased:
   Open-Meteo's 15-minute data and the blend first; our own radar nowcast later, where public radar
   exists (optical flow, as in pysteps and LibreWXR).
