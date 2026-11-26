@@ -24,12 +24,12 @@ A checked item means that the stated evidence was inspected or the change was ve
 - [x] Scope signing secrets to main-only steps rather than the general build job, which also runs for pull requests.
 - [x] Restrict temporary signing-file permissions with `umask 077`.
 - [x] Pin artifact actions to verified immutable commit SHAs: upload-artifact v7.0.2 and download-artifact v8.0.2; both are official signed releases.
-- [x] Verify exact PR head `e0c14077f0c82c85aafe25142062d290e55eb667` on run #250 (`45779511947`): checkout (including the canonical Motion submodule URL), JDK 21, Gradle setup, one combined verification/build step, and debug artifact upload all passed.
+- [x] Verify PR head `e5a3f96784c5fbb403851014d968629d3afeb785` on run #260 (`45781291703`): checkout (including the canonical Motion submodule URL), JDK 21, Gradle setup, one combined verification/build step, and debug artifact upload all passed. The run produced artifact `solstice-basic-debug` (artifact ID `15097649394`).
 - [ ] Verify the main-branch Profile APK is produced, downloaded, signed, named, and published as the expected testing pre-release.
-- [x] Verify PR run #250 skipped main-only signing-secret steps; build job had only `contents: read`, and the separate `contents: write` publish job was skipped.
+- [x] Verify PR run #260 skipped main-only signing-secret steps; build job had only `contents: read`, and the separate `contents: write` publish job was skipped.
 - [x] GitHub Actions parsed and executed the final workflow; Debug artifact path uploaded five files successfully. Profile artifact path and release job still require a protected-main run with approved signing secrets.
-- [x] First comparable timing sample: prior runs #237 (`45778065987`) and #239 (`45778503796`) each took 224 s on the same Ubuntu/JDK 21/Gradle setup; candidate run #250 took 192 s. This is 32 s (14.3%) lower elapsed job time in this sample. Run #250's combined Gradle step took 164 s and completed Spotless, Motion tests, and Debug assembly; it reports 204 actionable tasks (184 executed, 18 from cache, 2 up-to-date). The workflow restored the Gradle cache.
-- [x] Report the measured difference as an initial observation only: three runs on hosted runners are not enough to guarantee future savings or exact billing reduction. Track additional warm/cold runs before generalizing.
+- [x] Timing sample is mixed, not a stable saving: baseline runs #237 and #239 each took 224 s; run #250 took 192 s (32 s / 14.3% lower), but the later exact-head run #260 took 254 s (30 s / 13.4% slower than baseline) despite successful Gradle-cache restoration. Run #260's combined Gradle task took 216 s and reported `BUILD SUCCESSFUL in 3m 36s`; 204 actionable tasks (184 executed, 18 from cache, 2 up-to-date). Both candidate runs restored Gradle cache. Do not claim a stable CI time or runner-cost saving from this sample.
+- [x] Report the measured difference as variable: same configuration and cache restore do not guarantee faster hosted-runner wall time. Continue measuring several warm/cold runs and inspect job/task breakdowns; no invoice-level saving can be inferred.
 - [ ] Obtain focused independent review of the workflow/security diff. **Opus review recommended** because CI credentials and release permissions are involved; this does not block implementation or replace tests/owner authorization.
 
 ## 1. Documentation inventory and authority
@@ -77,7 +77,7 @@ A checked item means that the stated evidence was inspected or the change was ve
 
 - [x] Refresh `docs/MOTION_ADOPTION_PLAN.md` against the current Motion-UI main SHA, Solstice's pinned submodule SHA, merged PR #4, open PR #7, and both relevant CI results.
 - [x] Correct the submodule URL to canonical `INFORMATION89/Motion-UI.git` while deliberately preserving the existing submodule commit.
-- [ ] Verify the canonical URL checkout, current `motion/` submodule commit, composite build configuration, and clean recursive checkout on the latest exact PR head (CI checkout for run #246 succeeded; the build is still running).
+- [x] Verify the canonical URL checkout, current `motion/` submodule commit, and recursive submodule checkout on the exact current PR head: run #260 checkout passed; the combined Gradle task also passed.
 - [x] Distinguish Motion Core MOT0.1 merged in Motion PR #4 from the standalone Motion Lab PR #7 still in Draft, and the planned but non-existent `:motion-ui` module.
 - [ ] Do not describe a planned UI kit, iOS, desktop, or cross-platform capability as currently available in Solstice.
 - [ ] Verify ownership boundaries: generic motion/framework behavior belongs in Motion; weather behavior, screens, identity, navigation policy, and Solstice configuration remain here.
@@ -166,7 +166,7 @@ These are concrete audit leads, not a substitute for the full review:
 - `docs/UI_SYSTEMS.md` identifies itself as a 2026-11-19 research snapshot and says listed work is not built; refresh its inventory against current code before using it to assign implementation work.
 - The current Gradle Wrapper is 9.9.1, JDK is pinned to 21, `gradle/actions/setup-gradle` is already in use, and local Gradle build caching was disabled before this modernization branch. These facts should be rechecked on the final PR head.
 - The current workflow groups Spotless, Motion unit tests, Debug assembly, and optional main-only Profile assembly in one Gradle invocation, and cancels obsolete runs for the same PR/branch. This is a design-level optimization; measured savings remain unknown.
-- The CI refactor now scopes signing-secret access to main-only steps, pins artifact actions, and combines variant assembly in one Gradle invocation. Latest inspected run #239 passed Spotless and Motion unit tests; assembly remained in progress. Final artifact/publication checks and comparable timing measurements remain pending.
+- The CI refactor scopes signing-secret access to main-only steps, pins artifact actions, combines verification and variant assembly in one Gradle invocation, and cancels obsolete runs. Exact-head run #260 passed, uploaded the Debug APK, and correctly skipped Profile signing/publication on the PR. Performance measurements are variable: #250 was 192 s, #260 was 254 s versus 224 s baseline runs; no stable saving is demonstrated.
 
 ## 8. Explicit non-goals
 
