@@ -11,7 +11,7 @@ current Solstice handoff. Consumer-side dependency boundaries are in [INTEGRATIO
 
 ## Current cleanup branch
 
-Work is in `maintenance/pre-feature-cleanup-2026-11-27`, based on `main` at `5ba6deae3415ab6830a023c8d5f7e59f72fb534c`.
+Work is in `maintenance/pre-feature-cleanup-2026-11-27`, based on `main` at `a7e7e8764f1440e1852b33d867de39c4591e6369`.
 
 The cleanup restores the governance, CI, privacy-evidence and consumer-boundary work introduced by
 PR #14. That work was merged historically, but later PRs were created from an older base and the

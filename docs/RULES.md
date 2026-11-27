@@ -1,17 +1,17 @@
 # Solstice engineering rules
 
 These rules govern work in the Solstice application repository only. These rules come before speed and before any task.
-They change only with Marco's OK. If a task seems to need breaking one, stop and ask.
+They change only with the project owner's approval. If a task seems to need breaking one, stop and ask.
 
 ## 1. Ask first, always
 
-1. **Plans are made in chat with Marco.** Coding sessions only carry out what's agreed in
+1. **Plans are made in chat with the project owner.** Coding sessions only carry out what's agreed in
    [PLAN.md](PLAN.md), [ROADMAP.md](ROADMAP.md) and [CONTINUE.md](CONTINUE.md).
 2. **Never start building anything new without asking**: no new feature, screen, card, button, text,
    setting, motion, haptic, token or system. Say exactly what would change, show options when there
    are choices, and wait for a yes.
-3. **Check guidelines with Marco before relying on them.** When Apple's, Google's or our own rules
-   disagree, or a rule doesn't cover the case, bring it to Marco; don't pick on your own.
+3. **Check guidelines with the project owner before relying on them.** When Apple's, Google's or our own rules
+   disagree, or a rule doesn't cover the case, bring it to the project owner; don't pick on your own.
 4. When something agreed turns out not to work as planned, stop and report; don't improvise a
    different solution.
 
@@ -21,7 +21,7 @@ They change only with Marco's OK. If a task seems to need breaking one, stop and
 2. Motion-UI and Meridian-Engine are independent projects. Their implementation, architecture, releases, internal roadmaps, and tests belong in their own repositories.
 3. Solstice consumes only APIs and artifacts present in the exact reviewed dependency revision. Pin dependencies, review licences and public APIs, and test the app-side integration before updating a pin.
 4. A reusable capability that belongs in an external dependency must be proposed and implemented there first. Solstice records only its consumer requirements, integration contract, and app-side adoption.
-5. New Solstice UI code follows the current app structure. Keep edits to Breezy-derived upstream files small, preserve applicable licence notices, and record material fork changes in the plan.
+5. Solstice is being reconstructed as an independent application. Do not introduce new Breezy code or copy upstream implementation. Existing inherited files remain subject to the app audit and replacement plan; preserve their applicable licence notices until they are removed.
 
 ## 3. Never hardcode anything
 
@@ -33,7 +33,7 @@ They change only with Marco's OK. If a task seems to need breaking one, stop and
 3. A value with no token yet: **stop, propose a name and value, ask**, then add it to the tokens. Don't
    add it "for now".
 4. Allowed without a token: 0, 1, mathematical constants, and the entries in the reviewed allowlist.
-   CI enforces this; the allowlist only grows with Marco's OK.
+   CI enforces this; the allowlist only grows with the project owner's approval.
 5. No special cases by screen ("if in a window…"). Differences are configuration (data), passed in.
 
 ## 4. Data, sources and privacy
@@ -62,21 +62,30 @@ For app-owned provider coverage and attribution, use [COVERAGE.md](COVERAGE.md).
 5. Sources are tested offline with recorded responses, and changes to the blend are verified against
    public archives before they ship.
 
-## 5. Clean room (agreed 2026-11-23)
+## 5. Clean-room development and provenance
 
-Applies to the weather engine, Motion and future apps; the Solstice app itself stays a Breezy fork
-until Marco decides otherwise.
-1. **Never copy, translate or closely paraphrase another project's code**, Breezy included, into
-   these projects. Ideas, algorithms, public standards and data formats are fine.
-2. **Allowed sources:** public specs and standards (CAP, METAR, WMO), each service's own API docs and
-   terms, published papers, platform docs and guidelines, our own docs, and how things behave from
-   the outside. Libraries are used through their API, under their licence, never pasted in.
-3. **Spec, then build:** one session writes a spec in our own words from allowed sources and saves it
-   in the project's docs; a separate session builds only from that spec and never opens the original
-   code for that part.
-4. Each pull request lists what was consulted. Code that looks close to an existing project gets
-   rewritten, not justified.
-5. Honest limit: AI models have seen public code, so this lowers the risk rather than removing it.
+Solstice is being reconstructed as an independent application. Meridian-Engine and Motion-UI are
+independent projects with their own repositories and ownership. These rules govern only the
+Solstice work performed in this repository.
+
+1. **Do not introduce copied upstream implementation.** New Solstice code must be original work
+   based on public specifications, documented behavior, platform APIs, and approved dependencies.
+   Do not copy, translate, or closely paraphrase Breezy Weather or another project's source.
+2. **Existing inherited code is not automatically approved for reuse.** Keep it in the audit scope;
+   classify it for removal, replacement, or an explicitly justified temporary retention. Preserve
+   applicable licence and attribution notices while inherited code remains.
+3. **Allowed references:** public specifications and standards (CAP, METAR, WMO), service API
+   documentation and terms, published research, platform documentation and guidelines, our own
+   project documents, and externally observable behavior. Use libraries through their public APIs
+   under their licences; do not paste their implementation into Solstice.
+4. **Spec, then build:** record the intended behavior and allowed sources in Solstice's own words
+   before implementing a substantial new component. Keep implementation tasks separate from
+   source-code inspection when a clean-room boundary is required.
+5. Each pull request records material sources consulted and identifies any inherited files changed.
+   If new code is found to be too close to an upstream implementation, replace it rather than
+   rationalizing the similarity.
+6. This process reduces provenance risk but cannot eliminate the possibility that AI models have
+   encountered public source code during training.
 
 ## 6. Platform guidelines
 
@@ -95,7 +104,7 @@ short and never the only feedback.
 4.5:1 for body text, 3:1 for large text, on every sky; never colour alone; every gesture also has a
 button or a TalkBack action; nothing that disappears on a timer alone; RTL mirrored.
 
-**Decided exceptions** (Marco): the ✕ sits at the end of headers; the toolbar keeps its current
+**Decided exceptions** (project owner): the ✕ sits at the end of headers; the toolbar keeps its current
 animation; glass on cards is under review. Exceptions are listed here and in PLAN.md, nowhere else.
 
 ## 7. Motion
@@ -106,7 +115,7 @@ Full rules in [MOTION.md](MOTION.md). In short:
 - Things morph, never pop; one material per morph; the button becomes the card; closing goes back
   into the source.
 - Nothing blocks input; gestures drive a motion value and hand their velocity to the release.
-- **Reduce Motion** ("Remove animations"): every Motion piece has a reduced form, agreed with Marco
+- **Reduce Motion** ("Remove animations"): every Motion piece has a reduced form, agreed with the project owner
   (Apple's list: fades instead of moves, no blur hand-offs, no depth, less bounce, follow the finger).
 - Haptics from tokens only; they follow the system setting; none added without agreeing them.
 - Every new or changed motion is proposed with options and agreed before it's built.
@@ -122,12 +131,11 @@ Full rules in [MOTION.md](MOTION.md). In short:
 ## 9. Done means checked
 
 A change is done when:
-1. CI passes (lint, the no-hardcoding check, Motion's and the app's unit tests);
-2. logic has unit tests; each Motion piece has a Motion Lab demo;
+1. CI passes the formatting, no-hardcoding, relevant app/dependency unit-test, and required build checks;
+2. app-owned logic has unit tests; app-side Motion-UI behavior is covered by the consumer integration contract and tests; Motion Lab demos and Motion-UI API documentation remain owned by the Motion-UI repository;
 3. it was checked on the Pixel (profile build for smoothness; frame stats when motion changed), or is
    clearly marked "not checked on the phone";
-4. the docs are updated: PLAN.md (decisions), LOG.md (a dated line), ROADMAP.md (ticked), Motion's
-   README for any Motion API change.
+4. the docs are updated: PLAN.md (decisions), LOG.md (a dated line), and ROADMAP.md (ticked). Dependency-owned documentation changes belong in the dependency repository.
 
 ## 10. Docs
 

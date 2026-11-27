@@ -2,7 +2,7 @@
 
 **Status:** Internal technical audit; partial code-backed findings  
 **Reviewed:** 2026-11-26  
-**Not a privacy policy or legal opinion.** This document records the implementation paths inspected so far. It is not suitable as the public privacy notice until provider behavior, dependency instrumentation, retention, build variants, and legal obligations are fully reviewed.
+**Internal evidence map; not a public notice or legal opinion.** This document records implementation paths inspected so far. The public Solstice notice is in the repository root `PRIVACY.md`; this internal map does not establish that provider behavior, dependency instrumentation, retention, build variants, or legal obligations have been fully reviewed.
 
 ## 1. Relationship to the public notice
 
@@ -89,7 +89,7 @@ These features are distinct from remote telemetry and are enabled only for confi
 - The inspected provider's `isAllowedPackage()` method currently returns `true`; the access boundary is therefore the manifest's Android read permission, not a second in-code package allowlist. Keep the permission intact and make its Android permission prompt accurately disclose the data exposed.
 - The permission label and description strings still say "Breezy Weather". They need a separate Solstice-specific copy/security review before users are asked to grant the permission.
 - This mechanism is local Android app-to-app access, not a Solstice-hosted cloud API.
-- `PrivacyPolicyActivity.kt` dynamically lists privacy-policy URLs for HTTP weather sources returned by `SourceManager.getHttpSources()` and can show the configured app privacy URL. This provider-link list does not make the inherited root `PRIVACY.md` accurate for Solstice.
+- `PrivacyPolicyActivity.kt` dynamically lists privacy-policy URLs for HTTP weather sources returned by `SourceManager.getHttpSources()` and can show the configured app privacy URL. This provider-link list does not by itself validate every statement in the Solstice-owned root `PRIVACY.md`; public wording must remain limited to reviewed behavior.
 
 ## 6. Diagnostics and logs
 

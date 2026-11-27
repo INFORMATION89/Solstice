@@ -45,8 +45,9 @@ successful build, or unperformed specialist review does not count as completion.
 - [ ] Complete the code-path audit for background location, permissions, providers/endpoints,
   refresh scheduling, app-to-app data disclosures, diagnostics, retention/deletion, and build
   variants.
-- [ ] Rewrite and validate root `PRIVACY.md`. It still contains inherited Breezy wording and is
-  not Solstice's finished privacy notice. Use the data map as evidence, not as legal approval.
+- [x] Replace inherited root `PRIVACY.md` wording with a Solstice-owned notice grounded in the
+  current data map. The notice is published in the repository; technical, provider-policy, and
+  legal validation remain open and must not be treated as complete.
 - [ ] Correct the custom `READ_PROVIDER` permission label and description; it still uses Breezy
   wording. Treat this as visible app copy and follow the approval rule.
 - [ ] Confirm telemetry and data contribution remain off by default; any future opt-in must be
