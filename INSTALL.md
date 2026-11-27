@@ -1,16 +1,16 @@
 # Install Solstice
 
-**Current distribution status (2026-11-26):** Solstice currently provides a rolling Android testing build through GitHub Releases. This is a pre-release/testing channel, not a statement that Solstice has been published to Google Play or F-Droid.
+**Current distribution status (2026-11-27):** No testing pre-release is currently published. CI is configured to publish a rolling Android testing build after a successful push to `main` when the test-signing secrets are configured. The signing and update path have not yet been verified end to end. This is a pre-release/testing channel, not a statement that Solstice has been published to Google Play or F-Droid.
 
 ## Requirements
 
 - Android 10 (API 29) or newer.
 - The published testing APK is built for ARM64 Android devices (`arm64-v8a`).
 
-## Install the latest testing build
+## Install a testing build when one is available
 
-1. Open the [Solstice testing pre-release](https://github.com/INFORMATION89/Solstice/releases/tag/testing).
-2. Download the latest `solstice-testing-<commit>.apk` asset. You do not need a GitHub account to download it.
+1. Open the [Solstice testing pre-release](https://github.com/INFORMATION89/Solstice/releases/tag/testing). If no release is listed, there is no published APK to install yet.
+2. When a release is available, download its `solstice-testing-<commit>.apk` asset. You do not need a GitHub account to download it.
 3. Open the downloaded APK. The first time, Android may ask you to allow your browser or file manager to install unknown apps. Allow installation for that app, then open the APK again.
 4. Confirm the Android installation prompt.
 
@@ -18,7 +18,7 @@ The testing build uses Solstice's Profile variant. It can be installed alongside
 
 ## Receive testing updates automatically
 
-Use [Obtainium](https://github.com/ImranR98/Obtainium):
+Once a testing release is available, use [Obtainium](https://github.com/ImranR98/Obtainium):
 
 1. Add `https://github.com/INFORMATION89/Solstice` as the app source.
 2. Enable **Include pre-releases**.

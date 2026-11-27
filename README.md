@@ -11,10 +11,7 @@ License: GNU LGPL-3.0, with the additional terms inherited from Breezy Weather.
 
 ## Testing on your phone
 
-When CI succeeds and the test signing secrets are configured, pushes to `main` publish a test build to
-the **[testing pre-release](https://github.com/INFORMATION89/Solstice/releases/tag/testing)**.
-It's the smooth `profile` build (release code), and a new one installs over the last one, so your
-places and settings stay.
+CI is configured to publish a rolling testing build to the **[testing pre-release](https://github.com/INFORMATION89/Solstice/releases/tag/testing)** after a successful push to `main`, provided the test-signing secrets are configured. **No testing release is currently published.** The profile signing and update path have not yet been verified end to end; treat future builds as experimental and back up important data.
 
 1. On the phone, open the link above and download `solstice-testing-<commit>.apk`. You don't need to
    sign in.
