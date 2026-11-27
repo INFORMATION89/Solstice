@@ -45,7 +45,7 @@ They change only with Marco's OK. If a task seems to need breaking one, stop and
 
 ## 4. Data, sources and privacy
 
-Design in [SOURCES.md](SOURCES.md).
+For app-owned provider coverage and attribution, use [COVERAGE.md](COVERAGE.md). External dependency boundaries are in [INTEGRATIONS.md](INTEGRATIONS.md).
 
 **Privacy**
 1. Nothing leaves the phone except the weather requests needed for a forecast, unless the person

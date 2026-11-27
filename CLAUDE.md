@@ -17,7 +17,7 @@ including Claude Code. Then follow its reading order:
 
 Read specialist references only as needed: [DESIGN.md](docs/DESIGN.md), [MOTION.md](docs/MOTION.md),
 [WRITING.md](docs/WRITING.md), [UI_SYSTEMS.md](docs/UI_SYSTEMS.md), [PROPOSALS.md](docs/PROPOSALS.md),
-[INTEGRATIONS.md](docs/INTEGRATIONS.md), or a Solstice-owned feature specification.
+[INTEGRATIONS.md](docs/INTEGRATIONS.md), or a Solstice-owned feature specification. Do not read or maintain external dependency roadmaps here.
 
 External libraries and services are independently owned. Their implementation plans, internal
 milestones, labs, and technical decisions belong in their own repositories. Solstice's consumer-side

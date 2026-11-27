@@ -1,60 +1,51 @@
 # Solstice — current handoff
 
-**Snapshot:** 2026-11-26  
+**Snapshot:** 2026-11-27  
 **Scope:** Solstice Android application only.
 
 ## Read first
 
 Read root [AGENTS.md](../AGENTS.md), [RULES.md](RULES.md), [PLAN.md](PLAN.md),
 [ROADMAP.md](ROADMAP.md), and [AI_COST_POLICY.md](AI_COST_POLICY.md). Use this file only for the
-current app handoff. Dependency consumer boundaries are in [INTEGRATIONS.md](INTEGRATIONS.md);
-do not use Solstice plans to continue development of external dependencies.
+current Solstice handoff. Consumer-side dependency boundaries are in [INTEGRATIONS.md](INTEGRATIONS.md).
 
-## Current modernization PR
+## Current cleanup branch
 
-[PR #14 — Solstice documentation, AI governance, and Gradle CI](https://github.com/INFORMATION89/Solstice/pull/14)
-is the active Draft containing the documentation and CI modernization.
+Work is in `maintenance/pre-feature-cleanup-2026-11-27`, based on `main` at `5ba6deae3415ab6830a023c8d5f7e59f72fb534c`.
 
-- The previous exact head `31cace1d3166896871bb0e9ede8182f3b4c29aad` passed Build run #285
-  (`45905434026`). Spotless, the no-hardcoding guard and its self-tests, the configured app/dependency unit-test task
-graph, Debug assembly, and Debug APK upload passed. The main-only signing/Profile and publication
-  steps were correctly skipped on a PR.
-- This handoff and documentation cleanup advance the branch beyond that verified SHA. Run and inspect
-  CI on the new exact head before treating the updated branch as verified.
-- No app runtime or visible UI change is included in this documentation cleanup.
-- The no-hardcoding guard is heuristic; manual diff review remains required. Protected-main
-  Profile/signing/publication and physical-device behavior have not been verified by a PR run.
+The cleanup restores the governance, CI, privacy-evidence and consumer-boundary work introduced by
+PR #14. That work was merged historically, but later PRs were created from an older base and the
+current `main` tree no longer contained those files. This branch reapplies the PR #14 changes on top
+of the current `main`, while preserving the later Solstice decisions from PRs #15–#21.
 
-## Solstice work still open
+No app feature, visual redesign, provider change, or runtime behavior change is intended.
 
-1. **Privacy and data-flow review.** Continue from [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md).
-   Trace the background-location call path, current provider/endpoint fields, local app-to-app
-   disclosures, update checks, logging/diagnostics, retention/deletion, and build variants before
-   replacing the inherited public [PRIVACY.md](../PRIVACY.md). The data map is internal evidence,
-   not the public notice or legal approval.
-2. **Permission and user-facing copy.** The custom `READ_PROVIDER` permission still uses Breezy
-   wording. Any replacement is a visible app change and must follow RULES.md approval requirements.
-3. **CI/release path.** A protected-main run with configured signing secrets still needs to verify
-   the Profile artifact and testing-release publication end to end. Do not infer this from PR CI.
-4. **Android device pass.** UI, interaction, animation, TalkBack, and Android ICU behavior still need
-   physical-device/instrumentation checks where relevant. Record unavailable checks as NOT TESTED.
-5. **App roadmap.** Revalidate the remaining app bugs, settings, forecast, Outlook, alert, and
-   accessibility tasks in [ROADMAP.md](ROADMAP.md) against current source before starting them.
-   Preserve feels-like as a prominent practical metric while keeping actual air temperature visible.
+## Remaining cleanup and verification
 
-## Dependency use
+1. Validate all internal Markdown links and remove stale references to deleted external-dependency
+   plans and specifications.
+2. Audit the active roadmap so it contains Solstice-owned app work only; Motion-UI and Meridian
+   implementation work belongs in their respective repositories.
+3. Continue the code-backed privacy audit in [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md), including
+   background-location call paths, provider request fields, refresh scheduling, diagnostics,
+   retention/deletion, app-to-app disclosures, and build variants.
+4. Do not rewrite the public [PRIVACY.md](../PRIVACY.md) until the code-path audit is complete and
+   the actual shipped behavior is reconciled.
+5. Review Gradle, CI permissions, signing-secret scope, dependency pins, wrapper integrity, and
+   release artifact handling. Verify only what the available CI and repository evidence supports.
+6. Run the required checks once on the final coherent branch head. Record physical-device,
+   accessibility, and protected-main release checks as NOT TESTED unless they are actually run.
 
-Solstice consumes external libraries only through reviewed, pinned public APIs. Their own internal
-implementation work is outside this repository. Check [INTEGRATIONS.md](INTEGRATIONS.md) before any
-app-side adoption change; keep this handoff and all other app plans limited to Solstice tasks.
+## Known boundaries
 
-## Working sequence
+- Meridian's platform/packaging probe is not a production weather engine or consumer API. Solstice
+  must keep its current provider path until a stable, approved Meridian contract and artifact exist.
+- Motion-UI is independently maintained. Solstice records only its pinned consumer API and
+  app-side adoption requirements.
+- The public privacy notice remains inherited Breezy wording and must not be treated as authoritative.
+- No product feature, new provider, UI change, or new dependency is authorized by this cleanup task.
 
-1. Finish the documentation cleanup on PR #14; validate links, references, and active plan scope.
-2. Re-run required CI on the exact final PR head and review the complete diff.
-3. Continue the app privacy evidence audit before drafting public privacy wording.
-4. Take the next approved Solstice-owned task from ROADMAP, with focused tests and a phone check
-   when applicable.
+## Working method
 
-Do not merge PRs, publish releases, change protected repository settings, or incur unapproved paid
-usage without the required explicit authorization.
+Keep changes grouped into coherent commits, preserve current-main decisions, and open a PR for review.
+Do not merge, publish releases, change protected repository settings, or incur unapproved paid usage.
