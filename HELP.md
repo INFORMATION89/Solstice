@@ -74,7 +74,7 @@ The read-only weather ContentProvider is protected by a Solstice-specific Androi
 
 ## Privacy and data controls
 
-Review [PRIVACY.md](PRIVACY.md) and the provider-specific policies before enabling a source or sharing data with another app. The inherited privacy notice is currently under review for Solstice-specific accuracy; do not treat Breezy Weather wording in an older build or document as a substitute for checking the actual provider and app behavior.
+Review [PRIVACY.md](PRIVACY.md) and the provider-specific policies before enabling a source or sharing data with another app. The root PRIVACY.md is a Solstice-specific notice based on currently identified data flows. The technical audit remains open; do not treat it as a completed audit of every dependency, provider, build variant, retention path, or legal requirement.
 
 ## Still need help?
 

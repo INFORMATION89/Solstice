@@ -447,7 +447,7 @@ Solstice's recommendation work should leave room for the independent [Personal S
 - [ ] After PSC research and its provider/sync contracts are reviewed, decide whether and how Solstice should integrate an adapter.
 - [ ] Keep synchronization opt-in and separate from Meridian's optional public weather-data contribution and any telemetry.
 
-This is future planning, not an instruction to begin a provider integration now. See [PERSONAL_SYSTEMS_COORDINATOR.md](research/PERSONAL_SYSTEMS_COORDINATOR.md).
+This is future planning, not an instruction to begin a provider integration now. See [PERSONAL_SYSTEMS_COORDINATOR.md](../research/PERSONAL_SYSTEMS_COORDINATOR.md).
 
 ## Release
 
