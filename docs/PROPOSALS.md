@@ -1,10 +1,9 @@
-# Proposals waiting for Marco
+# Proposals and decision history
 
 Mockups (sample data): Outlook, a rain card's sheet at both heights, onboarding and Settings, on the
 canvas https://claude.ai/artifact/PQ6PAqLwXQ4CnAQnExJk6p (2026-11-23).
 
-Status: **proposals** (2026-11-23). Nothing here is built until it's agreed (RULES.md section 1). Once
-a part is agreed it moves to PLAN.md "Decisions in force" and leaves this file.
+Unapproved material in this file is proposal-only; nothing here authorizes implementation (see RULES.md section 1). Sections marked **Decided** record decisions already agreed with the project owner. The current authoritative version of each approved decision is in PLAN.md; the markers remain here only as historical context. Unmarked ideas remain proposals until explicitly approved.
 
 ## 1. Outlook (replaces "This week")
 
