@@ -87,7 +87,7 @@ By default, blocks are configured to display in this order and can be reordered 
 - Moon
 - Clock (not enabled by default)
 
-Some blocks may not show with some sources if the data is not available. Check [sources](SOURCES.md) for more info.
+Some blocks may not show with some sources if the data is not available. Check the app's Weather Sources settings for available providers and location coverage.
 
 **All blocks can be tapped on to access more details.**
 

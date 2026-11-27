@@ -7,7 +7,7 @@ when it shows (the condition), what it says today, and room for your version. Fi
 How the app picks a text: it checks the conditions in each table from top to bottom and uses the
 first one that matches.
 
-## Ground rules (proposed, change them as you like; design rules in [DESIGN.md](DESIGN.md))
+## Writing rules (apply to new and revised Solstice copy; design rules in [DESIGN.md](DESIGN.md))
 
 - **Say what's happening, not the numbers.** A title should make sense without reading the data
   ("Going down to 16° in the next 3 hours", not "Hourly").

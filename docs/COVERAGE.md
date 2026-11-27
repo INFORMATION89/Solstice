@@ -1,8 +1,10 @@
-# Coverage
+# Solstice weather-source coverage
 
-This page documents the coverage status of weather sources around the world in Breezy Weather. Before you submit a request for a new source, please check this document to see if it has been considered for coverage in the past.
+**Evidence status:** this inventory is inherited from the Breezy Weather codebase and is not a fully re-audited statement of current Solstice behavior. It is a research starting point only. Before treating a source as enabled, selectable, or available in a particular region, verify the actual Solstice build flavor, adapter, location filtering, and current provider terms.
 
-In general, a weather source can be considered for inclusion in the official release of Breezy Weather if it meets the following requirements:
+Use this list to understand which providers have historically been considered and where additional coverage may be useful. Product and app-side provider decisions remain in Solstice; meteorological source evaluation, blending, correction, and engine-level provider strategy do not belong in this inventory.
+
+In general, a source can be considered for inclusion in Solstice only when its current adapter, data quality, geographic coverage, privacy, terms, and attribution have been verified:
 
 - **Geolocation availability:** A source should be able to provide data directly from geographical coordinates (latitude and longitude) directly, or return forecast locations from given coordinates. Breezy Weather is a mobile app, and is primary used for querying weather forecasts on the go. It is not enough to for a source to provide forecast from location names alone.
 - **Data format:** A source should provide its forecast data in JSON or XML format.

@@ -1,116 +1,69 @@
 # Solstice motion
 
-How Solstice moves. This is the user's reference (2026-11-19) and the rules every animation follows.
-The values live in code in `app/src/main/kotlin/org/breezyweather/ui/expressive/components/SolsticeMotion.kt`.
-Any new or changed motion is still proposed to the user and agreed before it's built.
+This document defines the interaction feel and motion behavior of the Solstice Android app. It does
+not define or plan the internals, APIs, modules, lab, or roadmap of an external motion library.
+Solstice owns its interaction design and decides which stable dependency APIs it consumes.
 
-## Pillars
+Any new or changed user-visible motion is proposed and agreed before implementation.
 
-### A. Fluid spring physics (no linear or eased curves)
+## Product principles
 
-Motion is interruptible and driven by velocity, not by duration. Use `spring()`, not `tween()`.
+### 1. Fluid, interruptible movement
 
-**Things morph, they never pop** (the user, 2026-11-21: very important). Nothing new appears out of
-nowhere: a sheet, card, menu or window grows out of the element that caused it, and that element *is*
-what transforms and expands (as iOS buttons do), then folds back into it. No fade-in from nothing, no
-replacing one thing with another.
+- Interactions should respond immediately and remain interruptible.
+- Dragging follows the finger; release uses the gesture's direction and velocity where appropriate.
+- A new gesture can catch an animation in progress. No animation should swallow an unrelated tap.
+- Avoid linear/eased movement for physical interactions when spring behavior better expresses the
+  gesture. Short, simple opacity or colour changes may use direct transitions.
 
-**Scope of `:motion`** (the user, 2026-11-21): it is the framework for **every interaction in any app**,
-not only Solstice: pressing buttons, opening lists, menus, cards and sheets, page changes, the page
-receding behind a sheet, drags, swipes, long presses and their haptics. The goal is clean, controlled,
-refined interactions like never seen on Android. Anything Solstice needs that moves or responds to touch
-is built as a `:motion` piece first, then used in the app.
+### 2. Things morph; they do not pop
 
-| Use | Spring | In code |
-|---|---|---|
-| Responsive controls (buttons, toggles, sliders) | `dampingRatio = Spring.DampingRatioNoBouncy`, `stiffness = Spring.StiffnessMediumLow` | `SolsticeMotion.control` |
-| Morphing containers (menus, sheets, pill-style buttons) | `dampingRatio = 0.78f`, `stiffness = 380f` (subtle elasticity) | `SolsticeMotion.container` |
-| Inner content scale-in | `dampingRatio = 0.85f`, `stiffness = 400f` | `SolsticeMotion.content` |
-| Settling after a drag (no bounce) | `dampingRatio = 1f`, `stiffness = Spring.StiffnessMediumLow` | `SolsticeMotion.settle` |
-| Dismissing a container back into its source | `dampingRatio = 1f`, `stiffness = 260f` | `SolsticeMotion.dismiss` |
-| Small controls only (switch thumbs, toggles, icon changes; Material's fast springs) | 0.2 s / 0.9 (`stiffness ≈ 987`) | `Motion.snappy` (added 2026-11-19) |
+A sheet, card, menu, or window should retain a clear visual relationship to the control or content that
+opened it. The opening element should feel like it grows into the destination, and closing should
+restore that relationship. Do not introduce a surface from nowhere or replace connected content with
+an unrelated fade.
 
-Values live in the `:motion` module (`io.github.information89.motion.Motion`, written as response +
-damping). Material components get them through `SolsticeMotionScheme` (fast → `snappy`, default →
-`container`, slow → `dismiss`; effects: fast → `snappy`, default → `settle`, slow → `dismiss`).
+### 3. One material through a morph
 
-The exception is a shared transition that's seeked. There, the parts follow the fraction
-linearly, and the spring is in the `Animatable` that sets the fraction, so only one physical
-curve applies.
+The source control and the surface it becomes should read as one continuous object. The transition may
+change shape, size, elevation, and content; it should not create an unnecessary material crossfade.
 
-### B. Gesture-driven elastic springs (Animatable plus velocity)
+### 4. Choreographed content
 
-- Pair an `Animatable` with `pointerInput` or `draggable`. The drag moves it directly, and the
-  release velocity becomes the spring's `initialVelocity`. Don't use `animateFloatAsState` for
-  gesture-driven motion.
-- Catch things mid-flight: a new drag stops the spring where it is and carries on from there.
-- **Animations never block input** (added by the user 2026-11-21): nothing waits for an animation to
-  finish. A tap on anything (a place card while a tab change plays, a button while a sheet settles)
-  works at once: the animation is retargeted, finished instantly, or keeps running underneath, but the
-  touch is never swallowed. This applies to every animation, through `:motion`. **Exception, agreed
-  2026-11-21:** page changes (swipes and tab taps) are the pager really scrolling, so a tap while the
-  pages still move first stops them (the user chose one springy page motion over this rule).
-- Pick the target from momentum: project where a fling would come to rest (`SolsticeMotion.project`).
-- Over-dragging rubber-bands, like iOS, and never stops dead (`SolsticeMotion.rubberBand`, coefficient 0.55).
+Content should appear when the container can support it. Text and icons should not be distorted while
+a surface changes size. Closing content should leave before the container collapses where this makes
+the transition clearer.
 
-### C. Continuous container morphing (`:motion` `Morph`; SharedTransitionLayout before M3)
+### 5. Responsive input and gesture ownership
 
-- Buttons, pills and floating buttons morph into the sheets and menus they open, and back. The
-  containers don't crossfade.
-- Use `SharedTransitionLayout` with `sharedBounds` and a custom `BoundsTransform`. The curve runs
-  from critically damped to lightly underdamped.
-- Text that travels (a button's label becoming a heading) shares bounds with scale-to-bounds.
-- **The button and the card it becomes share one material** (the user, 2026-11-21). A morphing
-  button and its card use the same background material (the same glass, or the same fill). The
-  morph changes the shape, size and content, never the material, so nothing crossfades and the card
-  reads as the button itself grown. Different materials at the two ends (an outlined button opening
-  into a glass card, say) are not allowed.
-- **The button itself becomes the card** (agreed 2026-11-21, a style morph): `Morph` takes the
-  source's and target's `MorphStyle` (fill, border, shadow, material amount) and the source's own
-  content. Its first frame is exactly the button, `Modifier.morphSource` hides the real button in that
-  same frame, and every property interpolates to the card's; materials never crossfade. First used
-  by the moon pill.
+- Input remains responsive during page changes, sheets, and morphs.
+- Every gesture has one clear owner; nested scrolling and child interactions must continue to work.
+- A touch may interrupt, reverse, or redirect an animation.
+- The app must not rely on an animation completing before an action can be taken.
 
-### D. Choreographed content reveal
+### 6. Reduce Motion and accessibility
 
-When a pill expands into a card, the inner content is delayed and scaled, so it doesn't look
-squished while the container first stretches:
+Respect Android's system animation and reduced-motion settings. A reduced form should preserve the
+meaning and continuity of the interaction while reducing spatial travel, overshoot, blur, and
+decorative effects. Direct manipulation should still follow the finger. Haptics are supplementary;
+they are never the only feedback.
 
-- **Container bounds:** start immediately (0 ms delay), lightly underdamped.
-- **Inner content:** `fadeIn(tween(180, delayMillis = 60))` combined with
-  `scaleIn(initialScale = 0.92f, animationSpec = spring(0.85f, 400f))`. Text and icons emerge as
-  the glass reaches about 70 % of its target size.
-- **Closing:** the content leaves first, then the container shrinks back.
-- **When a gesture drives it:** the reveal is tied to the morph's position (from 35 % to 70 % of
-  the way, 0.92 to 1 scale), so pulling scrubs it too.
+## Solstice-specific behavior
 
-## Also always
+- **Toolbar:** the current animated toolbar and its bud are part of Solstice's product identity.
+  Keep their behavior and recognizable appearance unless a product decision explicitly changes them.
+- **Moon card:** the moon button and card remain visually connected through opening and closing.
+- **Search and place windows:** retain their source relationship and responsive pull/back behavior.
+- **Places:** reorder gestures must remain predictable, interruptible, and accessible.
+- **Messages:** actions and timing must remain accessible and must not disappear before assistive
+  technology users can act on them.
 
-- **Never a plain fade-in:** things morph into other things.
-- **Consistency:** the same values everywhere.
+## Implementation
 
-## Where it's applied
+Solstice uses its own design decisions and tokens and may consume generic interaction primitives
+from pinned dependencies. This document does not prescribe a dependency's implementation or public
+API. Check [INTEGRATIONS.md](INTEGRATIONS.md) before changing a dependency pin, and consult the
+dependency's own documentation for APIs actually present at that exact revision.
 
-- **Moon card (2026-11-19):** the pill morphs into a full-height sheet.
-  - It's driven by a gesture `Animatable` with velocity.
-  - Pulling down scrubs it back into the pill, and pulling up past open rubber-bands.
-  - The content is choreographed.
-- **Search sheet** (2026-11-19): `SolsticeSheetState` (presence + detent), see PLAN.md log.
-- **Postcard window, Places drag, toolbar** (2026-11-19): on tokens; the window closes with a swipe
-  down. See PLAN.md log.
-- **Everything else** (2026-11-19): on tokens. Exceptions: the sticker peel, the Forecast develop
-  and the moon's drift (timed effects / a slow drift, not gestures). The moon card keeps its own
-  MotionValue (a full-height sheet whose pull plays the morph backwards).
-- **Motion lab** (M5, 2026-11-19): Settings → Debug → Motion lab; slow motion is `MotionTime.scale`.
-- **Haptics** (2026-11-21, F1): `:motion` `Haptic` tokens via `haptics().perform(...)`; no direct
-  vibrator or `HapticFeedbackType` calls in the app, and no new haptics without agreeing them.
-- **Page changes** (2026-11-21, revised): `:motion` `PageSpring` (`pageSpringFling`, `springToPage`,
-  `PageOvershoot`): swipes and tab taps spring the pages themselves on `Motion.momentum`, bouncing past
-  the first and last page. `PageTransition` (the drawn picture slide) is gone.
-- **README** (2026-11-19): `motion/README.md` (pieces, tokens, rules, examples).
-- **Next:** refining rounds (CONTINUE.md section 4).
-
-## Framework
-
-The plan to build these rules once, as a reusable `:motion` module, is in
-[PLAN.md](PLAN.md#motion-framework-proposed-2026-11-19-to-agree-before-building) (proposed 2026-11-19).
+When an app-side interaction changes, add focused regression coverage and update the Solstice
+roadmap. Check the result on a physical Android device when available; otherwise record NOT TESTED.

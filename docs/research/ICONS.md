@@ -1,11 +1,10 @@
-# Weather icons: what Material Symbols covers
+# Solstice weather icons: Material Symbols coverage
 
-Checked 2026-11-23 directly against Google's `material-design-icons` repo (the same place
-`tools/make_symbols.py` downloads from), Rounded style. Decided: Material Symbols now, our own set
-based on it later (PLAN.md). Weather icons today are still Breezy's PNGs; the app's UI icons already
-come from Material Symbols through `tools/make_symbols.py`.
+Checked 2026-11-23 directly against Google's `material-design-icons` repository in Rounded style.
+The current product decision is to use Material Symbols for now and consider a Solstice-owned weather
+icon set later. Interface icons already use Material Symbols through `tools/make_symbols.py`.
 
-## Meridian's conditions → Material Symbols
+## Solstice weather conditions → Material Symbols
 
 | Condition | Day | Night | Gap |
 |---|---|---|---|
@@ -37,17 +36,16 @@ temperature `thermostat`, rain chance `water_drop`, umbrella `umbrella`, moon `b
 
 **Not in Material Symbols** (404 when checked): `uv_index`, `sunrise`, `sunset`, `haze`, `wildfire`.
 
-## What our own set would add (drawn on the same 960 grid, weight 500, Rounded)
+## Gaps a Solstice-owned icon set could address
 
-1. Showers: sun with rain, moon with rain; moon with snow.
-2. Mostly clear distinct from partly cloudy (smaller cloud).
-3. Drizzle (fine dots), freezing rain and ice.
-4. Thunderstorm with rain, heavy thunderstorm, thunderstorm with hail.
-5. Haze, dust, smoke.
-6. UV index (for the sun button and the UV sheet).
-7. Sunrise and sunset as two glyphs.
-8. Eight moon phases (for the moon card rework).
-9. Pressure gauge and pollen.
+1. Showers: sun with rain, moon with rain, and moon with snow.
+2. Distinguish mostly clear from partly cloudy.
+3. Drizzle, freezing rain, and ice.
+4. Thunderstorm with rain, heavy thunderstorm, and thunderstorm with hail.
+5. Haze, dust, and smoke.
+6. UV index, sunrise, and sunset as distinct symbols.
+7. Eight moon phases.
+8. Pressure gauge and pollen.
 
-Everything else uses Material Symbols as is. The mapping table above becomes data (a condition-to-icon
-table), so swapping in our own icons later changes the table, not code.
+Everything else can use Material Symbols. Keep the condition-to-icon mapping in app data so a future
+icon set changes the mapping rather than the weather logic.

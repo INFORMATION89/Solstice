@@ -1,47 +1,39 @@
-# README and store text (drafts, 2026-11-23)
+# Solstice README and store text — draft
 
-Drafts for Marco. Nothing here replaces the live README or `fastlane/metadata` until agreed. Rules:
-WRITING.md (plain, calm, no exclamation marks); store limits from Google Play and F-Droid (title 30
-characters, short description 80, full description 4,000). Credit Breezy Weather and say it's not
-affiliated; claim only what's built (the engine and alerts are "planned" until they ship).
+**Status:** drafts for product review, 2026-11-23. Nothing here replaces the live README or
+`fastlane/metadata` until approved. Claim only behavior that has shipped and has been checked on the
+app. Follow [WRITING.md](../WRITING.md) for plain, calm wording.
 
-## README (draft)
+## README draft
 
 ```markdown
 # Solstice
 
-A weather app that feels good to use: fast, light, and made around what you need to know next.
+A weather app that feels good to use: clear, calm, and focused on what you need to know next.
 
-Solstice is an unofficial fork of [Breezy Weather](https://github.com/breezy-weather/breezy-weather),
-redesigned. It is not affiliated with or endorsed by Breezy Weather.
+Solstice is an unofficial fork of [Breezy Weather](https://github.com/breezy-weather/breezy-weather).
+It is not affiliated with or endorsed by Breezy Weather.
 
-## What's different
+## The experience
 
-- **Forecast at a glance:** the temperature with the sun's path across the day, and short sentences
-  that say what's coming ("You'll need an umbrella on Thursday").
-- **Motion that follows your finger:** every card, sheet and window grows out of what you tapped and
-  can be pulled back; nothing blocks a tap.
-- **Places as postcards:** swipe between your places; open one as a window over the page.
-- **Many sources, your choice:** the weather sources Breezy Weather supports, with the ones that
-  cover your place shown first.
-- **Private by default:** no account, no ads, no tracking. Locations are only sent to the weather
-  sources you pick.
+- **Forecast at a glance:** temperature, the sun's path, and the hours ahead.
+- **Useful summaries:** short sentences that explain what is coming.
+- **Places as postcards:** move between your saved places and open a place in its own window.
+- **Weather sources:** choose from the sources supported by the app; available coverage depends on
+  the selected source and location.
+- **A thoughtful interface:** connected cards and sheets, a distinctive animated toolbar, and
+  interactions designed to remain responsive.
 
-## Planned
+## Planned app improvements
 
-- **Meridian**, our own forecast engine: blends several models, corrects them with nearby airport
-  reports, and shows how sure it is. Open source, usable by other apps.
-- Alerts you choose: a countdown before rain, official warnings, tomorrow's weather in the evening.
+- A practical "what to wear" card using the forecast and the app's own guidance.
+- A sun and UV detail experience.
+- More useful Outlook summaries and configurable weather alerts.
 
 ## Install
 
 [Testing builds](https://github.com/INFORMATION89/Solstice/releases/tag/testing) (Android 10 and
-newer). Add the repo to Obtainium with pre-releases on to get updates.
-
-## Built with
-
-[Motion](https://github.com/INFORMATION89/Motion), our open-source motion and UI framework for
-Jetpack Compose.
+newer). Add the repository to Obtainium with pre-releases enabled.
 
 ## Licence
 
@@ -51,53 +43,51 @@ source and is credited in the app.
 
 ## Store text, English (en-US)
 
-**Title (8/30):** Solstice
+**Title:** Solstice
 
-**Short description (≤ 80):** Weather that tells you what's next. Fast, private, no ads.
+**Short description (draft):** Weather that tells you what's next.
 
-**Full description:**
+**Full description (draft):**
 
 > Solstice shows the weather the way you'd ask about it: will it rain, how warm will it get, what
-> should I wear. Short sentences answer first; the details are one tap away.
+> should I know before going out. Short summaries answer first; the details are one tap away.
 >
-> • The day at a glance: temperature, the sun's path and the hours ahead
-> • The week in one sentence, and each day when you want more
-> • Rain card with what's coming in the next hours
-> • Swipe between your places, or open one as a window
-> • Smooth motion: everything grows from what you tap and follows your finger
-> • Many weather sources to choose from; the ones that cover your place come first
-> • Official weather warnings where your country publishes them
-> • No account, no ads, no tracking
+> - The day at a glance: temperature, the sun's path, and the hours ahead
+> - A week view with daily forecasts
+> - Precipitation details for the coming hours where the selected source provides them
+> - Saved places, quick navigation, and place windows
+> - A distinctive interface with responsive, connected interactions
+> - Multiple weather sources, with coverage depending on your location
+> - Official weather warnings where supported
 >
-> Solstice is an unofficial fork of Breezy Weather and isn't affiliated with or endorsed by it.
-> Weather data comes from the sources you pick and is credited in the app.
+> Solstice is an unofficial fork of Breezy Weather and is not affiliated with or endorsed by it.
+> Weather data comes from the selected providers and is credited in the app.
 
 ## Store text, Mexican Spanish (es-MX)
 
 **Título:** Solstice
 
-**Descripción breve (≤ 80):** El clima que te dice qué viene. Rápido, privado y sin anuncios.
+**Descripción breve (borrador):** El clima que te dice qué viene.
 
-**Descripción completa:**
+**Descripción completa (borrador):**
 
-> Solstice te muestra el clima como lo preguntarías: ¿va a llover?, ¿cuánto calor va a hacer?, ¿qué
-> me pongo? Primero responden frases cortas; los detalles están a un toque.
+> Solstice te muestra el clima como lo preguntarías: ¿va a llover?, ¿cuánto calor hará?, ¿qué debo
+> saber antes de salir? Primero responde con resúmenes breves; los detalles están a un toque.
 >
-> • El día de un vistazo: temperatura, el recorrido del sol y las próximas horas
-> • La semana en una frase, y cada día cuando quieras más
-> • Tarjeta de lluvia con lo que viene en las próximas horas
-> • Desliza entre tus lugares o abre uno como ventana
-> • Movimiento fluido: todo crece desde lo que tocas y sigue tu dedo
-> • Muchas fuentes de clima para elegir; primero las que cubren tu lugar
-> • Alertas oficiales donde tu país las publica
-> • Sin cuenta, sin anuncios, sin rastreo
+> - El día de un vistazo: temperatura, recorrido del sol y próximas horas
+> - Vista semanal con pronóstico diario
+> - Detalles de precipitación para las próximas horas cuando la fuente seleccionada los ofrece
+> - Lugares guardados, navegación rápida y ventanas por lugar
+> - Una interfaz propia con interacciones fluidas y conectadas
+> - Varias fuentes meteorológicas, con cobertura según tu ubicación
+> - Avisos meteorológicos oficiales donde estén disponibles
 >
-> Solstice es un fork no oficial de Breezy Weather y no está afiliado ni respaldado por este proyecto.
-> Los datos del clima vienen de las fuentes que eliges y se acreditan en la app.
+> Solstice es un fork no oficial de Breezy Weather y no está afiliado ni respaldado por ese proyecto.
+> Los datos del clima provienen de las fuentes seleccionadas y se acreditan en la app.
 
-## To check before using
+## Verify before publication
 
-- Character counts in the store's own editor.
-- "Fork" in Spanish: kept as is (common in Mexican tech writing); "bifurcación" sounds formal.
-- Screenshots: after the Motion UI move (Saturday), not before.
-- Where it's published (GitHub only, F-Droid, Play): not decided.
+- Confirm every feature and privacy claim against the current shipped app.
+- Check character limits in the actual store editor.
+- Do not promise future weather-engine capability, cross-platform support, or an unmerged UI component.
+- Use current Solstice screenshots only after the relevant app UI has been reviewed on a device.

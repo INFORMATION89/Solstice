@@ -1,3 +1,7 @@
+> **Historical implementation reference:** this document describes the inherited upstream update flow as
+> recorded on 2025-08-15. It is not a verified description of the current Solstice implementation.
+> Check current Solstice source code before relying on any step, scheduling interval, or cache behavior.
+
 ## Weather update process
 
 *Latest update of this document: 2025-08-15 (v6.0.5-alpha)*
