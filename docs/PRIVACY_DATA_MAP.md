@@ -1,14 +1,14 @@
 # Solstice privacy and data-flow map
 
-**Status:** Internal technical audit, initial code-backed findings  
+**Status:** Internal technical audit; partial code-backed findings  
 **Reviewed:** 2026-11-26  
 **Not a privacy policy or legal opinion.** This document records the implementation paths inspected so far. It is not suitable as the public privacy notice until provider behavior, dependency instrumentation, retention, build variants, and legal obligations are fully reviewed.
 
-## 1. Why the current notice is not authoritative
+## 1. Relationship to the public notice
 
-The root `PRIVACY.md` is inherited Breezy Weather wording. It opens with a broad claim that Breezy Weather does not collect personal data and describes upstream update checks, icon packs, and third-party app sharing. It does not accurately describe Solstice's own app identity, current provider set, IP-derived location source, current Android app-to-app integrations, or Solstice-specific controls.
+The root `PRIVACY.md` is now a Solstice-owned notice based on the findings below. This map remains the technical evidence record and is intentionally more cautious and detailed. It is not a legal opinion or proof that every dependency, build variant, device service, and retention path has been audited.
 
-Do not repeat the inherited blanket claim that "no personal data is collected" until every active network path, build flavor, dependency, and local export path has been reconciled.
+Do not broaden public claims beyond the code paths and provider behavior actually verified. In particular, do not claim that no personal data is processed or that all data stays on-device.
 
 ## 2. Location acquisition and geocoding
 
@@ -103,7 +103,7 @@ Solstice's project rules require analytics/tracking/ads/social features to remai
 
 The code inspected in this pass did not establish an active remote forecast-error telemetry pipeline. Do not imply that the future opt-in contribution design is already implemented. Equally, do not use that absence as proof of "no data leaves the device": weather/geocoding/provider requests and local app-to-app sharing are active functionality.
 
-## 8. Remaining evidence before replacing `PRIVACY.md`
+## 8. Remaining evidence to complete the privacy review
 
 - [ ] Enumerate all permissions and link each to the exact user-visible feature and background worker that uses it.
 - [ ] Verify default location, search, reverse-geocoding, and weather-source choices by build flavor and region.
@@ -115,8 +115,9 @@ The code inspected in this pass did not establish an active remote forecast-erro
 - [ ] Verify local storage categories, backups, retention/deletion behavior, and what is removed when a saved place is deleted.
 - [ ] Verify the Android permission grant flow and third-party client behavior for `READ_PROVIDER`; correct the stale Breezy label/description after copy approval.
 - [ ] Document every configured app-to-app receiver and its payload; confirm the UI clearly explains the selected packages.
-- [ ] Draft a Solstice-specific public notice that distinguishes device location, IP-derived location, weather/geocoding providers, GitHub update checks, local app-to-app sharing, user-triggered logs, and any future optional data contribution.
-- [ ] Obtain owner review of the final user-facing privacy notice and any consent/permission wording before replacing the public policy.
+- [x] Publish a Solstice-specific notice distinguishing device location, IP-derived location, weather/geocoding providers, GitHub update checks, local app-to-app sharing, user-triggered logs, and future optional contributions.
+- [ ] Review the public notice against all shipped build variants, current provider policies, Android backup/deletion behavior, dependency diagnostics, and applicable legal requirements.
+- [ ] Review user-visible permission and consent wording before changing it.
 
 ## 9. Reviewed code entry points
 

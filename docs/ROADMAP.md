@@ -14,17 +14,17 @@ revalidated against current source, current product decisions, and the dependenc
 - [x] Remove duplicated Meridian and Motion-UI implementation plans/specifications from the active Solstice documentation tree.
 - [x] Remove stale references to deleted dependency documents from the current plan and engineering rules.
 - [ ] Validate every active Markdown link and heading reference.
-- [ ] Reconcile the current product plan, rules, handoff, and roadmap; keep one authority per subject.
+- [x] Reconcile the current product plan, rules, handoff, and roadmap; keep one authority per subject.
 - [ ] Confirm proposal-only material is clearly distinguished from approved decisions.
 - [ ] Keep the dated log chronological and historical; do not use it as current implementation guidance.
 
 ## Privacy, security, and licensing
 
 - [x] Create an internal, code-backed privacy/data-flow map. It is evidence, not the public notice or legal approval.
-- [ ] Complete the audit of location permissions and call paths, providers and request fields, refresh scheduling, app-to-app sharing, diagnostics, retention/deletion, and build variants.
+- [ ] Complete the remaining audit of location permissions and call paths, provider request fields and retention, refresh scheduling, diagnostics, local storage/backup/deletion, and build variants.
 - [ ] Reconcile provider terms, privacy links, attribution, third-party notices, and LGPL-3.0 obligations with the actual shipped build.
 - [ ] Review the custom `READ_PROVIDER` permission wording. Treat any user-visible replacement as a separate copy change requiring owner approval.
-- [ ] Rewrite the public privacy notice only after the code-path audit is complete and the exact claims have been reviewed and approved.
+- [x] Replace inherited Breezy wording with a Solstice-owned notice grounded in the current data map; keep unresolved technical and legal review items open.
 - [ ] Review Actions permissions, secret exposure, signing, artifact provenance, and release replacement behavior.
 
 ## Build, dependencies, and quality

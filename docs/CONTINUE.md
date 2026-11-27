@@ -29,8 +29,9 @@ No app feature, visual redesign, provider change, or runtime behavior change is 
 3. Continue the code-backed privacy audit in [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md), including
    background-location call paths, provider request fields, refresh scheduling, diagnostics,
    retention/deletion, app-to-app disclosures, and build variants.
-4. Do not rewrite the public [PRIVACY.md](../PRIVACY.md) until the code-path audit is complete and
-   the actual shipped behavior is reconciled.
+4. Keep the Solstice-owned [PRIVACY.md](../PRIVACY.md) synchronized with verified behavior. It
+   replaces inherited Breezy wording but must not claim that unverified flows or retention practices
+   have been fully audited.
 5. Review Gradle, CI permissions, signing-secret scope, dependency pins, wrapper integrity, and
    release artifact handling. Verify only what the available CI and repository evidence supports.
 6. Run the required checks once on the final coherent branch head. Record physical-device,
@@ -42,7 +43,7 @@ No app feature, visual redesign, provider change, or runtime behavior change is 
   must keep its current provider path until a stable, approved Meridian contract and artifact exist.
 - Motion-UI is independently maintained. Solstice records only its pinned consumer API and
   app-side adoption requirements.
-- The public privacy notice remains inherited Breezy wording and must not be treated as authoritative.
+- Root PRIVACY.md is now Solstice's own notice, based on the current code-backed data map. The audit remains open; do not broaden its claims without evidence.
 - No product feature, new provider, UI change, or new dependency is authorized by this cleanup task.
 
 ## Working method
