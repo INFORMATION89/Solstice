@@ -67,13 +67,13 @@ logs, session notes or build reports here.
 ### Project
 | Topic | Decision |
 |---|---|
-| What | Fork of Breezy Weather (no shared git history; base in `UPSTREAM_BASE`), redesigned |
+| What | Independent Solstice weather app, reconstructed without reusing Breezy implementation; inherited code is a temporary migration substrate subject to audit and replacement |
 | Name and ID | Solstice, `io.github.information89.solstice` (required: upstream's licence forbids the Breezy name) |
 | Minimum Android | 10 (API 29), since 2026-11-21 |
 | Flavor shipped | `basic`; never build with `-Pbreezy` |
-| Upstream sync | Patch-based (CONTINUE.md); edits to upstream files kept small and listed below |
+| Upstream sync | None. Do not sync Breezy changes; audit and replace inherited implementation under the Solstice reconstruction plan |
 | Weather sources | Worldwide + North America; AccuWeather disabled for now; current-location name from Android's geocoder |
-| Widgets | Upstream's for now; Solstice widgets later |
+| Widgets | Solstice-owned; inherited widgets are temporary migration substrate and must be audited and replaced |
 | Motion | Separate repo (`INFORMATION89/Motion-UI`, Apache-2.0), a git submodule built with `includeBuild` |
 
 ### Look and feel

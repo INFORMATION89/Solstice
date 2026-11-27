@@ -33,7 +33,7 @@ when a dependency update is proposed.
 Repository: [INFORMATION89/Meridian-Engine](https://github.com/INFORMATION89/Meridian-Engine)
 
 Solstice does **not** currently depend on a production Meridian artifact or public weather API.
-The app's current weather behavior remains in its existing Solstice/Breezy-derived provider path.
+The app's current weather behavior still runs through inherited provider code. That path is temporary migration substrate, not the target architecture; Solstice is being reconstructed independently and must not retain or extend Breezy implementation as its long-term engine.
 The MER-0.1 platform and packaging probe was merged into Meridian-Engine's `main` through PR #15
 on 2026-11-26, but it remains a compatibility/test harness, not a production weather engine or
 consumer-ready forecast API. Its successful platform and licence checks do not authorize Solstice
