@@ -95,10 +95,27 @@ These features are distinct from remote telemetry and are enabled only for confi
 
 ## 6. Local storage, cache, backup, and deletion
 
-- `CurrentLocationStore` stores the last known latitude, longitude, and successful-refresh timestamp in a private `SharedPreferences` store named `current_location`. `clearCurrentLocation()` resets those values, but all call sites that should invoke it during location removal or app reset have not yet been traced.
-- Saved locations are stored in the SQLDelight database. The inspected `locations` table contains coordinates, place labels, and source selections. The `weathers` and `location_parameters` tables declare foreign keys to `locations` with `ON DELETE CASCADE`; `LocationRepository.delete()` deletes the location row. Other tables and all reset/uninstall paths still need a complete deletion audit.
-- The shared OkHttp client has a 50 MiB cache under the app's `cacheDir`. Cache contents and eviction/deletion behavior have not yet been examined for sensitive location-derived responses.
-- The manifest does not explicitly set `android:allowBackup`, `android:fullBackupContent`, or `android:dataExtractionRules`, and no backup-rules XML was found in the inspected app resource tree. Actual Android backup inclusion and transport behavior must be confirmed for supported OS versions and device/OEM behavior; do not claim local data is excluded from backup.
+### Saved locations and dependent weather data
+
+- `CurrentLocationStore` stores the last known latitude, longitude, and successful-refresh timestamp in a private `SharedPreferences` store named `current_location`. `clearCurrentLocation()` resets those values. The store is separate from SQLDelight, so deleting a location row does not itself clear these preferences; all call sites and reset flows that should clear them still need a complete trace.
+- The SQLDelight database is opened as `breezyweather.db` through `AndroidSqliteDriver`. Its `locations` table contains coordinates, place labels, and source selections.
+- All seven location-dependent tables inspected declare foreign keys to `locations(formatted_id)` with `ON DELETE CASCADE`: `weathers`, `location_parameters`, `alerts`, `dailys`, `hourlys`, `minutelys`, and `normals`. `DbModule` explicitly enables SQLite foreign-key enforcement on open. Therefore a location-row deletion cascades to these seven tables when the database is opened through the configured driver.
+- `LocationRepository.delete()` deletes one location row; `deleteAll()` deletes all location rows; and `addAll()` removes rows absent from the supplied location list inside a transaction. These database operations cover the seven dependent tables through the cascades. They do not prove that the separate `current_location` preferences or HTTP cache are cleared.
+- A full app reset path and every caller of `CurrentLocationStore.clearCurrentLocation()` have not yet been exhaustively traced. Do not describe user deletion/reset as complete until those paths are verified.
+
+### HTTP cache
+
+- The singleton OkHttp client stores its HTTP cache at `cacheDir/http_cache`, with a 50 MiB maximum. OkHttp's HTTP cache follows HTTP cacheability and freshness directives from responses; the configured size is an upper bound, not a fixed retention period.
+- Android's app-specific cache directory is private to the app, excluded from Auto Backup, removed on uninstall, and may be evicted by Android when storage is low. These system behaviors do not replace app-managed cleanup.
+- The reviewed client setup does not attach the cache to a location-deletion lifecycle or define a location-specific eviction policy. Deleting a saved place from SQLDelight therefore does not, by itself, prove that related cached responses are purged. Only responses eligible for HTTP caching are affected; actual provider response headers and cache contents still need endpoint-level verification.
+- No fixed application-level retention duration has been established for this cache. Do not describe 50 MiB as a time-based retention limit.
+
+### Android backup and restore
+
+- The app targets Android API 37. Its merged source manifest does not set `android:allowBackup`, `android:fullBackupContent`, or `android:dataExtractionRules`, and no backup-rules XML was found in the app resource tree.
+- For apps targeting API 23 or higher, Android Auto Backup is enabled by default when `android:allowBackup` is omitted. Its default included data classes cover private SharedPreferences and databases; cache directories are excluded. On the inspected configuration, `current_location` preferences and `breezyweather.db` are therefore eligible for Auto Backup unless overridden by a manifest overlay, device policy, or platform behavior.
+- This is a source/configuration finding, not a successful backup-and-restore test. Cloud backup and device-to-device transfer behavior can differ by Android version and device manufacturer. Verify the merged manifests for every shipped variant and test backup/restore before making stronger claims.
+- Android references: [Auto Backup](https://developer.android.com/identity/data/autobackup) and [app-specific storage](https://developer.android.com/training/data-storage/app-specific).
 
 ## 7. Diagnostics and logs
 
@@ -119,10 +136,10 @@ The code inspected in this pass did not establish an active remote forecast-erro
 - [x] Trace the background-location permission's user-facing request and scheduled-refresh call path: it is a separate, user-controlled permission in Settings → Location; the background worker requires it to acquire a fresh current-location fix.
 - [x] Trace periodic refresh scheduling: WorkManager uses the configured interval (90 minutes by default in non-debug builds), requires network connectivity, and by default skips work when the battery is low. Android may defer execution.
 - [x] Trace the optional update check's default, worker trigger, daily throttle, and GitHub endpoint. Complete enumeration of forced/manual callers and build-flavor support remains open.
-- [x] Confirm that saved-location deletion cascades to the inspected weather and source-parameter tables.
-- [ ] Verify backup inclusion/exclusion and restore behavior for every supported Android version and build variant.
+- [x] Confirm that saved-location deletion cascades to all seven inspected dependent tables: weather, source parameters, alerts, daily, hourly, minutely, and normals.
+- [x] Inspect source backup configuration: API 37 target, no explicit backup attributes/rules, and Android Auto Backup defaults make SharedPreferences and the SQLDelight database eligible while cacheDir is excluded. [ ] Verify merged manifests and backup/restore behavior for every shipped variant and supported device.
 - [ ] Trace every call site that clears the separate current-location preference store and verify deletion/reset behavior.
-- [ ] Audit the 50 MiB HTTP cache's contents, retention, and clearing behavior.
+- [x] Inspect the shared OkHttp cache location, 50 MiB cap, HTTP cache semantics, Android cache-directory lifecycle, and absence of a location-deletion hook in the reviewed client setup. [ ] Inspect provider response headers/cache entries and trace all cache eviction/clear call sites.
 - [ ] Enumerate all permissions and link each to the exact user-visible feature and background worker that uses them.
 - [ ] Verify default location, search, reverse-geocoding, and weather-source choices by build flavor and region.
 - [ ] Capture representative sanitized requests for each active external provider and identify which fields (coordinates, place IDs, query text, locale, API key, headers) are transmitted.
@@ -130,14 +147,14 @@ The code inspected in this pass did not establish an active remote forecast-erro
 - [x] Inspect the HTTP client/interceptor configuration: update checks use the shared OkHttp client, and no app/device/version fields are added in the reviewed GitHub release request. Exact runtime headers/User-Agent still need capture.
 - [x] Trace the background update-check trigger and 24-hour successful-check throttle; forced/manual callers and per-flavor support remain open.
 - [ ] Audit crash/log export, logging, analytics/telemetry SDKs, notification services, update checks, dependency graph, and all shipped flavors.
-- [ ] Complete the local storage, cache, Android backup, retention/deletion, and saved-place removal audit; partial confirmed cascades are documented above.
+- [ ] Complete the remaining local-storage audit: exhaustively trace current-location preference clearing, full reset paths, cache call sites/provider response headers, and real backup/restore behavior.
 - [ ] Verify the Android permission grant flow and third-party client behavior for `READ_PROVIDER`; correct the stale Breezy label/description after copy approval.
 - [ ] Document every configured app-to-app receiver and its payload; confirm the UI clearly explains the selected packages.
 - [x] Publish a Solstice-specific notice distinguishing device location, IP-derived location, weather/geocoding providers, GitHub update checks, local app-to-app sharing, user-triggered logs, and future optional contributions.
 - [ ] Review the public notice against all shipped build variants, current provider policies, Android backup/deletion behavior, dependency diagnostics, and applicable legal requirements.
 - [ ] Review user-visible permission and consent wording before changing it.
 
-## 9. Reviewed code entry points
+## 10. Reviewed code entry points
 
 - `app/src/main/AndroidManifest.xml` — permissions, custom `READ_PROVIDER`, provider export/read permission.
 - `app/src/main/kotlin/org/breezyweather/sources/SourceManager.kt` — registered sources and default source selection.
@@ -149,3 +166,10 @@ The code inspected in this pass did not establish an active remote forecast-erro
 - `app/src/main/kotlin/org/breezyweather/background/updater/AppUpdateChecker.kt`, `GetApplicationRelease.kt`, and `ReleaseService.kt` — optional GitHub update check.
 - `app/src/main/kotlin/org/breezyweather/sources/gadgetbridge/GadgetbridgeService.kt` and `breezyupdatenotifier/BreezyUpdateNotifierService.kt` — local app broadcasts.
 - `app/src/main/kotlin/org/breezyweather/background/provider/WeatherContentProvider.kt` — local exported data provider.
+
+## 9. Licensing and third-party attribution evidence
+
+- The root `LICENSE` is an LGPL version 3 text with additional permissions/definitions; `LICENSE_ADDITIONAL` separately prohibits implying contributor trademark rights, misrepresenting material origin, and leaving modified versions unmarked. The README identifies Solstice as an unofficial Breezy Weather fork and links the repository source.
+- The app uses the AboutLibraries Gradle plugin with `offlineMode = true` and the fork-specific `config-fork` metadata directory. `DependenciesActivity` renders the generated `R.raw.aboutlibraries` inventory in the in-app Dependencies screen.
+- The fork-specific metadata currently includes custom records for Breezy Weather (LGPL-3.0-only), Geometric Weather (LGPL-3.0-only), KNMI iOS (EUPL-1.2), Mihon (Apache-2.0), Asap fonts (OFL-1.1), and Google Maps Android utility library (Apache-2.0). Gradle dependency collection supplements these custom records; this file list is not a complete dependency inventory.
+- The code-backed existence of an in-app dependency inventory and custom license metadata is confirmed. Completeness of the generated inventory against each shipped variant, exact notices/source offers in distributed APKs, and compliance with the inherited LGPL additional permissions have not been verified against built artifacts. Do not treat the current inventory as a completed legal review.
