@@ -1,8 +1,8 @@
 # Solstice modernization checklist
 
 **Scope:** Solstice Android application repository only  
-**Tracking PR:** [#14 — Solstice documentation, AI governance, and Gradle CI](https://github.com/INFORMATION89/Solstice/pull/14)  
-**Status snapshot:** 2026-11-26
+**Origin:** [#14 — Solstice documentation, AI governance, and Gradle CI](https://github.com/INFORMATION89/Solstice/pull/14) (merged). This follow-up restores its baseline on current `main` and reconciles later changes.  
+**Status snapshot:** 2026-11-27
 
 This checklist covers Solstice-owned documentation, governance, privacy, build/CI, and release
 readiness. It is not an implementation or status tracker for external dependencies. Product
@@ -105,8 +105,7 @@ successful build, or unperformed specialist review does not count as completion.
 - [ ] Ensure all remaining app privacy, release, accessibility, and device gaps are either completed
   or explicitly marked deferred with evidence and an owner decision.
 - [ ] Review the final PR scope and exact-head CI before requesting owner review.
-- [ ] Keep PR #14 Draft until the owner review and outstanding acceptance gates are resolved or
-  explicitly deferred.
+- [ ] Keep the follow-up cleanup PR unmerged until the owner review and outstanding acceptance gates are resolved or explicitly deferred.
 
 ## 6. Confirmed boundaries
 
