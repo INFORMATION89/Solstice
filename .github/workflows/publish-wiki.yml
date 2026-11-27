@@ -1,0 +1,67 @@
+name: Publish GitHub Wiki
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/wiki/**"
+      - ".github/workflows/publish-wiki.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-solstice-wiki
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source pages
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate Wiki pages
+        run: |
+          test -s docs/wiki/Home.md
+          test -s docs/wiki/Roadmap.md
+
+      - name: Publish pages
+        env:
+          WIKI_TOKEN: ${{ secrets.WIKI_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${WIKI_TOKEN}" ]]; then
+            echo "::error::The WIKI_TOKEN repository secret is missing or empty."
+            exit 1
+          fi
+
+          wiki_dir="$(mktemp -d)"
+          trap 'rm -rf "${wiki_dir}"' EXIT
+
+          auth_header="$(printf 'x-access-token:%s' "${WIKI_TOKEN}" | base64 -w 0)"
+
+          git -c "http.extraheader=AUTHORIZATION: basic ${auth_header}" \
+            clone --quiet "https://github.com/${GITHUB_REPOSITORY}.wiki.git" "${wiki_dir}"
+
+          cp docs/wiki/Home.md "${wiki_dir}/Home.md"
+          cp docs/wiki/Roadmap.md "${wiki_dir}/Roadmap.md"
+
+          git -C "${wiki_dir}" config user.name "github-actions[bot]"
+          git -C "${wiki_dir}" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "${wiki_dir}" add Home.md Roadmap.md
+
+          if git -C "${wiki_dir}" diff --cached --quiet; then
+            echo "Wiki pages are already up to date."
+            exit 0
+          fi
+
+          git -C "${wiki_dir}" commit -m "docs(wiki): sync from ${GITHUB_SHA}"
+          wiki_branch="$(git -C "${wiki_dir}" branch --show-current)"
+          git -C "${wiki_dir}" -c "http.extraheader=AUTHORIZATION: basic ${auth_header}" \
+            push origin "HEAD:${wiki_branch}"
