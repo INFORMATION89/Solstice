@@ -434,6 +434,17 @@ Lab, Motion README, first UI kit pieces in Motion (if the module split is agreed
 - [ ] Simplify settings (fewer trend options).
 - [ ] App drawer name: choose "Solstice" or "Weather".
 
+## Future cross-device ecosystem integration (research pending)
+
+Solstice's recommendation work should leave room for the independent [Personal Systems Coordinator](https://github.com/INFORMATION89/Personal-Systems-Coordinator), without making it a dependency for current features.
+
+- [ ] When recommendation settings are designed, classify portable user preferences separately from derived personalization and Meridian's local forecast-learning data.
+- [ ] Define stable, versioned contracts for the approved recommendation preferences before implementing persistence that may later synchronize.
+- [ ] After PSC research and its provider/sync contracts are reviewed, decide whether and how Solstice should integrate an adapter.
+- [ ] Keep synchronization opt-in and separate from Meridian's optional public weather-data contribution and any telemetry.
+
+This is future planning, not an instruction to begin a provider integration now. See [PERSONAL_SYSTEMS_COORDINATOR.md](research/PERSONAL_SYSTEMS_COORDINATOR.md).
+
 ## Release
 
 - [ ] Rewrite `PRIVACY.md` and `INSTALL.md`.

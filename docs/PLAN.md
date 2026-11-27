@@ -178,6 +178,14 @@ Values follow the unit settings; a card is skipped when the source has no data f
   side-by-side step; **M0** (empty repo) at the end of Saturday if time is left (2026-11-23).
 - Engine code starts after Saturday's session; Saturday stays as planned (guardrails, then Motion).
 
+### Cross-device preferences and personalization (future; research pending)
+
+- **Shared foundation:** [Personal Systems Coordinator](https://github.com/INFORMATION89/Personal-Systems-Coordinator) is the planned provider-neutral foundation for optional, user-controlled synchronization across the application family.
+- **Solstice use case:** when designing and integrating recommendations, account for carrying explicit recommendation preferences and any approved, portable personalization state between the user's devices.
+- **Not a current dependency:** recommendations and local weather learning must continue to work without a connected provider. PSC research, provider selection, data categories, schemas, encryption and conflict behavior are still open.
+- Keep explicit preferences, derived personalization, Meridian's local forecast-learning records and optional public weather-data contribution as separate data categories. Linking a storage provider must not enable telemetry or public weather-data contribution.
+- Integration checkpoint and ownership boundaries: [docs/research/PERSONAL_SYSTEMS_COORDINATOR.md](research/PERSONAL_SYSTEMS_COORDINATOR.md). Do not implement a provider integration until the PSC research and contracts are reviewed.
+
 ### Rain and alerts (decided 2026-11-22)
 - **One "precipitation is likely" rule** for the rain card, notifications and Live Updates: hourly at
   least 40 % chance and 0.2 mm; minute by minute at least 0.1 mm/h for two steps in a row; snow counts;
