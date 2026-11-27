@@ -14,13 +14,13 @@ another doc disagree, this file wins, and the other doc gets fixed.
 Rule for this file: when a decision changes, edit it here and add a dated line to LOG.md. Don't append
 logs, session notes or build reports here.
 
-## Direction (discussed with Marco 2026-11-22, details to agree before any code)
+## Direction (discussed with the project owner 2026-11-22; proposals remain subject to approval before implementation)
 
-1. **Motion becomes the UI framework, not only the animation library.** The pieces Solstice built
-   (page frame and scaffold, card, sheet, toolbar, buttons and header actions, messages, text roles,
-   glass, tokens) move into the Motion repo, so Solstice and future apps are mostly configuration.
-   Work happens in Motion first (with its lab), then the app imports and configures it.
-   Structure, names and order: to propose and agree (see "Open questions").
+1. **Motion-UI is the shared UI dependency.** Solstice consumes only stable, reviewed components
+   available in its pinned revision. Solstice retains ownership of page composition, toolbar,
+   navigation, weather cards, app-specific sheets, theme values, accessibility decisions, and product
+   behavior. Generic framework implementation and Motion Lab work belong in Motion-UI; Solstice's
+   consumer contract is documented in INTEGRATIONS.md.
 2. **Forecast keeps today's layout** (Marco, 2026-11-22: "it's more unique"). The layout wireframes
    (design canvas "Solstice layout directions") are not the new Forecast; what stays from them:
    - **A2 is the pattern for cards that aren't full pages:** a partial sheet that grows out of the
@@ -222,11 +222,8 @@ Values follow the unit settings; a card is skipped when the source has no data f
    built in, but "off until relevant": a local source (SMN, CDMX network, SGIRPC) appears only for
    places it covers, starts off, and is offered once ("Mexico City has a local network, use it?").
    Revisit plugins only if the source list grows a lot. **Decided 2026-11-23:** all built in, off
-   until relevant where needed (SOURCES.md).
+   until relevant where needed (COVERAGE.md).
 6. Launcher icon drawing; distribution (GitHub only, or Obtainium/IzzyOnDroid too); twinkling stars.
-
-7. **Clean room leftovers:** Motion Lab's 7 demo files still carry Breezy's LGPL header; first job on
-   Saturday (CONTINUE.md, step 2).
 
 ## Research queue
 
@@ -240,7 +237,11 @@ They remain proposals until reviewed and approved:
 5. Card explainers: short Solstice texts, with "Read more" from Wikipedia (CC BY-SA: credit and link,
    never silently edited).
 
-## Upstream files touched
+## Historical fork modifications (reference only)
+
+The following records earlier fork-specific changes. It is not a current task list or a substitute for inspecting the code.
+
+### Upstream files touched
 - `app/src/main/kotlin/org/breezyweather/ui/theme/compose/Theme.kt`: `BreezyWeatherTheme` delegates
   to `ExpressiveTheme`; upstream's placeholder purple schemes removed (F1).
 - `app/src/res_fork/**`: launcher icon (F0; fork-only resources).
