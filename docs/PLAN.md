@@ -68,6 +68,7 @@ logs, session notes or build reports here.
 | Topic | Decision |
 |---|---|
 | What | Independent Solstice weather app, reconstructed without reusing Breezy implementation; inherited code is a temporary migration substrate subject to audit and replacement |
+| Business model | Non-commercial project; no monetization through advertising, subscriptions, paid features, or in-app purchases is planned. Reassess provider terms if this decision changes |
 | Name and ID | Solstice, `io.github.information89.solstice` (required: upstream's licence forbids the Breezy name) |
 | Minimum Android | 10 (API 29), since 2026-11-21 |
 | Flavor shipped | `basic`; never build with `-Pbreezy` |

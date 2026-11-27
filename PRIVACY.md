@@ -37,7 +37,7 @@ The reviewed Solstice features do not require you to create a Solstice account. 
 
 ## Analytics, advertising, and optional contributions
 
-The planned optional contribution of weather-error data is not represented as an active feature by this notice. Any future remote contribution, analytics, or other non-essential data sharing must be separately reviewed, explained before activation, and governed by an explicit user choice. Enabling one local integration does not enable another form of data sharing.
+Solstice is a non-commercial project. It is not intended to generate revenue through advertising, subscriptions, paid features, or in-app purchases. This product decision does not by itself establish that every dependency is free of analytics or diagnostics; those technical data flows remain subject to the audit described above. The planned optional contribution of weather-error data is not represented as an active feature by this notice. Any future remote contribution, analytics, or other non-essential data sharing must be separately reviewed, explained before activation, and governed by an explicit user choice. Enabling one local integration does not enable another form of data sharing.
 
 ## Your choices
 
