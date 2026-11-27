@@ -1,7 +1,7 @@
 # Solstice privacy and data-flow map
 
 **Status:** Internal technical audit; partial code-backed findings  
-**Reviewed:** 2026-11-26  
+**Reviewed:** 2026-11-27  
 **Internal evidence map; not a public notice or legal opinion.** This document records implementation paths inspected so far. The public Solstice notice is in the repository root `PRIVACY.md`; this internal map does not establish that provider behavior, dependency instrumentation, retention, build variants, or legal obligations have been fully reviewed.
 
 ## 1. Relationship to the public notice
@@ -18,7 +18,8 @@ Do not broaden public claims beyond the code paths and provider behavior actuall
 - Uses Android `LocationManager`, preferring Fused Location Provider where available, then network/GPS/passive providers as appropriate.
 - Requires coarse or fine Android location permission. Uses a balanced-accuracy location request and can fall back to the last known location.
 - The app receives latitude/longitude from Android. The app code does not itself send a network request in this service; Android's chosen location provider or device services may have their own data handling, which varies by device/vendor and is not controlled by Solstice.
-- The manifest declares coarse, fine, and `ACCESS_BACKGROUND_LOCATION`. The inspected `AndroidLocationService.permissions` list requests only coarse/fine location; this does not establish whether another worker or feature requests background access. The background permission's request flow, actual call sites, and user-visible rationale remain unverified. Do not infer continuous or background tracking from the manifest declaration alone.
+- The manifest declares coarse, fine, and `ACCESS_BACKGROUND_LOCATION`. `AndroidLocationService.permissions` exposes only coarse/fine for the location source. The separate background permission is user-controlled in **Settings → Location**: the screen shows a distinct background-access row after foreground location permission is granted and requests `ACCESS_BACKGROUND_LOCATION` only when the person selects it. Its rationale says this allows scheduled refresh to use the most recent location known by Android; without it, background refresh uses the most recent coordinates obtained in the foreground, which may be outdated.
+- `WeatherUpdateJob` calls `RefreshHelper.updateCurrentCoordinates(context, true)` when its update set includes the current-position location. `RefreshHelper` refuses to acquire a new background location unless `ACCESS_BACKGROUND_LOCATION` is granted. The inspected `AndroidLocationService` requests balanced-accuracy updates and removes the listener after the first result; if no new fix arrives in its request window, it falls back to the last known location. This is a scheduled refresh path, not evidence of continuous location tracking.
 
 ### IP.SB IP-derived location
 
@@ -62,7 +63,8 @@ Do not infer that all providers run for every refresh. The app uses per-feature 
 - Code: `SettingsManager.kt`, `AppUpdateChecker.kt`, `GetApplicationRelease.kt`, and `ReleaseService.kt`.
 - When enabled in a supported build, the app requests the latest release from the configured GitHub repository through `https://api.github.com/`. The request exposes ordinary HTTP metadata (including the network IP and request headers) to GitHub.
 - The installed version name is passed into the local comparison logic after the latest release is fetched. The reviewed request endpoint is the latest-release endpoint; the exact User-Agent/headers need a separate network-client configuration check before claiming precisely what version/device information is or is not transmitted.
-- The precise frequency/trigger rules and current build-flavor availability still need confirmation from the worker/caller path. Do not copy the old Breezy statement "once every 24 hours" into the Solstice notice until verified.
+- The background `WeatherUpdateJob` invokes the checker after a weather-update attempt when the feature is supported and the user has enabled the setting. `GetApplicationRelease` throttles successful checks to at most once every 24 hours unless `forceCheck` is true; the timestamp is stored locally after the GitHub request succeeds. Other forced/manual caller paths and per-flavor feature availability still need a complete call-site review.
+- The request is a GET to `https://api.github.com/repos/{org}/{repository}/releases/latest`. The reviewed request code does not put the installed app version, device model, or location in the URL or request body; ordinary network metadata and standard HTTP headers still reach GitHub. The update check uses the shared OkHttp client.
 
 ## 5. Local app-to-app data sharing
 
@@ -91,28 +93,44 @@ These features are distinct from remote telemetry and are enabled only for confi
 - This mechanism is local Android app-to-app access, not a Solstice-hosted cloud API.
 - `PrivacyPolicyActivity.kt` dynamically lists privacy-policy URLs for HTTP weather sources returned by `SourceManager.getHttpSources()` and can show the configured app privacy URL. This provider-link list does not by itself validate every statement in the Solstice-owned root `PRIVACY.md`; public wording must remain limited to reviewed behavior.
 
-## 6. Diagnostics and logs
+## 6. Local storage, cache, backup, and deletion
 
-The inspected `CrashLogUtils.dumpLogs()` path is user-initiated: it runs `logcat *:E -d -f` into a cache file, appends app version/flavor/commit, Android build, and device brand/manufacturer/name/model details, then exposes the file through a notification for the person to open/share. This is a local export path, not an automatic upload in the inspected implementation. Error-level logs may contain additional sensitive context if other code logs it; the person should be told to inspect the file before sharing. No automatic crash-report upload was identified in the limited code paths inspected. This is not yet proof that the entire app/dependency graph contains no diagnostics collection.
+- `CurrentLocationStore` stores the last known latitude, longitude, and successful-refresh timestamp in a private `SharedPreferences` store named `current_location`. `clearCurrentLocation()` resets those values, but all call sites that should invoke it during location removal or app reset have not yet been traced.
+- Saved locations are stored in the SQLDelight database. The inspected `locations` table contains coordinates, place labels, and source selections. The `weathers` and `location_parameters` tables declare foreign keys to `locations` with `ON DELETE CASCADE`; `LocationRepository.delete()` deletes the location row. Other tables and all reset/uninstall paths still need a complete deletion audit.
+- The shared OkHttp client has a 50 MiB cache under the app's `cacheDir`. Cache contents and eviction/deletion behavior have not yet been examined for sensitive location-derived responses.
+- The manifest does not explicitly set `android:allowBackup`, `android:fullBackupContent`, or `android:dataExtractionRules`, and no backup-rules XML was found in the inspected app resource tree. Actual Android backup inclusion and transport behavior must be confirmed for supported OS versions and device/OEM behavior; do not claim local data is excluded from backup.
+
+## 7. Diagnostics and logs
+
+The inspected `CrashLogUtils.dumpLogs()` path is user-initiated: it runs `logcat *:E -d -f` into a cache file, appends app version/flavor/commit, Android build, and device brand/manufacturer/name/model details, then exposes the file through a notification for the person to open/share. This is a local export path, not an automatic upload in the inspected implementation. Error-level logs may contain additional sensitive context if other code logs it; the person should be told to inspect the file before sharing.
+
+The shared OkHttp logging interceptor is configured to log request/response bodies only when `BreezyWeather.instance.debugMode` is true, and to `NONE` otherwise. The exact runtime definition of that flag and the full set of shipped build variants still need verification. A version-catalog scan found no obvious Firebase Analytics, Crashlytics, Sentry, Amplitude, Mixpanel, Segment, or Adjust dependency declarations; this is not a complete transitive dependency or runtime SDK audit.
 
 Before making an absolute statement, scan the complete dependency graph, build variants, manifests, network interceptors, logging wrappers, and CI/release tooling for crash-reporting, analytics, telemetry, attribution, and automatic upload SDKs.
 
-## 7. Consent, telemetry, and data contribution
+## 8. Consent, telemetry, and data contribution
 
 Solstice's project rules require analytics/tracking/ads/social features to remain absent unless explicitly approved. Any future weather-error contribution or remote data sharing must be off by default, described separately from core operation, opt-in, revocable, and disclose the exact payload, purpose, recipient, retention, and data path before activation.
 
 The code inspected in this pass did not establish an active remote forecast-error telemetry pipeline. Do not imply that the future opt-in contribution design is already implemented. Equally, do not use that absence as proof of "no data leaves the device": weather/geocoding/provider requests and local app-to-app sharing are active functionality.
 
-## 8. Remaining evidence to complete the privacy review
+## 9. Remaining evidence to complete the privacy review
 
-- [ ] Enumerate all permissions and link each to the exact user-visible feature and background worker that uses it.
+- [x] Trace the background-location permission's user-facing request and scheduled-refresh call path: it is a separate, user-controlled permission in Settings → Location; the background worker requires it to acquire a fresh current-location fix.
+- [x] Trace periodic refresh scheduling: WorkManager uses the configured interval (90 minutes by default in non-debug builds), requires network connectivity, and by default skips work when the battery is low. Android may defer execution.
+- [x] Trace the optional update check's default, worker trigger, daily throttle, and GitHub endpoint. Complete enumeration of forced/manual callers and build-flavor support remains open.
+- [x] Confirm that saved-location deletion cascades to the inspected weather and source-parameter tables.
+- [ ] Verify backup inclusion/exclusion and restore behavior for every supported Android version and build variant.
+- [ ] Trace every call site that clears the separate current-location preference store and verify deletion/reset behavior.
+- [ ] Audit the 50 MiB HTTP cache's contents, retention, and clearing behavior.
+- [ ] Enumerate all permissions and link each to the exact user-visible feature and background worker that uses them.
 - [ ] Verify default location, search, reverse-geocoding, and weather-source choices by build flavor and region.
 - [ ] Capture representative sanitized requests for each active external provider and identify which fields (coordinates, place IDs, query text, locale, API key, headers) are transmitted.
 - [ ] Review each provider's current privacy policy, terms, attribution, data retention, onward sharing, and regional limitations.
-- [ ] Inspect the HTTP client/interceptor configuration and User-Agent construction; determine whether app/device/version details are included.
-- [ ] Find the exact update-check scheduling/call path, trigger, frequency, and whether it differs by flavor.
+- [x] Inspect the HTTP client/interceptor configuration: update checks use the shared OkHttp client, and no app/device/version fields are added in the reviewed GitHub release request. Exact runtime headers/User-Agent still need capture.
+- [x] Trace the background update-check trigger and 24-hour successful-check throttle; forced/manual callers and per-flavor support remain open.
 - [ ] Audit crash/log export, logging, analytics/telemetry SDKs, notification services, update checks, dependency graph, and all shipped flavors.
-- [ ] Verify local storage categories, backups, retention/deletion behavior, and what is removed when a saved place is deleted.
+- [ ] Complete the local storage, cache, Android backup, retention/deletion, and saved-place removal audit; partial confirmed cascades are documented above.
 - [ ] Verify the Android permission grant flow and third-party client behavior for `READ_PROVIDER`; correct the stale Breezy label/description after copy approval.
 - [ ] Document every configured app-to-app receiver and its payload; confirm the UI clearly explains the selected packages.
 - [x] Publish a Solstice-specific notice distinguishing device location, IP-derived location, weather/geocoding providers, GitHub update checks, local app-to-app sharing, user-triggered logs, and future optional contributions.
