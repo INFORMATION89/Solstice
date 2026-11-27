@@ -5,7 +5,8 @@
 
 ## Current repository state
 
-- Work continues on `main`; current baseline is `e55a63863ccddd082ef76507cf03abc2b439a922`.
+- `main` remains at baseline `e55a63863ccddd082ef76507cf03abc2b439a922`.
+- This grouped documentation follow-up is on branch `docs/privacy-audit-followup-2026-11-27` in [PR #23](https://github.com/INFORMATION89/Solstice/pull/23), because repository branch protection requires changes to enter `main` through a pull request.
 - PR #22, “maintenance: reconcile Solstice before feature work”, was squash-merged into `main`.
 - Post-merge Build workflow run [46056082442](https://github.com/INFORMATION89/Solstice/actions/runs/46056082442) completed successfully on the exact `main` commit. The build, no-old-icons check, hardcoding guard, and debug APK build passed; profile signing and publication were skipped.
 - No product runtime behavior or feature was introduced by PR #22.
@@ -38,4 +39,4 @@
 
 ## Working method
 
-Continue on `main` for this owner-directed maintenance sequence. Keep related documentation changes atomic, avoid small PRs and unnecessary CI runs, and do not alter runtime privacy/security behavior or publish releases without explicit authorization.
+Keep related documentation changes atomic, avoid small PRs and unnecessary CI runs, and do not alter runtime privacy/security behavior or publish releases without explicit authorization. Branch protection requires reviewed PRs for changes to `main`.

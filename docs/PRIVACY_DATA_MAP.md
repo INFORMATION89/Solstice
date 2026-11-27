@@ -137,9 +137,11 @@ The code inspected in this pass did not establish an active remote forecast-erro
 - [x] Trace periodic refresh scheduling: WorkManager uses the configured interval (90 minutes by default in non-debug builds), requires network connectivity, and by default skips work when the battery is low. Android may defer execution.
 - [x] Trace the optional update check's default, worker trigger, daily throttle, and GitHub endpoint. Complete enumeration of forced/manual callers and build-flavor support remains open.
 - [x] Confirm that saved-location deletion cascades to all seven inspected dependent tables: weather, source parameters, alerts, daily, hourly, minutely, and normals.
-- [x] Inspect source backup configuration: API 37 target, no explicit backup attributes/rules, and Android Auto Backup defaults make SharedPreferences and the SQLDelight database eligible while cacheDir is excluded. [ ] Verify merged manifests and backup/restore behavior for every shipped variant and supported device.
+- [x] Inspect source backup configuration: API 37 target, no explicit backup attributes/rules, and Android Auto Backup defaults make SharedPreferences and the SQLDelight database eligible while cacheDir is excluded.
+- [ ] Verify merged manifests and backup/restore behavior for every shipped variant and supported device.
 - [ ] Trace every call site that clears the separate current-location preference store and verify deletion/reset behavior.
-- [x] Inspect the shared OkHttp cache location, 50 MiB cap, HTTP cache semantics, Android cache-directory lifecycle, and absence of a location-deletion hook in the reviewed client setup. [ ] Inspect provider response headers/cache entries and trace all cache eviction/clear call sites.
+- [x] Inspect the shared OkHttp cache location, 50 MiB cap, HTTP cache semantics, Android cache-directory lifecycle, and absence of a location-deletion hook in the reviewed client setup.
+- [ ] Inspect provider response headers/cache entries and trace all cache eviction/clear call sites.
 - [ ] Enumerate all permissions and link each to the exact user-visible feature and background worker that uses them.
 - [ ] Verify default location, search, reverse-geocoding, and weather-source choices by build flavor and region.
 - [ ] Capture representative sanitized requests for each active external provider and identify which fields (coordinates, place IDs, query text, locale, API key, headers) are transmitted.
@@ -167,7 +169,7 @@ The code inspected in this pass did not establish an active remote forecast-erro
 - `app/src/main/kotlin/org/breezyweather/sources/gadgetbridge/GadgetbridgeService.kt` and `breezyupdatenotifier/BreezyUpdateNotifierService.kt` — local app broadcasts.
 - `app/src/main/kotlin/org/breezyweather/background/provider/WeatherContentProvider.kt` — local exported data provider.
 
-## 9. Licensing and third-party attribution evidence
+## 11. Licensing and third-party attribution evidence
 
 - The root `LICENSE` is an LGPL version 3 text with additional permissions/definitions; `LICENSE_ADDITIONAL` separately prohibits implying contributor trademark rights, misrepresenting material origin, and leaving modified versions unmarked. The README identifies Solstice as an unofficial Breezy Weather fork and links the repository source.
 - The app uses the AboutLibraries Gradle plugin with `offlineMode = true` and the fork-specific `config-fork` metadata directory. `DependenciesActivity` renders the generated `R.raw.aboutlibraries` inventory in the in-app Dependencies screen.
