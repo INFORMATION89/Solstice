@@ -1,6 +1,6 @@
-# Rules
+# Solstice engineering rules
 
-How every session works on Solstice and Motion. These rules come before speed and before any task.
+These rules govern work in the Solstice application repository only. These rules come before speed and before any task.
 They change only with Marco's OK. If a task seems to need breaking one, stop and ask.
 
 ## 1. Ask first, always
@@ -15,20 +15,13 @@ They change only with Marco's OK. If a task seems to need breaking one, stop and
 4. When something agreed turns out not to work as planned, stop and report; don't improvise a
    different solution.
 
-## 2. Motion and frameworks first, then the app
+## 2. App and dependency boundaries
 
-1. Anything reusable is built in **Motion** first, tried in the Motion Lab, then the app imports it and
-   **configures** it. The app holds configuration and weather-specific content only.
-2. Motion never imports app code. A change Motion needs lands in Motion, then Solstice bumps the
-   submodule (CONTINUE.md, "Motion").
-3. **Use what exists before writing anything**, in this order: Motion's pieces and tokens → Material 3
-   components → a maintained library (check its licence) → new code, only after asking.
-4. **One of each system.** One page frame, card, sheet, toolbar, message, button style, text role set,
-   glass. If a system lacks something, extend the system; never build a one-off beside it.
-5. New code in the app goes in `ui/expressive/`; edits to upstream files stay small and are listed in
-   PLAN.md.
-6. **The weather engine works like Motion:** its own library, no UI code and no Solstice code in it;
-   Solstice imports and configures it. Written clean room (section 5).
+1. Solstice owns its Android application, screens, weather presentation, saved places, permissions, lifecycle, refresh scheduling, notifications, user-facing recommendations, privacy choices, and product decisions.
+2. Motion-UI and Meridian-Engine are independent projects. Their implementation, architecture, releases, internal roadmaps, and tests belong in their own repositories.
+3. Solstice consumes only APIs and artifacts present in the exact reviewed dependency revision. Pin dependencies, review licences and public APIs, and test the app-side integration before updating a pin.
+4. A reusable capability that belongs in an external dependency must be proposed and implemented there first. Solstice records only its consumer requirements, integration contract, and app-side adoption.
+5. New Solstice UI code follows the current app structure. Keep edits to Breezy-derived upstream files small, preserve applicable licence notices, and record material fork changes in the plan.
 
 ## 3. Never hardcode anything
 
@@ -48,21 +41,15 @@ They change only with Marco's OK. If a task seems to need breaking one, stop and
 For app-owned provider coverage and attribution, use [COVERAGE.md](COVERAGE.md). External dependency boundaries are in [INTEGRATIONS.md](INTEGRATIONS.md).
 
 **Privacy**
-1. Nothing leaves the phone except the weather requests needed for a forecast, unless the person
-   opted in.
-2. Opt-in is asked once during onboarding, off by default, and can be changed any time in settings.
-   Saying no changes nothing else in the app.
-3. The opt-in screen shows the actual data that would be sent (a real example from that phone) and a
-   visualization of its path: phone → what's removed (place, time, identifiers) → our server → what's
-   done with it → what comes back to everyone.
-4. Data is minimized before it leaves the phone: forecast error only, the area rounded to a coarse
-   cell, time rounded to the hour. No account, no device or advertising ID, no location history, no
-   raw coordinates. Cell size and rounding are tokens.
-5. The server uses an area only once enough phones have contributed there; below that, nothing about
-   the area is kept. The threshold is a token.
-6. Contributions are kept for a short, stated time; the server code is open source; applicable law
-   (Mexico's LFPDPPP, the EU's GDPR) is checked before the server exists.
-7. No analytics, no tracking, no ads, no social features without Marco's OK.
+
+1. The public [PRIVACY.md](../PRIVACY.md) describes data flows Solstice has identified. The internal [PRIVACY_DATA_MAP.md](PRIVACY_DATA_MAP.md) records code evidence and unresolved audit questions.
+2. Never claim that no personal data is processed, that all data stays on-device, or that third-party providers do not retain requests unless complete, current evidence supports the exact claim.
+3. Distinguish device location, IP-derived location, search and reverse-geocoding requests, weather-provider requests, optional update checks, local app-to-app sharing, and user-initiated log exports. Do not conflate local sharing with remote telemetry.
+4. A provider receives the fields required for the selected feature and ordinary network metadata. Document the actual endpoint, payload, purpose, recipient, provider policy, and known retention before making a more specific public claim.
+5. Optional, non-essential remote sharing must be off by default, separately explained, explicit, revocable, and independent of unrelated settings. Do not describe a proposed contribution pipeline as implemented.
+6. Do not add analytics, tracking, advertising, social features, or new data recipients without explicit product-owner approval and a documented privacy review.
+7. Treat permissions and exported Android components as disclosure boundaries. Their prompts, labels, receiver selection, and access controls must accurately describe the data exposed.
+8. Keep the privacy notice and data map synchronized whenever a data flow, provider, permission, build flavor, or sharing feature changes.
 
 **Sources**
 1. Each source declares its coverage, tier, terms and required attribution as data, not code.
