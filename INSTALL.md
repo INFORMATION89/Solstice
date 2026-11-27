@@ -1,82 +1,34 @@
-# Simple instructions
+# Install Solstice
 
-Go to [Releases page](https://github.com/breezy-weather/breezy-weather/releases) and download the file with the following format `breezy-weather-vX.Y.Z_standard.apk`.
+**Current distribution status (2026-11-27):** No testing pre-release is currently published. CI is configured to publish a rolling Android testing build after a successful push to `main` when the test-signing secrets are configured. The signing and update path have not yet been verified end to end. This is a pre-release/testing channel, not a statement that Solstice has been published to Google Play or F-Droid.
 
-Install it and you’re done!
+## Requirements
 
-After adding your first location, you will be asked if you want to be notified of app updates. We highly recommend you enable it.
+- Android 10 (API 29) or newer.
+- The published testing APK is built for ARM64 Android devices (`arm64-v8a`).
 
+## Install a testing build when one is available
 
-# Detailed instructions
+1. Open the [Solstice testing pre-release](https://github.com/INFORMATION89/Solstice/releases/tag/testing). If no release is listed, there is no published APK to install yet.
+2. When a release is available, download its `solstice-testing-<commit>.apk` asset. You do not need a GitHub account to download it.
+3. Open the downloaded APK. The first time, Android may ask you to allow your browser or file manager to install unknown apps. Allow installation for that app, then open the APK again.
+4. Confirm the Android installation prompt.
 
-## Flavors
+The testing build uses Solstice's Profile variant. It can be installed alongside a separate Solstice build. It also includes a second **Motion Lab** launcher icon for motion experiments; the app's Settings → Debug area also provides access to the lab.
 
-The recommended flavor of **Breezy Weather** is the standard version. It is fully open source and contains no proprietary components.
+## Receive testing updates automatically
 
-For specific needs, we also offer a flavor with only free-network sources (libre and self-hostable): Open-Meteo, Pirate Weather, Bright Sky (DWD), Recosanté and ClimWeb (used by many African countries).
+Once a testing release is available, use [Obtainium](https://github.com/ImranR98/Obtainium):
 
-Both flavors are signed with the same signature, so you can easily try/switch between both.
+1. Add `https://github.com/INFORMATION89/Solstice` as the app source.
+2. Enable **Include pre-releases**.
+3. Save the source and let Obtainium check for newer testing releases.
 
+Solstice's in-app GitHub update check is a separate optional setting and is disabled by default. You do not need to enable it to install or update through Obtainium.
 
-## Sources to get Breezy Weather from
+## Important notes
 
-**Breezy Weather** releases are available from the following sources:
-- **[GitHub releases](https://github.com/breezy-weather/breezy-weather/releases)** is where releases built by GitHub are published under APK format. Any Android device can install APK files without needing any particular app. If you have a GitHub account, you can subscribe to be notified of updates, however it’s more convenient to use a store app to track updates. Due to technical limitations, this is also the only source to provide architecture-specific APKs, although the difference between them and the universal APK is of a negligible 2 MB, so it should not be a criteria of choice.
-- **[Breezy Weather’s F-Droid repositories](https://github.com/breezy-weather/fdroid-repo/blob/main/README.md)** are maintained by Breezy Weather developers and get updates from a F-Droid client that doesn’t support receiving updates from GitHub.
-- **[Izzy F-Droid repository](https://apt.izzysoft.de/fdroid/index/info)** offers the standard flavor which is our recommended choice if you would like someone to independently review the app before it gets published. Updates are fast (less than 24 hours).
-- **[F-Droid default repository](https://f-droid.org/packages/org.breezyweather/)** offers the flavor with only free-network sources. Updates require someone on F-Droid team to manually add new versions, as autoupdates cannot be enabled for technical reasons. Since November 2025, after this manual action, updates are made available faster than it used to be in the past. If you decide to use this source and you want to report an issue, you will be asked to update to the latest version before making the report if it happens to be lagging behind.
-
-| Differences                | GitHub releases | [F-Droid repo] Breezy Weather | [F-Droid repo] Izzy    | [F-Droid repo] Default     |
-|----------------------------|-----------------|-------------------------------|------------------------|----------------------------|
-| Available flavors          | All             | All                           | Standard               | Free network sources-only  |
-| Pre-releases               | Optional        | Optional                      | ❌                      | ❌                          |
-| Delay for updates          | Immediate       | Immediate                     | Every day at 18:00 UTC | Depends on a manual action |
-| APK matches source code    | ✅               | ✅                             | ✅                      | ✅                          |
-| Independently reviewed     | ❌               | ❌                             | ✅                      | ✅                          |
-| Architecture-specific APKs | ✅               | ❌                             | ❌                      | ❌                          |
-
-
-### Other not supported well-known sources
-
-- Google Play Store:
-  - Costs money
-  - Is privacy invasive for the developer (requires sending your ID and giving your phone number)
-  - We don’t [comply with Google Play policy](https://github.com/breezy-weather/breezy-weather/issues/31)
-- Accrescent: waiting for it to become stable (no ETA announced by upstream)
-
-
-## Client configuration instructions
-
-### Obtainium
-
-[Link to Obtainium page](https://github.com/ImranR98/Obtainium/blob/main/README.md)
-
-#### Getting updates from GitHub releases
-
-In the “Add App” screen:
-1. Add the following URL: `https://github.com/breezy-weather/breezy-weather`
-2. To receive updates for prereleases, enable “Include prereleases”
-3. (Optional) If you want the flavor with only free network sources, add `freenet` in the “Filter APKs by Regular Expression”
-4. Tap the “Add” button at the very top, and you’re done!
-
-#### Getting updates from a F-Droid repository
-
-In the “Add App” screen, just add as App Source URL the following URL depending on the repository you want to use:
-   - Standard flavor from Izzy repo: `https://apt.izzysoft.de/fdroid/index/apk/org.breezyweather`
-   - Standard flavor from Breezy Weather repo: configure Obtainium to use GitHub releases instead (see previous section)
-   - Free-net flavor from Breezy Weather repo: configure Obtainium to use GitHub releases instead (see previous section)
-   - Free-net flavor from default F-Droid repo: `https://f-droid.org/packages/org.breezyweather/`
-
-Tap the “Add” button at the very top, and you’re done!
-
-
-### F-Droid client
-
-1) Look for the Repositories option from your F-Droid client and add a new repository depending on the source you want to use:
-   - Standard flavor from Izzy repo: `https://apt.izzysoft.de/fdroid/repo`
-   - Standard flavor from Breezy Weather repo: `https://breezy-weather.github.io/fdroid-repo/fdroid/repo`
-   - Free-net flavor from Breezy Weather repo: `https://breezy-weather.github.io/fdroid-repo/fdroid-version/fdroid/repo`
-   - Free-net flavor from default F-Droid repo: should already be enabled by default on your F-Droid client
-
-2) After adding the repository, go to the app details and make sure to select which repo you want to get updates from to avoid cross-updates between flavors and repos. This is how you do it:
-![F-Droid preferred repo feature](docs/fdroid_client_config.png)
+- Do not use Breezy Weather's releases, F-Droid repositories, package identifiers, or Obtainium source as Solstice update channels. Solstice is a separate app and uses its own releases.
+- A testing pre-release may change frequently and may contain unfinished functionality. Back up important information before installing experimental builds.
+- If Android refuses to update an existing installation, do not uninstall immediately if you need to preserve its local data. First confirm that the APK is from the same Solstice signing channel and report the installation error through [Solstice Issues](https://github.com/INFORMATION89/Solstice/issues).
+- No stable store distribution channel is documented here. This guide will be updated when a separately validated distribution channel is available.

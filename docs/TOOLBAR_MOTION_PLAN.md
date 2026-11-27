@@ -1,45 +1,43 @@
-# Apple's principles for the toolbar (proposal, 2026-11-21, for the user to agree)
+# Solstice toolbar motion — design proposal
 
-What `docs/MORPH_STUDY.md` learned, applied to the toolbar (`shell/Toolbar.kt`, its values in
-`ToolbarMotion`). Nothing changes until it's agreed (MOTION.md).
+**Status:** proposal for product review; no implementation change is authorized by this document alone.
 
-## Where it stands
+The toolbar in `shell/Toolbar.kt` and its app-side interaction state in `ToolbarMotion` are part of
+Solstice's product identity. The pages pill is navigation; the accessory action changes with context
+(for example, Search on the home screen and Pin in a place window). Preserve the existing bud,
+wobble, and toolbar animation unless the product owner explicitly approves a change.
 
-- Each animation is a separate `Animatable` on a token spring: the bud's neck, wobble and ripple; the
-  pin's jab; slide to switch's pop; the tab press. Their values live in `ToolbarMotion`, and the Motion
-  Lab can tune them.
-- The tab highlight and labels follow the pager's position (or `ShellNavigation`'s glide). They don't
-  have springs of their own.
-- **Slide to switch:** a long press, then a drag that scrolls the pager at a fixed ratio
-  (`slideTravel`). On release it snaps to the nearest page, with no velocity carried and no
-  projection.
+## Current interaction questions
 
-## Proposal
+- The tab highlight and labels follow the current page/pager position.
+- A long-press-and-drag gesture may be used to move between tabs; it should follow the finger and
+  settle on the intended page on release.
+- A tap during movement must remain responsive and should not be swallowed by an animation.
+- The accessory bud should remain visually attached to the toolbar pill as it appears or changes.
 
-1. **Velocity everywhere** (WWDC18). Slide to switch tracks the finger's velocity. On release it
-   projects where the fling would land and picks that tab (`MotionPhysics.chooseTarget`, the UIKit
-   rule), and the highlight springs there starting at the finger's speed, not from rest. A quick
-   flick across the pill jumps two tabs, as a fling does on iOS.
-2. **The highlight is its own surface, on its own springs.** Today its position and width are maths
-   on the pager position. Instead it becomes a `:motion` morph between tabs: position and width on
-   separate springs, the width trailing a little so it stretches as it moves (iOS's "motion
-   stretching", and the iOS 26 tab bar's liquid selection). Tapping a tab mid-glide retargets with the
-   current velocity, never from rest.
-3. **Interactive glass on press** (iOS 26: glass "scales and bounces" under the finger): the whole
-   pill sinks a little and springs back with a bounce, using the same press as `SpringMorph` from one
-   `:motion` piece. The tab squeeze stays for the tab itself.
-4. **The bud as a morph:** the search and pin buds pop out of the pill as a `SpringMorph`-style
-   surface: the bubble is the pill's end grown out, not a separate shape. The neck, wobble and
-   ripple become the morph's stretch and overshoot, on its springs, with no hand-tuned amounts.
-5. **Damping follows the gesture** (WWDC18): a tap moves the highlight with no bounce
-   (`Motion.smooth`); a release with momentum gets a slight overshoot (`Motion.momentum`); Reduce
-   Motion removes the elastic parts.
-6. **Never blocks input:** any touch on the toolbar catches what's moving (highlight, bud, pop) where
-   it is.
-7. **Haptics** once F1's haptics system exists: a soft tick per tab passed while sliding, and a light
-   impact when the bud pops free.
+## Design principles to evaluate
 
-## Order
+1. **Velocity continuity:** a drag should carry a natural sense of momentum into the selected tab.
+   A quick gesture may travel farther than a slow drag, but should not skip pages unexpectedly.
+2. **Continuous selection geometry:** the selection indicator should move and resize as one coherent
+   surface. A retargeted gesture should continue from its current position rather than restarting.
+3. **Press feedback:** pressing the toolbar may produce a restrained scale/shape response that
+   remains legible and does not interfere with the tab selection.
+4. **Bud continuity:** Search and Pin should feel like accessories that grow from the toolbar's end,
+   not unrelated floating shapes.
+5. **Reduced motion:** remove unnecessary travel, elastic stretch, and decorative blur while keeping
+   the active page and action clear.
+6. **Haptics:** any additional tactile feedback is optional and requires explicit product approval.
+   It must not be the only indication that an action occurred.
 
-Lab first, as for the morph: a generic tab bar demo built on the new pieces next to today's toolbar,
-then the app's toolbar once it's agreed.
+## Review checklist
+
+- Does the current toolbar behavior remain recognizable?
+- Can the user interrupt movement, tap another page, or use back without waiting?
+- Does the indicator always identify the actual selected page?
+- Do the bud and accessory actions remain visually and semantically clear?
+- Are touch targets, TalkBack actions, focus, RTL, and reduced motion supported?
+- Does the result remain smooth on a physical Android device?
+
+This document defines only Solstice's desired toolbar experience. It does not specify how an external
+library implements animation primitives, and it does not assign tasks to another repository.

@@ -523,7 +523,7 @@ before choosing; check each license.
 
 Goal: get every animation to iOS-level refinement with **one small system** that the whole app (and
 other projects) uses, instead of building each morph by hand. The rules stay the ones in
-[MOTION.md](MOTION.md); this is how to build them once.
+[MOTION.md](../MOTION.md); this is how to build them once.
 
 ### Why the current moon-card approach doesn't scale
 
@@ -612,7 +612,7 @@ it can go into other projects as is. Rough API:
 
 Not in it: glass, blur, colours, layouts. Those stay in Solstice and only read the motion value.
 
-Added after the library research (2026-11-19, [UI_SYSTEMS.md](UI_SYSTEMS.md)):
+Added after the library research (2026-11-19, [UI_SYSTEMS.md](../UI_SYSTEMS.md)):
 
 - A **Solstice `MotionScheme`** that returns these tokens, set in `ExpressiveTheme` instead of
   `MotionScheme.expressive()`, so Material components (switches, buttons, Settings sheets) move like
@@ -665,7 +665,7 @@ smoothness).
 
 ## Design system foundations (proposed 2026-11-19, to agree)
 
-Audit of every UI system and the libraries checked: [UI_SYSTEMS.md](UI_SYSTEMS.md). In short:
+Audit of every UI system and the libraries checked: [UI_SYSTEMS.md](../UI_SYSTEMS.md). In short:
 
 - **Tokens first:** spacing on a 4 dp grid, named sizes, shape tokens with continuous corners,
   one palette file for the non-dynamic colours, named hero type styles, motion tokens. Today there

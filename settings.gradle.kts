@@ -37,7 +37,7 @@ include(":maps-utils")
 include(":ui-weather-view")
 include(":weather-unit")
 
-// Motion (INFORMATION89/Motion, Apache-2.0) is a git submodule at motion/, built from source: its
+// Motion Core from INFORMATION89/Motion-UI (Apache-2.0) is a git submodule at motion/, built from source: its
 // `io.github.information89:motion` is that build's `:motion` project. Clone Solstice with
 // `--recurse-submodules` (or run `git submodule update --init`). Workflow: docs/CONTINUE.md, "Motion".
 includeBuild("motion") {

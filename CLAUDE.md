@@ -1,16 +1,28 @@
-# Solstice
+# Solstice — Claude Code entry point
 
-Unofficial fork of Breezy Weather, redesigned. The UI framework and motion live in the Motion repo
-(`motion/` submodule).
+Solstice is an Android weather application based on a Breezy Weather fork. Its product identity,
+weather behavior, privacy requirements, UX, and roadmap are owned by this repository.
 
-**Read before doing anything, every session:**
-1. `docs/RULES.md`: how we work. Above all: ask Marco before building anything new; Motion and
-   frameworks first, then the app configures them; never hardcode anything.
-2. `docs/PLAN.md`: decisions in force, direction, open questions.
-3. `docs/CONTINUE.md`: where things stand, setup, upstream updates, the Motion submodule workflow.
-4. The [shared AI usage and cost policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md): model choice, ChatGPT/Claude use, agent coordination, spending and context efficiency.
+**Read root [AGENTS.md](AGENTS.md) first.** It is the operational entry point for all coding agents,
+including Claude Code. Then follow its reading order:
 
-Then, as the task needs: `docs/DESIGN.md`, `docs/MOTION.md`, `docs/WRITING.md`, `docs/UI_SYSTEMS.md`, `docs/SOURCES.md`, `docs/ENGINE_SPEC.md`, `docs/MERIDIAN_PLAN.md`, `docs/ONBOARDING.md`, `docs/PROPOSALS.md`, `docs/OUTREACH.md`,
-`docs/ROADMAP.md`, specs in `docs/specs/`, research notes in `docs/research/`. History is in `docs/LOG.md`; `docs/archive/` is reference only.
+1. [docs/RULES.md](docs/RULES.md) for Solstice product, engineering, privacy, licensing, and approval rules.
+2. [docs/PLAN.md](docs/PLAN.md) for decisions in force; [docs/ROADMAP.md](docs/ROADMAP.md) for app-owned work.
+3. [docs/CONTINUE.md](docs/CONTINUE.md) for the current app handoff.
+4. [docs/AI_COST_POLICY.md](docs/AI_COST_POLICY.md) and the shared
+   [AI Usage and Cost Policy](https://github.com/INFORMATION89/Motion-UI/blob/main/docs/AI_USAGE_POLICY.md)
+   for model selection, context efficiency, spending controls, and verification costs.
+5. [docs/MODERNIZATION_CHECKLIST.md](docs/MODERNIZATION_CHECKLIST.md) before continuing documentation,
+   CI, privacy, or app governance cleanup.
 
-Never push upstream's git history to this repo; never build with `-Pbreezy`.
+Read specialist references only as needed: [DESIGN.md](docs/DESIGN.md), [MOTION.md](docs/MOTION.md),
+[WRITING.md](docs/WRITING.md), [UI_SYSTEMS.md](docs/UI_SYSTEMS.md), [PROPOSALS.md](docs/PROPOSALS.md),
+[INTEGRATIONS.md](docs/INTEGRATIONS.md), or a Solstice-owned feature specification. Do not read or maintain external dependency roadmaps here.
+
+External libraries and services are independently owned. Their implementation plans, internal
+milestones, labs, and technical decisions belong in their own repositories. Solstice's consumer-side
+boundary is documented only in [INTEGRATIONS.md](docs/INTEGRATIONS.md).
+
+Claude-specific instructions do not override [AGENTS.md](AGENTS.md), [RULES.md](docs/RULES.md), or
+[AI_COST_POLICY.md](docs/AI_COST_POLICY.md). Never push upstream Git history into this repository; never
+build with `-Pbreezy`.

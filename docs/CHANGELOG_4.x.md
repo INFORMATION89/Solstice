@@ -1,3 +1,6 @@
+> **Upstream archive:** inherited Breezy Weather release history. This is not Solstice's changelog;
+> see the repository-root `CHANGELOG.md` for changes released by Solstice.
+
 # Version 4.6.14-beta (2023-01-07)
 
 **Weather sources**
@@ -356,7 +359,7 @@ If you notice any data that was available on v4.3.0-beta for a source and is now
 - This also fixes many errors with midnight sun and polar night.
 - Fix day and night temperature for OpenWeather which was completely broken and could show higher temperature at night than during the day.
 - When dew point is missing and relative humidity and air temperature are available, it will be automatically computed.
-- When degree day is missing, it will be calculated according to EU formula (check [Day details documentation](docs/DAY_DETAILS.md) for more info).
+- When degree day is missing, it will be calculated according to EU formula (check [Day details documentation](DAY_DETAILS.md) for more info).
 - When degree day is 0, it will no longer be shown.
 - When temperature < 10 °C and wind speed > 4.8 km/h, and wind chill temperature is missing, it will be automatically computed.
 - Fix top appbar/status bar visibility issues

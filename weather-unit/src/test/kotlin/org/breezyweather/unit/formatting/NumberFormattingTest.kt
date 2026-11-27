@@ -29,22 +29,32 @@ class NumberFormattingTest {
     @Test
     fun `Format double with decimals and French-style number formatting`() = runTest {
         7.00646.format(
+            useNumberFormatter = false,
+            useNumberFormat = false,
             decimals = 2,
             locale = Locale.Builder().setLanguage("fr").setRegion("FR").build()
         ) shouldBe "7,01"
         14.34234.format(
+            useNumberFormatter = false,
+            useNumberFormat = false,
             decimals = 2,
             locale = Locale.Builder().setLanguage("fr").setRegion("FR").build()
         ) shouldBe "14,34"
         14.34834.format(
+            useNumberFormatter = false,
+            useNumberFormat = false,
             decimals = 2,
             locale = Locale.Builder().setLanguage("fr").setRegion("FR").build()
         ) shouldBe "14,35"
         14.34834.format(
+            useNumberFormatter = false,
+            useNumberFormat = false,
             decimals = 3,
             locale = Locale.Builder().setLanguage("fr").setRegion("FR").build()
         ) shouldBe "14,348"
         14.34864.format(
+            useNumberFormatter = false,
+            useNumberFormat = false,
             decimals = 3,
             locale = Locale.Builder().setLanguage("fr").setRegion("FR").build()
         ) shouldBe "14,349"
@@ -53,6 +63,8 @@ class NumberFormattingTest {
     @Test
     fun `Format double without values ending with a 0`() = runTest {
         7.00246.format(
+            useNumberFormatter = false,
+            useNumberFormat = false,
             decimals = 2,
             locale = Locale.Builder().setLanguage("en").setRegion("US").build()
         ) shouldBe "7"
@@ -61,6 +73,8 @@ class NumberFormattingTest {
     @Test
     fun `Format int`() = runTest {
         14.format(
+            useNumberFormatter = false,
+            useNumberFormat = false,
             decimals = 0,
             locale = Locale.Builder().setLanguage("en").setRegion("US").build()
         ) shouldBe "14"
@@ -69,11 +83,15 @@ class NumberFormattingTest {
     @Test
     fun `Format with leading sign`() = runTest {
         7.3.format(
+            useNumberFormatter = false,
+            useNumberFormat = false,
             decimals = 1,
             locale = Locale.Builder().setLanguage("en").setRegion("US").build(),
             showSign = true
         ) shouldBe "+7.3"
         (-7.3).format(
+            useNumberFormatter = false,
+            useNumberFormat = false,
             decimals = 1,
             locale = Locale.Builder().setLanguage("en").setRegion("US").build(),
             showSign = true

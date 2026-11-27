@@ -1,3 +1,6 @@
+> **Upstream archive:** inherited Breezy Weather release history. This is not Solstice's changelog;
+> see the repository-root `CHANGELOG.md` for changes released by Solstice.
+
 # Version 5.4.8 (2025-06-22)
 
 **Improvements and fixes**
