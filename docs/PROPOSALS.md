@@ -2,6 +2,7 @@
 
 Mockups (sample data): Outlook, a rain card's sheet at both heights, onboarding and Settings, on the
 canvas https://claude.ai/artifact/PQ6PAqLwXQ4CnAQnExJk6p (2026-11-23).
+Marco's notes and screenshots on that canvas are recorded in [research/CANVAS_COMMENTS.md](research/CANVAS_COMMENTS.md).
 
 Unapproved material in this file is proposal-only; nothing here authorizes implementation (see RULES.md section 1). Sections marked **Decided** record decisions already agreed with the project owner. The current authoritative version of each approved decision is in PLAN.md; the markers remain here only as historical context. Unmarked ideas remain proposals until explicitly approved.
 
