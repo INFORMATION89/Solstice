@@ -3,6 +3,8 @@
 Unofficial fork of [Breezy Weather](https://github.com/breezy-weather/breezy-weather), redesigned in
 Material You Expressive. Not affiliated with or endorsed by Breezy Weather.
 
+Solstice is currently transitioning away from its fork origins toward becoming an independent project.
+
 Based on upstream Breezy Weather at `5ec3b9b` (2026-11-17), without its git history. Product decisions:
 [docs/PLAN.md](docs/PLAN.md). Setup and current app status:
 [docs/CONTINUE.md](docs/CONTINUE.md).
